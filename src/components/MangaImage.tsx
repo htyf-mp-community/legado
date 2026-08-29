@@ -1,0 +1,15 @@
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Pressable, Share, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { cacheMangaImage, cachedMangaUri, saveMangaImage } from '../core/mangaCache';
+import { useAppTheme } from '../theme/AppTheme';
+
+export function MangaImage({ uri, index, bookId, headers = {}, fitScreen = false, onTap }: { uri: string; index: number; bookId: string; headers?: Record<string, string>; fitScreen?: boolean; onTap?: () => void }) {
+  const { colors, t } = useAppTheme();
+  const { width, height: windowHeight } = useWindowDimensions(), [ratio, setRatio] = useState(0.7), [failed, setFailed] = useState(false), [sourceUri, setSourceUri] = useState(uri), [caching, setCaching] = useState(true), [saving, setSaving] = useState(false), [saveError, setSaveError] = useState('');
+  useEffect(() => { let active = true; setFailed(false); setCaching(true); void cachedMangaUri(bookId, uri).then(hit => hit || cacheMangaImage(bookId, uri, headers)).then(value => { if (active) setSourceUri(value); }).catch(() => { if (active) setSourceUri(uri); }).finally(() => { if (active) setCaching(false); }); return () => { active = false; }; }, [bookId, uri]);
+  useEffect(() => { let active = true; Image.getSize(sourceUri, (w, h) => { if (active && w > 0 && h > 0) setRatio(w / h); }, () => { if (active) setFailed(true); }); return () => { active = false; }; }, [sourceUri]);
+  const imageWidth = Math.max(1, width), height = fitScreen ? Math.max(1, windowHeight) : imageWidth / ratio;
+  if (failed) return <View accessibilityRole="alert" style={[s.error,{height:Math.min(height,360),backgroundColor:colors.surface}]}><Text style={{color:colors.text}}>{t('mangaPageFailed',{page:index+1})}</Text><Text numberOfLines={2} style={[s.uri,{color:colors.muted}]}>{uri}</Text></View>;
+  return <Pressable accessibilityRole="imagebutton" accessibilityLabel={t('mangaPageLabel',{page:index+1})} style={{ width:imageWidth,height }} onPress={onTap} onLongPress={() => { if (saving) return; setSaving(true); setSaveError(''); void saveMangaImage(bookId,uri,index,headers).then(path => Share.share({ title:t('mangaImageSaved'), url:`file://${path}`, message:t('mangaImageSavedPath',{path}) })).catch(error => setSaveError(error instanceof Error ? error.message : String(error))).finally(() => setSaving(false)); }}>{caching || saving ? <ActivityIndicator color={colors.primary} style={s.loading} /> : null}<Image source={{ uri:sourceUri, headers: sourceUri.startsWith('file://') ? undefined : headers }} resizeMode="contain" style={s.image} onError={() => setFailed(true)} />{saveError ? <Text accessibilityRole="alert" style={[s.saveError,{color:colors.danger,backgroundColor:colors.surface}]}>{saveError}</Text> : null}</Pressable>;
+}
+const s=StyleSheet.create({image:{width:'100%',height:'100%',zIndex:1},loading:StyleSheet.absoluteFill,error:{width:'100%',alignItems:'center',justifyContent:'center',padding:20,gap:8},uri:{textAlign:'center'},saveError:{position:'absolute',zIndex:2,left:12,right:12,bottom:12,padding:8,textAlign:'center'}});

@@ -1,0 +1,6 @@
+import { addHttpLog, httpLogDetail, loadHttpLogs, redactBody, redactHeaders } from '../src/data/httpLog';
+const mockValues=new Map<string,string>();
+jest.mock('../src/data/storage',()=>({appStorage:{getString:(key:string)=>mockValues.get(key),set:(key:string,value:unknown)=>mockValues.set(key,String(value)),remove:(key:string)=>mockValues.delete(key)}}));
+jest.mock('../src/data/diagnosticPreferences',()=>({loadDiagnosticPreferences:()=>({recordHttpLog:true})}));
+test('HTTP diagnostics redact credentials and bounded sensitive JSON',()=>{expect(redactHeaders({Authorization:'Bearer secret',Accept:'text/plain',Cookie:'sid=1'})).toBe('Authorization: [REDACTED]\nAccept: text/plain\nCookie: [REDACTED]');expect(redactBody(JSON.stringify({name:'ok',password:'secret',nested:{token:'abc'}}))).toContain('[REDACTED]')});
+test('HTTP diagnostics retain newest 50 records and render details',()=>{for(let index=0;index<55;index++)addHttpLog({time:index+1,method:'GET',url:`https://example.test/${index}`,statusCode:200,duration:index,requestHeaders:{},responseBody:'ok'});const logs=loadHttpLogs();expect(logs).toHaveLength(50);expect(logs[0].url).toContain('/54');expect(httpLogDetail(logs[0])).toContain('Response')});

@@ -1,0 +1,2 @@
+const fs=require('fs'),path=require('path'),root=path.join(__dirname,'..','src','screens');
+test.each([['SourceManager.tsx','bookSourceUrl'],['RssSourceManager.tsx','sourceUrl'],['BulkBookCache.tsx','book.id']])('%s exposes Android endpoint interval selection',(file,identity)=>{const source=fs.readFileSync(path.join(root,file),'utf8');expect(source).toContain('expandSelectionInterval');expect(source).toContain(identity)});

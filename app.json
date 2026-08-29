@@ -1,0 +1,15 @@
+{
+  "name": "apps",
+  "displayName": "Legado 阅读",
+  "htyf": {
+    "type": "app",
+    "entry": "./src/index.tsx",
+    "version": "0.0.5",
+    "name": "Legado",
+    "appid": "plugin_legado",
+    "rotate": "auto",
+    "appUrlConfig": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/app.json",
+    "zipUrl": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/dist.dgz",
+    "projectname": "小程序"
+  }
+}

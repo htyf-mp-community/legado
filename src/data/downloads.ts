@@ -1,0 +1,7 @@
+import{appStorage}from'./storage';
+const KEY='media.downloads.v1';
+export type DownloadState='queued'|'downloading'|'completed'|'failed'|'cancelled';
+export type DownloadRecord={id:string;url:string;title:string;path:string;headers:Record<string,string>;state:DownloadState;progress:number;bytesWritten:number;contentLength:number;createdAt:number;error?:string};
+export function normalizeDownload(value:Partial<DownloadRecord>):DownloadRecord{return{id:String(value.id??''),url:String(value.url??''),title:String(value.title??'未命名下载'),path:String(value.path??''),headers:value.headers&&typeof value.headers==='object'?value.headers:{},state:['queued','downloading','completed','failed','cancelled'].includes(String(value.state))?value.state as DownloadState:'queued',progress:Math.min(1,Math.max(0,Number(value.progress)||0)),bytesWritten:Math.max(0,Number(value.bytesWritten)||0),contentLength:Math.max(0,Number(value.contentLength)||0),createdAt:Number(value.createdAt)||Date.now(),error:value.error?String(value.error):undefined}}
+export function loadDownloads():DownloadRecord[]{const raw=appStorage.getString(KEY);if(!raw)return[];try{return(JSON.parse(raw) as Partial<DownloadRecord>[]).map(normalizeDownload).map(item=>item.state==='downloading'?{...item,state:'failed' as const,error:'应用退出后下载中断，请重试'}:item).sort((a,b)=>b.createdAt-a.createdAt)}catch{return[]}}
+export function saveDownloads(value:DownloadRecord[]){appStorage.set(KEY,JSON.stringify(value.map(normalizeDownload)))}

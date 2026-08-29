@@ -1,0 +1,8 @@
+jest.mock('react-native-mmkv', () => ({ createMMKV: () => ({ getString: jest.fn(), set: jest.fn() }) }));
+import { buildEditedRssSource, migrateRssArticleOrigin, rssAdvancedFields, RssSourceEditorError } from '../src/core/rssSourceEditor';
+import type { RssSource } from '../src/types';
+
+const source: RssSource = { sourceName: ' Demo ', sourceUrl: ' https://example.test ', enabled: true, customOrder: 0, sortUrl: '/sort', ruleNextPage: 'PAGE', extraOption: 2 };
+test('keeps protected form values while preserving advanced RSS fields',()=>{const result=buildEditedRssSource(source,'{"sourceName":"Override","extraOption":3,"preload":true}');expect(result).toMatchObject({sourceName:'Demo',sourceUrl:'https://example.test',sortUrl:'/sort',ruleNextPage:'PAGE',extraOption:3,preload:true});expect(rssAdvancedFields(result)).toMatchObject({extraOption:3,preload:true})});
+test.each([[{...source,sourceName:' '},'{}','rssNameRequired'],[{...source,sourceUrl:' '},'{}','rssUrlRequired'],[source,'{','rssAdvancedInvalid'],[source,'[]','rssAdvancedObject']] as const)('returns translatable RSS validation errors',(value,json,code)=>{try{buildEditedRssSource(value,json);throw new Error('expected')}catch(error){expect(error).toBeInstanceOf(RssSourceEditorError);expect((error as RssSourceEditorError).code).toBe(code)}});
+test('migrates RSS read/favorite records when a source URL changes',()=>{expect(migrateRssArticleOrigin([{id:'old::article',origin:'old',sort:'News',title:'A',link:'article',read:true,starred:true}], 'old','new')).toEqual([{id:'new::article',origin:'new',sort:'News',title:'A',link:'article',read:true,starred:true}])});

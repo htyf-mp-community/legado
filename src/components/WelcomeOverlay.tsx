@@ -1,0 +1,5 @@
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { loadWelcomePreferences } from '../data/welcomePreferences';
+import { useAppTheme } from '../theme/AppTheme';
+export function WelcomeOverlay(){const{colors,dark}=useAppTheme(),value=loadWelcomePreferences(),image=dark?value.imageDark||value.image:value.image,showText=dark?value.showTextDark:value.showText,showIcon=dark?value.showIconDark:value.showIcon;return <View accessibilityViewIsModal accessibilityLabel="Legado HTYF" style={[StyleSheet.absoluteFill,s.root,{backgroundColor:colors.background}]}>{value.customWelcome&&image?<Image source={{uri:image}} resizeMode="cover" style={StyleSheet.absoluteFill}/>:null}<View style={s.brand}>{showIcon?<Text style={s.icon}>📖</Text>:null}{showText?<><Text style={[s.title,{color:colors.text}]}>Legado</Text><Text style={[s.subtitle,{color:colors.muted}]}>HTYF React Native</Text></>:null}</View></View>}
+const s=StyleSheet.create({root:{zIndex:999,elevation:999,alignItems:'center',justifyContent:'center'},brand:{alignItems:'center',gap:8,padding:24},icon:{fontSize:64},title:{fontSize:30,fontWeight:'800'},subtitle:{fontSize:14}});

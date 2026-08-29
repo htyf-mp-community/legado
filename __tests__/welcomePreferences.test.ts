@@ -1,0 +1,4 @@
+import { defaultWelcomePreferences, loadWelcomePreferences, normalizeWelcomePreferences, saveWelcomePreferences } from '../src/data/welcomePreferences';
+jest.mock('../src/data/storage',()=>{const values=new Map<string,string>();return{appStorage:{getString:(key:string)=>values.get(key),set:(key:string,value:unknown)=>values.set(key,String(value)),remove:(key:string)=>values.delete(key)}}});
+test('welcome duration is bounded to the Android preference range',()=>{expect(normalizeWelcomePreferences({showTime:-1}).showTime).toBe(0);expect(normalizeWelcomePreferences({showTime:999}).showTime).toBe(800)});
+test('welcome image and per-theme visibility persist',()=>{const value=saveWelcomePreferences({...defaultWelcomePreferences,customWelcome:true,image:'file:///day.jpg',showIconDark:false});expect(loadWelcomePreferences()).toEqual(value)});

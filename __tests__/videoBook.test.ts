@@ -1,0 +1,4 @@
+import{groupVideoEpisodes,inlineVideoManifestType,parseVideoSources}from'../src/core/videoBook';
+test('groups loose episodes and volume children',()=>expect(groupVideoEpisodes([{id:'a',title:'电影',content:'',url:'a'},{id:'v',title:'第二季',content:'',isVolume:true},{id:'b',title:'第1集',content:'',url:'b'}])).toEqual([{title:'剧集',episodeIndexes:[0]},{title:'第二季',episodeIndexes:[2]}]));
+test('parses and deduplicates video lines and html sources',()=>expect(parseVideoSources('高清|https://cdn.test/a.m3u8\nhttps://cdn.test/a.m3u8\n<video src="b.mp4"></video>','https://cdn.test/base/')).toEqual([{uri:'https://cdn.test/a.m3u8',headers:{}},{uri:'https://cdn.test/base/b.mp4',headers:{}}]));
+test('preserves inline DASH and HLS manifests as playable data sources',()=>{expect(inlineVideoManifestType('<MPD></MPD>')).toBe('mpd');expect(parseVideoSources('#EXTM3U\n#EXT-X-VERSION:3')[0].uri).toMatch(/^data:application\/vnd\.apple\.mpegurl/)})

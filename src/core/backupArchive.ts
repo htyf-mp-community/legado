@@ -1,0 +1,11 @@
+import{CachesDirectoryPath,mkdir,readDir,readFile,unlink,writeFile}from'@dr.pogodin/react-native-fs';
+import{keepLocalCopy,saveDocuments}from'@react-native-documents/picker';
+import{getUnzip}from'react-native-nitro-unzip';
+import{createBackup,parseBackup,type BackupPayload}from'../data/backup';
+import{loadBackupPreferences}from'../data/backupPreferences';
+const clean=(uri:string)=>decodeURIComponent(uri.replace(/^file:\/\//,''));
+const stamp=()=>new Date().toISOString().slice(0,10);
+export async function createBackupArchive(raw=createBackup()){parseBackup(raw);const token=`${Date.now()}-${Math.random().toString(36).slice(2)}`,directory=`${CachesDirectoryPath}/backup-${token}`,path=`${CachesDirectoryPath}/legado-htyf-backup-${stamp()}.zip`;await mkdir(directory);try{await writeFile(`${directory}/backup-htyf.json`,raw,'utf8');await getUnzip().zip(directory,path).await();return path}finally{try{await unlink(directory)}catch{}}}
+export function localBackupFileName(onlyLatest=loadBackupPreferences().onlyLatest){return onlyLatest?'legado-htyf-backup.zip':`legado-htyf-backup-${stamp()}.zip`}
+export async function saveBackupArchive(raw=createBackup()){const path=await createBackupArchive(raw);try{const result=await saveDocuments({sourceUris:[`file://${path}`],mimeType:'application/zip',fileName:localBackupFileName(),copy:true});if(result[0].error)throw new Error(result[0].error);return result[0]}finally{try{await unlink(path)}catch{}}}
+export async function inspectBackupArchive(uri:string,fileName='backup.zip'):Promise<{raw:string;payload:BackupPayload}>{const copies=await keepLocalCopy({files:[{uri,fileName}],destination:'cachesDirectory'}),copy=copies[0];if(copy.status==='error')throw new Error(copy.copyError);const archive=clean(copy.localUri),destination=`${CachesDirectoryPath}/htyf-backup-${Date.now()}`;try{await getUnzip().extract(archive,destination).await();const files=await readDir(destination),backup=files.find(item=>item.isFile()&&item.name==='backup-htyf.json');if(!backup)throw new Error('ZIP 中缺少 backup-htyf.json');const raw=await readFile(backup.path,'utf8');return{raw,payload:parseBackup(raw)}}finally{try{await unlink(destination)}catch{}try{await unlink(archive)}catch{}}}

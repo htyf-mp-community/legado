@@ -1,0 +1,9 @@
+const mockPick=jest.fn(),mockCopy=jest.fn(),mockRead=jest.fn(),mockUnlink=jest.fn();
+jest.mock('@react-native-documents/picker',()=>({pick:(...args:unknown[])=>mockPick(...args),keepLocalCopy:(...args:unknown[])=>mockCopy(...args),types:{json:'json',plainText:'text'}}));
+jest.mock('@dr.pogodin/react-native-fs',()=>({readFile:(...args:unknown[])=>mockRead(...args),unlink:(...args:unknown[])=>mockUnlink(...args)}));
+jest.mock('../src/data/storage',()=>({appStorage:{getString:()=>undefined,set:()=>undefined}}));
+import { defaultRssSources, importRssSourcesInput, pickRssSourcesInput } from '../src/core/rssSourceImport';
+beforeEach(()=>{jest.clearAllMocks();mockUnlink.mockResolvedValue(undefined)});
+test('imports HTTP RSS JSON and reports status failures',async()=>{const body=JSON.stringify([{sourceName:'A',sourceUrl:'https://a'}]);await expect(importRssSourcesInput('https://rules',async()=>({ok:true,text:async()=>body}) as Response)).resolves.toEqual([expect.objectContaining({sourceName:'A'})]);await expect(importRssSourcesInput('https://rules',async()=>({ok:false,status:503,text:async()=>''}) as Response)).rejects.toThrow('HTTP 503')});
+test('reads a picked RSS file and always removes the copy',async()=>{mockPick.mockResolvedValue([{uri:'content://rss',name:'rss.json'}]);mockCopy.mockResolvedValue([{status:'success',localUri:'file:///tmp/rss.json'}]);mockRead.mockResolvedValue(JSON.stringify([{sourceName:'A',sourceUrl:'https://a'}]));await expect(pickRssSourcesInput()).resolves.toHaveLength(1);expect(mockUnlink).toHaveBeenCalledWith('/tmp/rss.json')});
+test('ships the four Android default RSS sources as fresh copies',()=>{const first=defaultRssSources(),second=defaultRssSources();expect(first.map(item=>item.sourceName)).toEqual(['使用说明','小说拾遗','Meow云','烏雲净化']);expect(first).not.toBe(second);expect(first[0]).not.toBe(second[0])});
