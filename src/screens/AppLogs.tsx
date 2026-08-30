@@ -18,7 +18,7 @@ export function AppLogs({ back }: { back: () => void }) {
         onBack={back}
         action={(
           <View style={s.row}>
-            <Pressable accessibilityRole="button" accessibilityLabel={t('copy')} style={s.touch} onPress={() => { Clipboard.setString(kind==='app'?exportAppLogs(logs):httpLogs.map(httpLogDetail).join('\n\n')); void jssdk.showToast({ type: 'success', title: t('logsCopied') }); }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('copy')} style={s.touch} onPress={() => { Clipboard.setString(`=== APP LOGS ===\n${exportAppLogs(logs)}\n\n=== HTTP LOGS ===\n${httpLogs.map(httpLogDetail).join('\n\n')}`); void jssdk.showToast({ type: 'success', title: t('logsCopied') }); }}>
               <Text style={{ color: colors.primary }}>{t('copy')}</Text>
             </Pressable>
             <Pressable accessibilityRole="button" accessibilityLabel={t('clear')} style={s.touch} onPress={() => { if(kind==='app'){clearAppLogs();setLogs([])}else{clearHttpLogs();setHttpLogs([])} }}>

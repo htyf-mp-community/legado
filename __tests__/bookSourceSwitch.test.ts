@@ -22,6 +22,16 @@ test('isolates failed sources, ignores disabled sources and deduplicates candida
   expect(search).toHaveBeenCalledTimes(2);
 });
 
+test('keeps a candidate with the same relative book URL when it belongs to another source', async () => {
+  const sameRelativeUrl = candidate('good', 'old-book');
+  const result = await discoverSourceSwitchCandidates(
+    book,
+    [source('good')],
+    jest.fn(async () => [sameRelativeUrl]),
+  );
+  expect(result.candidates).toEqual([sameRelativeUrl]);
+});
+
 test('returns a translatable error when the candidate source was removed', async () => {
   await expect(applySourceSwitchCandidate(book, candidate('missing', 'new'), [])).rejects.toEqual(new SourceSwitchError('sourceSwitchSourceRemoved'));
 });
@@ -63,4 +73,32 @@ test('automatic switching validates chapter content and isolates broken candidat
   expect(switched).toMatchObject({ origin: 'good', content: 'working chapter', currentChapterIndex: 1 });
   expect(switched.chapters?.[1].content).toBe('working chapter');
   expect(load).toHaveBeenCalledTimes(2);
+});
+
+test('automatic switching accepts equivalent decorated author names', async () => {
+  const decorated = { ...candidate('good', 'good-book'), author: '作者： Author ' };
+  const discover = jest.fn(async () => ({ candidates: [decorated], failedSources: 0 }));
+  const apply = jest.fn(async () => ({
+    ...book,
+    origin: 'good',
+    bookUrl: 'good-book',
+    currentChapterIndex: 1,
+    chapters: [
+      { id: 'good-1', title: 'Chapter 1', url: 'good-1', content: '' },
+      { id: 'good-2', title: 'Chapter 2', url: 'good-2', content: '' },
+    ],
+  }));
+  const load = jest.fn(async () => 'working chapter');
+
+  const switched = await autoSwitchSourceForChapter(
+    book,
+    1,
+    [source('good')],
+    discover,
+    apply,
+    load,
+  );
+
+  expect(switched.content).toBe('working chapter');
+  expect(apply).toHaveBeenCalledWith(expect.anything(), decorated, expect.anything());
 });

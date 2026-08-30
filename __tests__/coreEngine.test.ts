@@ -22,6 +22,7 @@ import {
   loadChapters,
   loadBookInfo,
   resolveBookInfoTocUrl,
+  resolveWebBookUrl,
 } from '../src/core/webBook';
 import type { BookSource, SearchBook } from '../src/types';
 const source: BookSource = {
@@ -52,6 +53,18 @@ const source: BookSource = {
     chapterUrl: '$.url',
   },
 };
+
+test('resolves root-relative web book URLs without relying on the runtime URL implementation', () => {
+  expect(
+    resolveWebBookUrl(
+      '/41/27285_2.html',
+      'https://www.sudugu.cc/41/27285.html',
+    ),
+  ).toBe('https://www.sudugu.cc/41/27285_2.html');
+  expect(
+    resolveWebBookUrl('//cdn.example.com/a.jpg', 'https://www.sudugu.cc/41/'),
+  ).toBe('https://cdn.example.com/a.jpg');
+});
 describe('core source engine', () => {
   test('builds the bounded conditional search URL used by the imported Fanqie source', () => {
     const fanqie: BookSource = {
@@ -167,6 +180,40 @@ getUrl(key)`,
       2,
       'http://legacy.example/search',
       expect.any(Object),
+    );
+    fetchMock.mockRestore();
+  });
+  test('retries a cached GET 404 once with cache bypass headers', async () => {
+    const originalUrl = 'https://www.sudugu.cc/41/27285.html',
+      fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(async url => {
+        const cacheBusted = String(url).includes('_htyf_retry=');
+        return {
+          ok: cacheBusted,
+          status: cacheBusted ? 200 : 404,
+          url: String(url),
+          headers: { forEach: () => undefined, get: () => null },
+          text: async () => cacheBusted ? '<div class="con">正文</div>' : 'cached not found',
+        } as unknown as Response;
+      });
+
+    await expect(
+      executeSourceRequest({
+        url: originalUrl,
+        method: 'GET',
+        headers: {},
+        sourceId: 'https://www.sudugu.co',
+        cookieJar: false,
+      }),
+    ).resolves.toMatchObject({ data: '<div class="con">正文</div>' });
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      expect.stringMatching(/^https:\/\/www\.sudugu\.cc\/41\/27285\.html\?_htyf_retry=\d+$/),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        }),
+      }),
     );
     fetchMock.mockRestore();
   });
@@ -707,6 +754,131 @@ getUrl(key)`,
       }),
     ).resolves.toEqual({ content: '正文一\n\n正文二', subContent: '副文' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    fetchMock.mockRestore();
+  });
+  test('follows a Sudugu root-relative XPath next-page link', async () => {
+    const suduguSource: BookSource = {
+      ...source,
+      bookSourceUrl: 'https://www.sudugu.co',
+      ruleContent: {
+        content: 'class.con.0@html',
+        nextContentUrl:
+          "//div[@class='prenext']/span/a[text()='下一页']/@href",
+      },
+    };
+    const firstUrl = 'https://www.sudugu.cc/41/27285.html',
+      secondUrl = 'https://www.sudugu.cc/41/27285_2.html',
+      fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(
+        async input => ({
+          ok: true,
+          status: 200,
+          headers: { forEach: () => undefined, get: () => null },
+          text: async () =>
+            String(input) === firstUrl
+              ? '<div class="con">第一页</div><div class="prenext"><span><a href="/41/27285_2.html">下一页</a></span></div>'
+              : '<div class="con">第二页</div>',
+          url: String(input),
+        }) as unknown as Response,
+      );
+
+    await expect(
+      loadChapterContent(suduguSource, {
+        url: firstUrl,
+        title: '第1章 初入',
+        index: 0,
+        bookUrl: 'https://www.sudugu.cc/41/',
+        baseUrl: 'https://www.sudugu.cc/41/',
+        isVolume: false,
+        isVip: false,
+        isPay: false,
+      }),
+    ).resolves.toBe('第一页\n第二页');
+    expect(fetchMock).toHaveBeenCalledWith(secondUrl, expect.any(Object));
+    fetchMock.mockRestore();
+  });
+  test('keeps every node selected by a chapter content rule', async () => {
+    const multiParagraphSource: BookSource = {
+      ...source,
+      ruleContent: { content: 'id.booktxt.0@tag.p@text' },
+    };
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { forEach: () => undefined, get: () => null },
+      text: async () =>
+        '<div id="booktxt"><p>第一段</p><p>第二段</p><p>第三段</p></div>',
+      url: 'https://example.com/chapter/1',
+    } as unknown as Response);
+    await expect(
+      loadChapterContent(multiParagraphSource, {
+        url: 'https://example.com/chapter/1',
+        title: '第一章',
+        index: 0,
+        bookUrl: 'https://example.com/book',
+        baseUrl: 'https://example.com/book',
+        isVolume: false,
+        isVip: false,
+        isPay: false,
+      }),
+    ).resolves.toBe('第一段\n第二段\n第三段');
+    fetchMock.mockRestore();
+  });
+  test('normalizes double-encoded HTML book introductions', async () => {
+    const introSource: BookSource = {
+      ...source,
+      ruleBookInfo: {
+        name: 'class.title.0@text',
+        intro: 'class.des.0@html',
+      },
+    };
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { forEach: () => undefined, get: () => null },
+      text: async () =>
+        '<h1 class="title">测试书</h1><div class="des">&amp;#x8bb8;&amp;#x4e45;&lt;p class=&quot;detail-btn&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;/p&gt;</div>',
+      url: 'https://example.com/book/1',
+    } as unknown as Response);
+
+    await expect(
+      loadBookInfo(introSource, {
+        name: '测试书',
+        author: '',
+        bookUrl: 'https://example.com/book/1',
+        origin: introSource.bookSourceUrl,
+        originName: introSource.bookSourceName,
+      }),
+    ).resolves.toMatchObject({ intro: '许久' });
+    fetchMock.mockRestore();
+  });
+  test('applies leading-separator Legado content cleanup rules', async () => {
+    const suduguSource: BookSource = {
+      ...source,
+      ruleContent: {
+        content: 'class.con.0@html',
+        replaceRegex: '##[\\(（]本章完[\\)）]$',
+      },
+    };
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { forEach: () => undefined, get: () => null },
+      text: async () =>
+        '<div class="con">&#x7b2c;&#x4e00;&#x6bb5;<br>&#31532;&#20108;&#27573;（本章完）</div>',
+      url: 'https://www.sudugu.cc/41/27285.html',
+    } as unknown as Response);
+    await expect(
+      loadChapterContent(suduguSource, {
+        url: 'https://www.sudugu.cc/41/27285.html',
+        title: '第1章 初入',
+        index: 0,
+        bookUrl: 'https://www.sudugu.cc/41/',
+        baseUrl: 'https://www.sudugu.cc/41/',
+        isVolume: false,
+        isVip: false,
+        isPay: false,
+      }),
+    ).resolves.toBe('第一段\n第二段');
     fetchMock.mockRestore();
   });
   test('preserves video HTML and inline DASH manifests', async () => {

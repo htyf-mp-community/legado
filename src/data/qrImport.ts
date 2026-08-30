@@ -5,7 +5,6 @@ import { loadReplaceRules, mergeReplaceRules, parseReplaceRules, saveReplaceRule
 import { loadTxtTocRules, mergeTxtTocRules, parseTxtTocRules, saveTxtTocRules } from './txtTocRules';
 import { loadDictRules, mergeDictRules, parseDictRules, saveDictRules } from './dictRules';
 import { loadHighlightRules, mergeHighlightRules, parseHighlightRules, saveHighlightRules } from './highlightRules';
-import { loadHttpTtsRules, mergeHttpTtsRules, parseHttpTtsRules, saveHttpTtsRules } from './httpTtsRules';
 import { loadAutoTasks, mergeAutoTasks, parseAutoTasks, saveAutoTasks } from './autoTasks';
 import { loadRuleSubscriptions, parseRuleSubscriptions, saveRuleSubscriptions, upsertRuleSubscription } from './ruleSubscriptions';
 
@@ -18,5 +17,5 @@ export async function importQrRules(kind: QrRuleKind, value: string): Promise<nu
   if (kind === 'highlightRule') { const incoming=parseHighlightRules(value); saveHighlightRules(mergeHighlightRules(loadHighlightRules(),incoming)); return incoming.length; }
   if (kind === 'autoTask') { const incoming=parseAutoTasks(value); saveAutoTasks(mergeAutoTasks(loadAutoTasks(),incoming)); return incoming.length; }
   if (kind === 'ruleSubscription') { const incoming=parseRuleSubscriptions(value); let current=loadRuleSubscriptions(); incoming.forEach(item=>{current=upsertRuleSubscription(current,item)}); saveRuleSubscriptions(current); return incoming.length; }
-  const incoming=parseHttpTtsRules(value); saveHttpTtsRules(mergeHttpTtsRules(loadHttpTtsRules(),incoming)); return incoming.length;
+  return 0;
 }

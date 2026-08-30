@@ -71,3 +71,23 @@ test('switches source while preserving identity, groups and matching progress', 
     progress: 0.5,
   });
 });
+
+test('matches the current chapter when source titles only differ in spacing and punctuation', () => {
+  const current = {
+    ...toLibraryBook(book, chapters),
+    chapterTitle: '第 1 章：初入',
+    progress: 0.9,
+  };
+  const switched = switchLibraryBookSource(
+    current,
+    { ...book, origin: 'https://new.example', bookUrl: '/new-book' },
+    [
+      { ...chapters[0], url: 'new-1', title: '第1章 初入', index: 0 },
+      { ...chapters[0], url: 'new-2', title: '第2章 继续', index: 1 },
+    ],
+  );
+  expect(switched).toMatchObject({
+    currentChapterIndex: 0,
+    chapterTitle: '第1章 初入',
+  });
+});

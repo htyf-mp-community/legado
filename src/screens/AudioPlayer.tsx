@@ -28,7 +28,6 @@ import { AUDIO_REMOTE_CHAPTER_EVENT } from '../core/audioRemoteNavigation';
 import { ensureAudioPlayer } from '../core/audioPlayer';
 import { buildSourceRequest } from '../core/sourceRequest';
 import { loadChapterContent } from '../core/webBook';
-import { splitTtsText, synthesizeHttpTts } from '../core/httpTts';
 import {
   clearAudioSleepDeadline,
   getAudioSleepDeadline,
@@ -37,7 +36,6 @@ import {
   setAudioSleepDeadline,
 } from '../data/audioPreferences';
 import { loadSources } from '../data/sources';
-import { loadHttpTtsRules } from '../data/httpTtsRules';
 import type { Book, BookChapter } from '../types';
 import type { BookSource } from '../types';
 import { useAppTheme } from '../theme/AppTheme';
@@ -76,10 +74,6 @@ export function AudioPlayer({
   const [rate, setRateValue] = useState(loadAudioPreferences().rate);
   const [mediaButtonPerNext, setMediaButtonPerNext] = useState(
     () => loadAudioPreferences().mediaButtonPerNext,
-  );
-  const [ttsRules] = useState(loadHttpTtsRules);
-  const [ttsRuleId, setTtsRuleId] = useState(
-    () => loadAudioPreferences().httpTtsRuleId,
   );
   const [sleepDeadline, setSleepDeadlineState] = useState(() => {
     const deadline = getAudioSleepDeadline();
@@ -123,72 +117,7 @@ export function AudioPlayer({
     setMessage(t('loadingNamedChapter', { chapter: chapter.title }));
     void loadSources()
       .then(async sources => {
-        if (book.sourceType !== 1) {
-          const rule =
-            ttsRules.find(item => item.id === ttsRuleId) ?? ttsRules[0];
-          if (!rule)
-            throw new Error(t('needHttpTtsRule'));
-          let content = chapter.content;
-          if (!content && book.origin && chapter.url) {
-            const source = sources.find(
-              item => item.bookSourceUrl === book.origin,
-            );
-            if (!source) throw new Error(t('sourceMissing'));
-            content = await loadChapterContent(source, {
-              url: chapter.url,
-              title: chapter.title,
-              index: safeIndex,
-              bookUrl: book.bookUrl ?? '',
-              baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
-              isVolume: !!chapter.isVolume,
-              isVip: !!chapter.isVip,
-              isPay: !!chapter.isPay,
-            });
-          }
-          content ||= safeIndex === (book.currentChapterIndex ?? 0)
-            ? book.content
-            : '';
-          const chunks = splitTtsText(content);
-          if (!chunks.length) throw new Error(t('noReadableContent'));
-          const urls = new Array<string>(chunks.length);
-          let cursor = 0;
-          const worker = async () => {
-            while (cursor < chunks.length) {
-              const index = cursor++;
-              urls[index] = await synthesizeHttpTts(
-                rule,
-                chunks[index],
-                Math.round(rate * 10),
-                `${book.id}-${safeIndex}-${index}`,
-              );
-            }
-          };
-          const concurrency = Math.max(
-            1,
-            Math.min(6, Number.parseInt(rule.concurrentRate ?? '3', 10) || 3),
-          );
-          await Promise.all(
-            Array.from({ length: Math.min(concurrency, chunks.length) }, worker),
-          );
-          await ensureAudioPlayer();
-          await TrackPlayer.reset();
-          await TrackPlayer.setQueue(
-            urls.map((url, index) => ({
-              id: `${book.id}:${safeIndex}:tts:${index}`,
-              url,
-              title: `${chapter.title} (${index + 1}/${urls.length})`,
-              artist: rule.name,
-              album: book.name,
-              artwork: book.coverUrl,
-            })),
-          );
-          await TrackPlayer.setRate(rate);
-          if (!active) return;
-          setPrepared(true);
-          setMessage(t('ttsSegmentsSummary', { chapter: chapter.title, rule: rule.name, count: chunks.length }));
-          if (autoPlay.current) await TrackPlayer.play();
-          return;
-        }
+        if (book.sourceType !== 1) throw new Error(t('audioSourceMissing'));
         const source = sources.find(item => item.bookSourceUrl === book.origin);
         if (!source) throw new Error(t('audioSourceMissing'));
         setActiveSource(source);
@@ -259,7 +188,7 @@ export function AudioPlayer({
     return () => {
       active = false;
     };
-  }, [book?.id, chapterIndex, ttsRuleId, t]);
+  }, [book?.id, chapterIndex, t]);
   useTrackPlayerEvents(
     [Event.PlaybackQueueEnded, Event.PlaybackError],
     event => {
@@ -287,16 +216,12 @@ export function AudioPlayer({
   }, [safeIndex, loading, playback.state, chapters.length]);
   const changeRate = async (value: number) => {
     setRateValue(value);
-    saveAudioPreferences({ rate: value, httpTtsRuleId: ttsRuleId, mediaButtonPerNext });
+    saveAudioPreferences({ rate: value, mediaButtonPerNext });
     if (prepared) await TrackPlayer.setRate(value);
-  };
-  const changeTtsRule = (id: number) => {
-    setTtsRuleId(id);
-    saveAudioPreferences({ rate, httpTtsRuleId: id, mediaButtonPerNext });
   };
   const changeMediaButtonMode = (value: boolean) => {
     setMediaButtonPerNext(value);
-    saveAudioPreferences({ rate, httpTtsRuleId: ttsRuleId, mediaButtonPerNext: value });
+    saveAudioPreferences({ rate, mediaButtonPerNext: value });
   };
   const setSleep = (minutes: number) => {
     const deadline = minutes ? Date.now() + minutes * 60_000 : 0;
@@ -387,27 +312,6 @@ export function AudioPlayer({
         <Text style={[styles.chapter, { color: colors.text }]}>{chapter?.title ?? t('noChapter')}</Text>
         <Text accessibilityLiveRegion="polite" style={[styles.message, { color: colors.muted }]}>{message}</Text>
         {loading ? <ActivityIndicator /> : null}
-        {book?.sourceType !== 1 ? (
-          <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('httpTtsEngine')}</Text>
-            <View style={styles.options}>
-              {ttsRules.map(rule => (
-                <Pressable accessibilityRole="radio"
-                  accessibilityState={{ selected: ttsRuleId === rule.id || (!ttsRuleId && rule === ttsRules[0]) }}
-                  key={rule.id}
-                  style={[
-                    styles.option, { backgroundColor: colors.surface },
-                    (ttsRuleId === rule.id || (!ttsRuleId && rule === ttsRules[0])) &&
-                      { backgroundColor: colors.primary },
-                  ]}
-                  onPress={() => changeTtsRule(rule.id)}
-                >
-                  <Text style={(ttsRuleId === rule.id || (!ttsRuleId && rule === ttsRules[0])) ? styles.optionTextActive : [styles.optionText, { color: colors.text }]}>{rule.name}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </>
-        ) : null}
         <View style={styles.timeline}>
           <Slider
             accessibilityLabel={t('playbackProgress')}

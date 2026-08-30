@@ -230,9 +230,11 @@ export function Rss({
       </View>
     );
   return (
-    <View style={[s.flex, { backgroundColor: colors.background }]}>
+    <View style={[s.flex, { backgroundColor: colors.background }]}> 
+      <View style={s.filterHeader}>
       <ScrollView
         horizontal
+        style={s.horizontalRail}
         contentContainerStyle={s.tabs}
         showsHorizontalScrollIndicator={false}
       >
@@ -279,6 +281,7 @@ export function Rss({
       {sortState.entries.length > 1 ? (
         <ScrollView
           horizontal
+          style={s.horizontalRail}
           contentContainerStyle={s.categories}
           showsHorizontalScrollIndicator={false}
         >
@@ -336,11 +339,20 @@ export function Rss({
           </Pressable>
         </View>
       ) : null}
-      <View style={s.actions}>
+      <ScrollView
+        horizontal
+        style={s.horizontalRail}
+        contentContainerStyle={s.actions}
+        showsHorizontalScrollIndicator={false}
+      >
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('refresh')}
-          style={s.action}
+          style={({ pressed }) => [
+            s.action,
+            { backgroundColor: colors.surface },
+            pressed && s.pressed,
+          ]}
           onPress={() => void refresh()}
         >
           <Text style={[s.actionText, { color: colors.text }]}>
@@ -359,13 +371,20 @@ export function Rss({
             )}
             accessibilityState={{ checked: articleView === view }}
             key={view}
-            style={s.action}
+            style={({ pressed }) => [
+              s.action,
+              {
+                backgroundColor:
+                  articleView === view ? colors.primary : colors.surface,
+              },
+              pressed && s.pressed,
+            ]}
             onPress={() => setArticleView(view)}
           >
             <Text
               style={[
                 articleView === view ? s.actionTextActive : s.actionText,
-                { color: articleView === view ? colors.primary : colors.text },
+                { color: articleView === view ? '#fff' : colors.text },
               ]}
             >
               {t(
@@ -381,7 +400,11 @@ export function Rss({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('importRssSources')}
-          style={s.action}
+          style={({ pressed }) => [
+            s.action,
+            { backgroundColor: colors.surface },
+            pressed && s.pressed,
+          ]}
           onPress={() => void importSources()}
         >
           <Text style={[s.actionText, { color: colors.text }]}>
@@ -391,14 +414,18 @@ export function Rss({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('manageRssSources')}
-          style={s.action}
+          style={({ pressed }) => [
+            s.action,
+            { backgroundColor: colors.surface },
+            pressed && s.pressed,
+          ]}
           onPress={manage}
         >
           <Text style={[s.actionText, { color: colors.text }]}>
             {t('manageSource')}
           </Text>
         </Pressable>
-      </View>
+      </ScrollView>
       {articleView === 'favorites' && favoriteGroups.length ? (
         <View>
           <ScrollView
@@ -461,15 +488,23 @@ export function Rss({
       {message ? (
         <Text
           accessibilityLiveRegion="polite"
-          style={[s.message, { color: error ? colors.danger : colors.muted }]}
+          style={[
+            s.message,
+            {
+              color: error ? colors.danger : colors.muted,
+              backgroundColor: colors.surface,
+              borderColor: error ? colors.danger : colors.border,
+            },
+          ]}
         >
           {message}
         </Text>
       ) : null}
+      </View>
       {loading ? (
         <ActivityIndicator color={colors.primary} style={s.loading} />
       ) : visible.length ? (
-        <ScrollView contentContainerStyle={s.list}>
+        <ScrollView style={s.contentScroll} contentContainerStyle={s.list}>
           {visible.map(article => (
             <Pressable
               accessibilityRole="button"
@@ -538,13 +573,27 @@ export function Rss({
         </ScrollView>
       ) : (
         <View style={s.center}>
-          <Text style={[s.empty, { color: colors.text }]}>
+          <Text style={[s.empty, { color: colors.text }]}> 
             {articleView === 'favorites'
               ? t('noFavoriteArticles')
               : articleView === 'history'
                 ? t('noRssHistory')
                 : t('refreshForArticles')}
           </Text>
+          {articleView === 'all' ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('refresh')}
+              style={({ pressed }) => [
+                s.primary,
+                { backgroundColor: colors.primary },
+                pressed && s.pressed,
+              ]}
+              onPress={() => void refresh()}
+            >
+              <Text style={s.primaryText}>{t('refresh')}</Text>
+            </Pressable>
+          ) : null}
         </View>
       )}
       <InTreeSheet
@@ -597,6 +646,8 @@ const plain = (value: string) =>
     .trim();
 const s = StyleSheet.create({
   flex: { flex: 1 },
+  filterHeader: { flexShrink: 0, paddingBottom: 8 },
+  contentScroll: { flex: 1 },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -615,7 +666,8 @@ const s = StyleSheet.create({
   primaryText: { color: '#fff', fontWeight: '700' },
   secondary: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 },
   secondaryText: { fontWeight: '700' },
-  tabs: { paddingHorizontal: 12, gap: 8, alignItems: 'center' },
+  horizontalRail: { flexGrow: 0 },
+  tabs: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
   chip: {
     minHeight: 44,
     paddingHorizontal: 16,
@@ -624,16 +676,24 @@ const s = StyleSheet.create({
   },
   text: {},
   activeText: { color: '#fff', fontWeight: '700' },
-  actions: { flexDirection: 'row', paddingHorizontal: 12, gap: 4 },
+  actions: { paddingHorizontal: 16, paddingVertical: 8, gap: 8 },
   action: {
     minHeight: 44,
-    flex: 1,
+    paddingHorizontal: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 22,
   },
   actionText: {},
   actionTextActive: { fontWeight: '700' },
-  message: { paddingHorizontal: 16 },
+  message: {
+    marginHorizontal: 16,
+    marginVertical: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   loading: { marginTop: 40 },
   list: { padding: 12, gap: 10 },
   article: { borderRadius: 10, padding: 14, gap: 7 },
@@ -643,7 +703,7 @@ const s = StyleSheet.create({
   star: { color: '#d59518', fontSize: 18 },
   description: { lineHeight: 20 },
   warning: { paddingHorizontal: 16, paddingVertical: 6 },
-  categories: { paddingHorizontal: 12, gap: 6 },
+  categories: { paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
   category: { minHeight: 44, paddingHorizontal: 12, justifyContent: 'center' },
   searchRow: {
     flexDirection: 'row',
@@ -664,6 +724,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  pressed: { opacity: 0.56 },
   loadMore: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   favoriteGroups: { paddingHorizontal: 12, gap: 8 },
   favoriteChip: {

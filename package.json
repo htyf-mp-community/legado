@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "postinstall": "node scripts/patch-orientation-locker.js",
     "htyf": "htyf",
     "npm-check": "npx npm-check -u",
     "android": "react-native run-android",
@@ -65,6 +66,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
+    "@babel/plugin-transform-export-namespace-from": "7.29.7",
     "@babel/plugin-syntax-typescript": "7.29.7",
     "@babel/preset-env": "7.29.7",
     "@babel/runtime": "7.29.7",

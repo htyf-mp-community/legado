@@ -87,11 +87,9 @@ test('translates replacement-rule management, editing and preview', () => {
   expect(en('replacePreviewDefault')).toContain('preview');
   expect(zh('deleteReplaceRuleTitle')).toBe('删除替换规则？');
 });
-test('translates HTTP TTS and TXT TOC rule management', () => {
+test('translates TXT TOC rule management', () => {
   const en = translator('en'),
     zh = translator('zh-CN');
-  expect(en('httpTtsRuleTitle', { count: 2 })).toBe('HTTP TTS (2)');
-  expect(en('pauseDurationMs')).toContain('ms');
   expect(en('txtTocRuleTitle', { count: 3 })).toBe('TXT TOC rules (3)');
   expect(zh('deleteTocRuleTitle')).toBe('删除目录规则？');
 });

@@ -4,7 +4,6 @@ const KEY = 'audio.preferences.v1';
 const SLEEP_KEY = 'audio.sleep.deadline.v1';
 export type AudioPreferences = {
   rate: number;
-  httpTtsRuleId?: number;
   mediaButtonPerNext: boolean;
 };
 export const defaultAudioPreferences: AudioPreferences = {
@@ -16,9 +15,6 @@ export function normalizeAudioPreferences(value: Partial<AudioPreferences>) {
   const rate = Number(value.rate);
   return {
     rate: [0.5, 0.75, 1, 1.25, 1.5, 2].includes(rate) ? rate : 1,
-    httpTtsRuleId: Number.isFinite(value.httpTtsRuleId)
-      ? Number(value.httpTtsRuleId)
-      : undefined,
     mediaButtonPerNext: value.mediaButtonPerNext === true,
   };
 }

@@ -25,14 +25,29 @@ export const readerHtmlMarker = (value: ReaderHtml) =>
   `${HTML_PREFIX}${encodeURIComponent(JSON.stringify(value))}${SUFFIX}`;
 const semanticMarker = (prefix: string, value: Record<string, string>) =>
   `${prefix}${encodeURIComponent(JSON.stringify(value))}${SUFFIX}`;
-const decodeEntities = (value: string) =>
+const decodeEntitiesOnce = (value: string) =>
   value
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'");
+    .replace(/&#39;/gi, "'")
+    .replace(/&#x([0-9a-f]+);/gi, (_match, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
+    .replace(/&#(\d+);/g, (_match, decimal: string) =>
+      String.fromCodePoint(Number.parseInt(decimal, 10)),
+    );
+const decodeEntities = (value: string) => {
+  let decoded = value;
+  for (let pass = 0; pass < 3; pass += 1) {
+    const next = decodeEntitiesOnce(decoded);
+    if (next === decoded) break;
+    decoded = next;
+  }
+  return decoded;
+};
 
 export function readerHtmlToText(value: string, baseUrl = '') {
   const image = (tag: string, click = '') => {
@@ -41,7 +56,7 @@ export function readerHtmlToText(value: string, baseUrl = '') {
       ? `\n${readerImageMarker({ src: absolute(decodeEntities(src), baseUrl), click: click ? absolute(decodeEntities(click), baseUrl) : undefined })}\n`
       : '';
   };
-  return value
+  return decodeEntities(value)
     .replace(
       /<usehtml>([\s\S]*?)<\/usehtml>/gi,
       (_all, html: string) =>
@@ -88,12 +103,9 @@ export function readerHtmlToText(value: string, baseUrl = '') {
     .replace(/<br\s*\/?\s*>/gi, '\n')
     .replace(/<\/p\s*>/gi, '\n')
     .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
+    .replace(/&(?:nbsp|amp|lt|gt|quot|#39|#x[0-9a-f]+|#\d+);/gi, entity =>
+      decodeEntities(entity),
+    )
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }

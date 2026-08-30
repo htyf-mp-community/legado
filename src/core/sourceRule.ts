@@ -1084,12 +1084,17 @@ export function sourceRuleValues(value: unknown, rawRule: unknown): unknown[] {
 }
 
 export function sourceRuleText(value: unknown, rule: unknown) {
-  const hit = sourceRuleValues(value, rule)[0];
-  return hit === undefined || hit === null
-    ? ''
-    : isNode(hit)
-      ? trimText(DomUtils.textContent(hit))
-      : typeof hit === 'string'
-        ? hit
-        : String(hit);
+  return sourceRuleTexts(value, rule)[0] ?? '';
+}
+
+export function sourceRuleTexts(value: unknown, rule: unknown) {
+  return sourceRuleValues(value, rule).map(hit =>
+    hit === undefined || hit === null
+      ? ''
+      : isNode(hit)
+        ? trimText(DomUtils.textContent(hit))
+        : typeof hit === 'string'
+          ? hit
+          : String(hit),
+  );
 }

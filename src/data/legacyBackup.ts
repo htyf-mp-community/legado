@@ -11,7 +11,6 @@ import { parseBookSources } from './sources';
 import { parseRssSources } from './rss';
 import { parseReplaceRules } from './replaceRules';
 import { parseTxtTocRules } from './txtTocRules';
-import { parseHttpTtsRules } from './httpTtsRules';
 import { parseDictRules } from './dictRules';
 import { parseHighlightRules } from './highlightRules';
 import { parseKeyboardAssists } from './keyboardAssists';
@@ -350,7 +349,6 @@ export function convertLegacyBackup(
   add('rssStar.json', 'rss.articles.v1', rssStars);
   add('replaceRule.json', 'replace.rules.v1', raw => parseReplaceRules(raw));
   add('txtTocRule.json', 'txt.toc.rules.v1', raw => parseTxtTocRules(raw));
-  add('httpTTS.json', 'http-tts.rules.v1', raw => parseHttpTtsRules(raw));
   add('dictRule.json', 'dictionary.rules.v1', raw => parseDictRules(raw));
   add('highlightRule.json', 'highlight.rules.v1', raw =>
     parseHighlightRules(raw),

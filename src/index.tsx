@@ -26,13 +26,11 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
+import Svg, { Circle, Path } from 'react-native-svg';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Slider from '@react-native-community/slider';
 import { VolumeManager } from 'react-native-volume-manager';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { PageHeader } from './components/PageHeader';
@@ -94,7 +92,6 @@ import {
 } from './data/readerMenu';
 import { reSegmentText } from './core/txtEncoding';
 import { HighlightRuleManager } from './screens/HighlightRuleManager';
-import { HttpTtsRuleManager } from './screens/HttpTtsRuleManager';
 import { RssSourceManager } from './screens/RssSourceManager';
 import { RssSourceDebug } from './screens/RssSourceDebug';
 import { CoverRuleSettings } from './screens/CoverRuleSettings';
@@ -200,12 +197,17 @@ import {
   readerTouchAction,
   type PullBookmarkState,
 } from './core/readerTouch';
-import { readerMenuTitle } from './core/readerMenuTitle';
+import {
+  readerMenuTitle,
+  readerMenuTitleDetails,
+} from './core/readerMenuTitle';
 import {
   normalizeReaderProgressTarget,
   readerProgressState,
 } from './core/readerProgress';
 import { readerChromeColors } from './core/readerChrome';
+import { readerSafeLayout } from './core/readerSafeLayout';
+import { useCapsule } from './hooks/useCapsule';
 import {
   readerPageColumns,
   reflowPageIndex,
@@ -217,6 +219,7 @@ import {
   loadReplaceRules,
 } from './data/replaceRules';
 import { loadSources } from './data/sources';
+import { addAppLog } from './data/appLog';
 import { loadChapterContent } from './core/webBook';
 import { BookSearch } from './screens/BookSearch';
 import { autoSwitchSourceForChapter } from './core/bookSourceSwitch';
@@ -273,7 +276,6 @@ type RootStackParamList = {
   AudioPlayer: { bookId: string };
   DictRules: undefined;
   HighlightRules: { ruleId?: number } | undefined;
-  HttpTtsRules: undefined;
   RssSources: undefined;
   RssSourceDebug: { sourceUrl: string };
   CoverRule: undefined;
@@ -312,7 +314,7 @@ type RootStackParamList = {
 };
 const Stack = createStackNavigator<RootStackParamList>();
 function Shell() {
-  const { t } = useAppTheme();
+  const { colors, t } = useAppTheme();
   const [generalPreferences, setGeneralPreferences] = useState(
       loadGeneralPreferences,
     ),
@@ -408,9 +410,13 @@ function Shell() {
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={t('search')}
+                  style={({ pressed }) => pressed && s.iconPressed}
                   onPress={() => navigation.navigate('Search')}
                 >
-                  <Text style={s.action}>⌕</Text>
+                  <Svg width={24} height={24} viewBox="0 0 24 24">
+                    <Circle cx={10.5} cy={10.5} r={6.5} fill="none" stroke={colors.text} strokeWidth={2} />
+                    <Path d="M15.5 15.5L21 21" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" />
+                  </Svg>
                 </Pressable>
               }
             />
@@ -681,7 +687,6 @@ function Shell() {
             openTxtTocRules={() => navigation.navigate('TxtTocRules')}
             openDictRules={() => navigation.navigate('DictRules')}
             openHighlightRules={() => navigation.navigate('HighlightRules')}
-            openHttpTtsRules={() => navigation.navigate('HttpTtsRules')}
             openCoverRule={() => navigation.navigate('CoverRule')}
             openCoverSettings={() => navigation.navigate('CoverSettings')}
             openWelcomeSettings={() => navigation.navigate('WelcomeSettings')}
@@ -841,11 +846,6 @@ function Shell() {
             back={() => navigation.goBack()}
             initialRuleId={route.params?.ruleId}
           />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="HttpTtsRules">
-        {({ navigation }) => (
-          <HttpTtsRuleManager back={() => navigation.goBack()} />
         )}
       </Stack.Screen>
       <Stack.Screen name="RssSources">
@@ -1415,15 +1415,15 @@ function BookDetail({
             <Text style={s.cacheButtonText}>{t('offlineCache')}</Text>
           </Pressable>
         ) : null}
-        <Pressable
-          accessibilityRole="button"
-          style={s.audioButton}
-          onPress={playAudio}
-        >
-          <Text style={s.audioButtonText}>
-            {book.sourceType === 1 ? t('audioPlayback') : t('readAloud')}
-          </Text>
-        </Pressable>
+        {book.sourceType === 1 ? (
+          <Pressable
+            accessibilityRole="button"
+            style={s.audioButton}
+            onPress={playAudio}
+          >
+            <Text style={s.audioButtonText}>{t('audioPlayback')}</Text>
+          </Pressable>
+        ) : null}
         {book.sourceType === 4 ? (
           <Pressable
             accessibilityRole="button"
@@ -1597,8 +1597,9 @@ function Reader({
     [highlightNoteDraft, setHighlightNoteDraft] = useState(''),
     [highlightColorDraft, setHighlightColorDraft] = useState(''),
     [replacePreviewActive, setReplacePreviewActive] = useState(false),
-    insets = useSafeAreaInsets(),
-    window = useWindowDimensions(),
+    capsuleLayout = useCapsule(),
+    insets = capsuleLayout.insets,
+    window = capsuleLayout.window,
     touchStart = useRef({ x: 0, y: 0 }),
     pullBookmarkCandidate = useRef(false),
     replacePreviewTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -1622,12 +1623,13 @@ function Reader({
         ? readerPageColumns(prefs.doublePageMode, window.width, window.height)
         : 1,
     pageCapacity = estimatePageCapacity(
-      window.width / pageColumns,
-      window.height,
+      Math.max(1, window.width - insets.left - insets.right) / pageColumns,
+      Math.max(1, window.height - insets.top - insets.bottom),
       prefs.fontSize,
       prefs.lineHeight,
     ),
-    previousPageCapacity = useRef(pageCapacity);
+    previousPageCapacity = useRef(pageCapacity),
+    safeLayout = readerSafeLayout(insets, capsuleLayout.capsule, window.width);
   const mangaSpecialUi =
       book?.sourceType === 2 && loadGeneralPreferences().showMangaUi,
     mangaHorizontal = mangaSpecialUi ? prefs.mangaHorizontal : true;
@@ -1927,6 +1929,7 @@ function Reader({
       })
       .catch(async reason => {
         if (!active) return;
+        addAppLog(`[reader-content] primary load failed book=${JSON.stringify(book.name)} chapterIndex=${safeIndex} chapter=${JSON.stringify(chapter.title)} origin=${book.origin ?? ''} bookUrl=${book.bookUrl ?? ''} chapterUrl=${chapter.url ?? ''}`, reason);
         if (loadGeneralPreferences().autoChangeSource && book.origin) {
           setRemoteLoading(chapter.id);
           setRemoteError(t('autoChangingSource'));
@@ -1943,6 +1946,7 @@ function Reader({
             return;
           } catch (switchError) {
             if (!active) return;
+            addAppLog(`[reader-content] automatic source switch failed book=${JSON.stringify(book.name)} chapter=${JSON.stringify(chapter.title)}`, switchError);
             setRemoteError(
               t('autoChangeSourceFailed', {
                 error:
@@ -2165,6 +2169,7 @@ function Reader({
       prefs.showReaderTitleAddition,
       prefs.showReaderTitleChapterNameOnly,
     ),
+    menuTitleDetails = readerMenuTitleDetails(menuTitle.addition),
     progressState = readerProgressState(
       prefs.progressBarBehavior,
       pageIndex,
@@ -2522,6 +2527,8 @@ function Reader({
         {
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
           backgroundColor: palette.background,
         },
       ]}
@@ -2547,7 +2554,14 @@ function Reader({
           values={readerInfoValues}
           color={palette.foreground}
           size={prefs.readerInfoTextSize}
-          style={s.readerInfoHeader}
+          style={[
+            s.readerInfoHeader,
+            {
+              top: safeLayout.infoTop,
+              left: safeLayout.left + 16,
+              right: safeLayout.right + 16,
+            },
+          ]}
         />
       ) : null}
       {prefs.showReaderFooter ? (
@@ -2560,7 +2574,16 @@ function Reader({
           values={readerInfoValues}
           color={palette.foreground}
           size={prefs.readerInfoTextSize}
-          style={s.readerInfoFooter}
+          style={[
+            s.readerInfoFooter,
+            {
+              bottom: controls
+                ? safeLayout.infoBottomWithControls
+                : safeLayout.infoBottom,
+              left: safeLayout.left + 16,
+              right: safeLayout.right + 16,
+            },
+          ]}
         />
       ) : null}
       <View
@@ -2959,7 +2982,10 @@ function Reader({
           accessibilityLiveRegion="polite"
           style={[
             s.pullBookmarkHint,
-            { backgroundColor: readerChrome.background },
+            {
+              top: safeLayout.hintTop,
+              backgroundColor: readerChrome.background,
+            },
           ]}
         >
           <Text style={{ color: readerChrome.foreground, fontWeight: '700' }}>
@@ -2978,12 +3004,23 @@ function Reader({
       {controls ? (
         <>
           <View
-            style={[s.readerTop, { backgroundColor: readerChrome.background }]}
+            style={[
+              s.readerTop,
+              {
+                top: safeLayout.top + 8,
+                left: safeLayout.left + 12,
+                right: window.width - safeLayout.topRight + 12,
+                backgroundColor: readerChrome.background,
+              },
+            ]}
           >
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('back')}
-              style={s.readerButton}
+              style={({ pressed }) => [
+                s.readerButton,
+                pressed && s.readerButtonPressed,
+              ]}
               onPress={leave}
             >
               <Text style={[s.readerIcon, { color: readerChrome.foreground }]}>
@@ -2997,15 +3034,26 @@ function Reader({
               >
                 {menuTitle.primary}
               </Text>
-              {menuTitle.addition ? (
+              {menuTitleDetails.chapter ? (
                 <Text
-                  numberOfLines={2}
+                  numberOfLines={1}
                   style={[
-                    s.readerTitleAddition,
+                    s.readerTitleChapter,
                     { color: readerChrome.foreground },
                   ]}
                 >
-                  {menuTitle.addition}
+                  {menuTitleDetails.chapter}
+                </Text>
+              ) : null}
+              {menuTitleDetails.sourceUrl ? (
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    s.readerTitleSource,
+                    { color: readerChrome.foreground },
+                  ]}
+                >
+                  {menuTitleDetails.sourceUrl}
                 </Text>
               ) : null}
             </View>
@@ -3014,7 +3062,10 @@ function Reader({
               accessibilityLabel={
                 marked ? t('removeBookmark') : t('addBookmark')
               }
-              style={s.readerButton}
+              style={({ pressed }) => [
+                s.readerButton,
+                pressed && s.readerButtonPressed,
+              ]}
               onPress={toggleBookmark}
             >
               <Text style={{ fontSize: 24, color: readerChrome.foreground }}>
@@ -3025,7 +3076,12 @@ function Reader({
           <View
             style={[
               s.readerProgressBar,
-              { backgroundColor: readerChrome.background },
+              {
+                left: safeLayout.left + 12,
+                right: safeLayout.right + 12,
+                bottom: safeLayout.progressBottom,
+                backgroundColor: readerChrome.background,
+              },
             ]}
           >
             <Text
@@ -3069,16 +3125,28 @@ function Reader({
               }}
             />
           </View>
-          <View
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.readerBottomContent}
             style={[
               s.readerBottom,
-              { backgroundColor: readerChrome.background },
+              {
+                left: safeLayout.left + 12,
+                right: safeLayout.right + 12,
+                bottom: safeLayout.bottom + 8,
+                backgroundColor: readerChrome.background,
+              },
             ]}
           >
             <Pressable
               accessibilityRole="button"
               disabled={index === 0}
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                index === 0 && s.readerActionDisabled,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => persistChapter(index - 1)}
             >
               <Text
@@ -3091,7 +3159,10 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => {
                 setBookmarks(listBookmarks(book.id));
                 setHighlights(listHighlights(book.id));
@@ -3102,7 +3173,10 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => setContentSearch(true)}
             >
               <Text style={{ color: readerChrome.foreground }}>
@@ -3111,7 +3185,10 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => openReviews(index)}
             >
               <Text style={{ color: readerChrome.foreground }}>
@@ -3121,7 +3198,11 @@ function Reader({
             <Pressable
               accessibilityRole="button"
               disabled={index === chapters.length - 1}
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                index === chapters.length - 1 && s.readerActionDisabled,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => persistChapter(index + 1)}
             >
               <Text
@@ -3137,7 +3218,10 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              style={s.readerAction}
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => setConfig(true)}
             >
               <Text style={{ color: readerChrome.foreground }}>
@@ -3146,14 +3230,30 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              style={s.readerAction}
+              accessibilityLabel={t('logs')}
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
+              onPress={openLogs}
+            >
+              <Text style={{ color: readerChrome.foreground }}>
+                {t('logs')}
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [
+                s.readerAction,
+                pressed && s.readerActionPressed,
+              ]}
               onPress={() => setAdvanced(true)}
             >
               <Text style={{ color: readerChrome.foreground }}>
                 {t('advanced')}
               </Text>
             </Pressable>
-          </View>
+          </ScrollView>
         </>
       ) : null}
       <ContentSearchSheet
@@ -4862,7 +4962,6 @@ function Settings({
   openTxtTocRules,
   openDictRules,
   openHighlightRules,
-  openHttpTtsRules,
   openCoverRule,
   openCoverSettings,
   openWelcomeSettings,
@@ -4884,7 +4983,6 @@ function Settings({
   openTxtTocRules: () => void;
   openDictRules: () => void;
   openHighlightRules: (ruleId?: number) => void;
-  openHttpTtsRules: () => void;
   openCoverRule: () => void;
   openCoverSettings: () => void;
   openWelcomeSettings: () => void;
@@ -4910,7 +5008,6 @@ function Settings({
     { label: t('txtTocRules'), open: openTxtTocRules },
     { label: t('dictionaryRules'), open: openDictRules },
     { label: t('highlightRules'), open: openHighlightRules },
-    { label: t('httpTts'), open: openHttpTtsRules },
     { label: t('coverRules'), open: openCoverRule },
     { label: t('coverSettings'), open: openCoverSettings },
     { label: t('welcomeSettings'), open: openWelcomeSettings },
@@ -5021,6 +5118,22 @@ function Mine({
     </ScrollView>
   );
 }
+function HomeTabIcon({ tab, color }: { tab: RootTab; color: string }) {
+  const path =
+    tab === 'bookshelf'
+      ? 'M4 5.5C7 4.5 9.5 5 12 7v12c-2.5-2-5-2.5-8-1.5V5.5zm16 0c-3-1-5.5-.5-8 1.5v12c2.5-2 5-2.5 8-1.5V5.5z'
+      : tab === 'explore'
+        ? 'M14.8 9.2l-2 3.6-3.6 2 2-3.6 3.6-2z'
+        : tab === 'rss'
+          ? 'M5 4h14v16H5V4zm3 4h8M8 12h8M8 16h5'
+          : 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8c.8-4 3-6 7-6s6.2 2 7 6';
+  return (
+    <Svg width={23} height={23} viewBox="0 0 24 24" accessibilityElementsHidden>
+      {tab === 'explore' ? <Circle cx={12} cy={12} r={8.5} fill="none" stroke={color} strokeWidth={1.8} /> : null}
+      <Path d={path} fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 function TabBar({
   active,
   select,
@@ -5046,20 +5159,21 @@ function TabBar({
       {tabKeys
         .filter(key => key !== 'explore' || preferences.showExplore)
         .filter(key => key !== 'rss' || preferences.showRss)
-        .map(key => (
-          <Pressable
+        .map(key => {
+          const selected = active === key;
+          return <Pressable
             accessibilityRole="tab"
-            accessibilityState={{ selected: active === key }}
+            accessibilityState={{ selected }}
             key={key}
-            style={s.tab}
+            style={({ pressed }) => [s.tab, pressed && s.iconPressed]}
             onPress={() => select(key)}
           >
-            {skin?.assignments[slots[key]] ? <Image source={{ uri: `file://${active === key ? skin.assignments[slots[key]]!.selected : skin.assignments[slots[key]]!.normal ?? skin.assignments[slots[key]]!.selected}` }} style={[s.tabSkinIcon, active !== key && !skin.assignments[slots[key]]!.normal ? s.tabSkinIconInactive : null]} /> : null}
-            <Text style={active === key ? s.tabActive : s.muted}>
+            {skin?.assignments[slots[key]] ? <Image source={{ uri: `file://${selected ? skin.assignments[slots[key]]!.selected : skin.assignments[slots[key]]!.normal ?? skin.assignments[slots[key]]!.selected}` }} style={[s.tabSkinIcon, !selected && !skin.assignments[slots[key]]!.normal ? s.tabSkinIconInactive : null]} /> : <HomeTabIcon tab={key} color={selected ? colors.primary : colors.muted} />}
+            <Text style={[s.tabLabel, selected && s.tabLabelActive, { color: selected ? colors.primary : colors.muted }]}>
               {labels[key]}
             </Text>
           </Pressable>
-        ))}
+        })}
     </View>
   );
 }
@@ -5235,11 +5349,9 @@ function AppNavigation() {
 export default function App() {
   // TODO(htyf-native): Replace the template com.apps/org.reactjs native identities only after native-project edits are separately authorized; see docs/htyf-migration-gaps.md.
   return (
-    <SafeAreaProvider>
-      <AppThemeProvider>
-        <AppNavigation />
-      </AppThemeProvider>
-    </SafeAreaProvider>
+    <AppThemeProvider>
+      <AppNavigation />
+    </AppThemeProvider>
   );
 }
 const s = StyleSheet.create({
@@ -5278,6 +5390,7 @@ const s = StyleSheet.create({
   muted: { color: '#777' },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: '#222' },
   action: { fontSize: 30 },
+  iconPressed: { opacity: 0.5 },
   headerTextButton: {
     minWidth: 52,
     minHeight: 44,
@@ -5317,14 +5430,16 @@ const s = StyleSheet.create({
     borderColor: '#ddd',
   },
   tab: {
-    minHeight: 52,
+    minHeight: 60,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 3,
   },
   tabSkinIcon: { width: 30, height: 30, resizeMode: 'contain', marginBottom: 2 },
   tabSkinIconInactive: { opacity: 0.4 },
-  tabActive: { color: '#2f6f4f', fontWeight: '700' },
+  tabLabel: { fontSize: 12, lineHeight: 16 },
+  tabLabelActive: { fontWeight: '700' },
   detail: { padding: 20, paddingBottom: 100 },
   hero: { flexDirection: 'row', marginBottom: 28 },
   largeCover: { width: 96, height: 132 },
@@ -5539,46 +5654,80 @@ const s = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: 60,
+    height: 64,
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.14,
+    shadowRadius: 10,
+    elevation: 6,
   },
   readerButton: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 24,
   },
-  readerIcon: { fontSize: 38 },
-  readerTitleBox: { flex: 1, justifyContent: 'center', minWidth: 0 },
-  readerTitle: { fontSize: 17, fontWeight: '600' },
-  readerTitleAddition: { fontSize: 10, opacity: 0.72 },
+  readerButtonPressed: { opacity: 0.48 },
+  readerIcon: { fontSize: 34, lineHeight: 38 },
+  readerTitleBox: {
+    flex: 1,
+    justifyContent: 'center',
+    minWidth: 0,
+    overflow: 'hidden',
+  },
+  readerTitle: { fontSize: 17, lineHeight: 21, fontWeight: '700' },
+  readerTitleChapter: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '500',
+    opacity: 0.72,
+  },
+  readerTitleSource: { fontSize: 9, lineHeight: 12, opacity: 0.46 },
   readerProgressBar: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 64,
-    minHeight: 44,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  readerProgressText: { width: 88, fontSize: 11 },
+  readerProgressText: { minWidth: 72, fontSize: 11, fontWeight: '600' },
   readerProgressSlider: { flex: 1, height: 44 },
   readerBottom: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    minHeight: 64,
-    flexDirection: 'row',
+    height: 68,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.14,
+    shadowRadius: 10,
+    elevation: 6,
   },
+  readerBottomContent: { minWidth: '100%', alignItems: 'stretch' },
   readerAction: {
-    minHeight: 64,
-    flex: 1,
+    minWidth: 72,
+    minHeight: 68,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  readerActionPressed: { opacity: 0.48 },
+  readerActionDisabled: { opacity: 0.42 },
   tocItem: {
     minHeight: 52,
     flexDirection: 'row',

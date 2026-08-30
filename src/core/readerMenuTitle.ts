@@ -3,6 +3,26 @@ export type ReaderMenuTitle = {
   addition?: string;
 };
 
+export type ReaderMenuTitleDetails = {
+  chapter?: string;
+  sourceUrl?: string;
+};
+
+export function readerMenuTitleDetails(
+  addition?: string,
+): ReaderMenuTitleDetails {
+  const lines = (addition ?? '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+  const sourceUrl = lines.find(line => /^https?:\/\//i.test(line));
+  const chapter = lines.find(line => line !== sourceUrl);
+  return {
+    ...(chapter ? { chapter } : {}),
+    ...(sourceUrl ? { sourceUrl } : {}),
+  };
+}
+
 export function readerMenuTitle(
   bookName: string,
   chapterTitle: string,

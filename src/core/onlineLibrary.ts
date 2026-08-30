@@ -1,5 +1,11 @@
 import type { Book, BookChapter, SearchBook } from '../types';
 
+const comparableChapterTitle = (value: string) =>
+  value
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .replace(/[\s\p{P}\p{S}]+/gu, '');
+
 export function onlineBookId(book: SearchBook) {
   return `remote:${encodeURIComponent(book.origin)}:${encodeURIComponent(book.bookUrl)}`;
 }
@@ -50,7 +56,9 @@ export function switchLibraryBookSource(
   const switched = toLibraryBook(remote, chapters),
     matchedIndex =
       switched.chapters?.findIndex(
-        chapter => chapter.title === current.chapterTitle,
+        chapter =>
+          comparableChapterTitle(chapter.title) ===
+          comparableChapterTitle(current.chapterTitle),
       ) ?? -1,
     currentIndex = Math.max(
       0,

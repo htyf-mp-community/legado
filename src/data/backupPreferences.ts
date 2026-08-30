@@ -13,7 +13,7 @@ const groups:Record<Exclude<BackupCategory,'settings'>,RegExp[]>={
   bookshelf:[/^library\./,/^book\.groups\./,/^bookshelf\./],
   annotations:[/^annotations\./,/^bookmarks\./,/^highlights\.data\./],
   sources:[/^sources\./,/^rss\.sources\./],
-  rules:[/^replace\./,/^txt\.toc\./,/^dictionary\./,/^highlight\.rules\./,/^http-tts\./,/^cover\.rule\./,/^rule\.subscriptions\./,/^auto\.tasks\./,/^keyboard-assists\./],
+  rules:[/^replace\./,/^txt\.toc\./,/^dictionary\./,/^highlight\.rules\./,/^cover\.rule\./,/^rule\.subscriptions\./,/^auto\.tasks\./,/^keyboard-assists\./],
   history:[/^read\.records\./,/^rss\.articles\./,/^browser\.history\./,/^download\./],
   cookies:[/^source-cookie\./],
   sourceVariables:[/^legacy\.runtime-source-cache\./],

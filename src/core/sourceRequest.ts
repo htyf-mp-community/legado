@@ -3,6 +3,7 @@ import { SourceRuleError, UnsupportedRuleError } from './errors';
 import { saveResponseCookies, sourceCookieHeader } from '../data/sourceCookies';
 import { loadGeneralPreferences } from '../data/generalPreferences';
 import { addHttpLog } from '../data/httpLog';
+import { addAppLog } from '../data/appLog';
 import iconv from 'iconv-lite';
 export type SourceRequest = {
   url: string;
@@ -28,6 +29,15 @@ const absolute = (value: string, base: string) => {
     return new URL(value, base).toString();
   } catch {
     throw new SourceRuleError(`无效地址: ${value}`);
+  }
+};
+const cacheBypassUrl = (value: string) => {
+  try {
+    const target = new URL(value);
+    target.searchParams.set('_htyf_retry', String(Date.now()));
+    return target.toString();
+  } catch {
+    return value;
   }
 };
 const replaceVars = (value: string, key: string, page: number) =>
@@ -284,6 +294,27 @@ export async function executeSourceRequest(
     // paths. The original request remains the authoritative fallback.
     if (!response.ok && preferredUrl !== request.url && !controller.signal.aborted)
       response = await fetch(request.url, options);
+    // NSURLSession may retain a transient 404 for chapter pages even after the
+    // origin starts serving them. Retry idempotent GETs once while explicitly
+    // bypassing intermediary and platform caches before treating it as final.
+    if (
+      !response.ok &&
+      response.status === 404 &&
+      request.method === 'GET' &&
+      !controller.signal.aborted
+    ) {
+      const retryUrl = cacheBypassUrl(response.url || request.url);
+      addAppLog(`[source-request] retry cached 404 url=${response.url || request.url} retryUrl=${retryUrl}`);
+      response = await fetch(retryUrl, {
+        ...options,
+        headers: {
+          ...request.headers,
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
+      addAppLog(`[source-request] retry complete status=${response.status} url=${response.url || retryUrl}`);
+    }
     const responseHeaders: Record<string, string> = {};
     if (typeof response.headers?.forEach === 'function')
       response.headers.forEach((value, key) => {

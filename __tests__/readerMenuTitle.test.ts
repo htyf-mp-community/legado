@@ -1,4 +1,7 @@
-import { readerMenuTitle } from '../src/core/readerMenuTitle';
+import {
+  readerMenuTitle,
+  readerMenuTitleDetails,
+} from '../src/core/readerMenuTitle';
 
 describe('reader menu title details', () => {
   test('keeps the book name as the primary title', () => {
@@ -28,6 +31,16 @@ describe('reader menu title details', () => {
     expect(readerMenuTitle('书', '章', '/local/chapter', true, false)).toEqual({
       primary: '书',
       addition: '章',
+    });
+  });
+
+  test('separates chapter and remote URL for a quieter visual hierarchy', () => {
+    expect(readerMenuTitleDetails('第一章\nhttps://source.test/1')).toEqual({
+      chapter: '第一章',
+      sourceUrl: 'https://source.test/1',
+    });
+    expect(readerMenuTitleDetails('https://source.test/1')).toEqual({
+      sourceUrl: 'https://source.test/1',
     });
   });
 });

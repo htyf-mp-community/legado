@@ -118,9 +118,11 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
       </View>
     );
   return (
-    <View style={[s.flex, { backgroundColor: colors.background }]}>
+    <View style={[s.flex, { backgroundColor: colors.background }]}> 
+      <View style={s.filterHeader}>
       <ScrollView
         horizontal
+        style={s.horizontalRail}
         contentContainerStyle={s.tabs}
         showsHorizontalScrollIndicator={false}
       >
@@ -129,7 +131,11 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
             accessibilityLabel={t('chooseExploreSource', { name: item.bookSourceName })}
             accessibilityState={{ selected: sourceUrl === item.bookSourceUrl }}
             key={item.bookSourceUrl}
-            style={[s.chip, { backgroundColor: sourceUrl === item.bookSourceUrl ? colors.primary : colors.surface }]}
+            style={({ pressed }) => [
+              s.chip,
+              { backgroundColor: sourceUrl === item.bookSourceUrl ? colors.primary : colors.surface },
+              pressed && s.pressed,
+            ]}
             onPress={() => setSourceUrl(item.bookSourceUrl)}
           >
             <Text
@@ -144,6 +150,7 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
       {entries.length > 1 ? (
         <ScrollView
           horizontal
+          style={s.horizontalRail}
           contentContainerStyle={s.categories}
           showsHorizontalScrollIndicator={false}
         >
@@ -152,7 +159,14 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
               accessibilityLabel={t('chooseExploreEntry', { name: entry.title })}
               accessibilityState={{ selected: index === entryIndex }}
               key={`${entry.title}:${entry.url}`}
-              style={s.category}
+              style={({ pressed }) => [
+                s.category,
+                {
+                  backgroundColor:
+                    index === entryIndex ? colors.surface : 'transparent',
+                },
+                pressed && s.pressed,
+              ]}
               onPress={() => setEntryIndex(index)}
             >
               <Text style={[index === entryIndex ? s.categoryActive : s.muted, { color: index === entryIndex ? colors.primary : colors.muted }]}>
@@ -162,14 +176,20 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
           ))}
         </ScrollView>
       ) : null}
-      <View style={s.statusRow}>
+      <View
+        style={[
+          s.statusRow,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+      >
         <Text accessibilityLiveRegion="polite" style={[s.message, { color: error ? colors.danger : colors.muted }]}>{message}</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('refreshExplore')} style={s.refresh} onPress={() => setReload(value => value + 1)}><Text style={{ color: colors.primary, fontWeight: '700' }}>{t('refresh')}</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('refreshExplore')} style={({ pressed }) => [s.refresh, pressed && s.pressed]} onPress={() => setReload(value => value + 1)}><Text style={{ color: colors.primary, fontWeight: '700' }}>{t('refresh')}</Text></Pressable>
+      </View>
       </View>
       {loading ? (
         <ActivityIndicator color={colors.primary} style={s.loading} />
       ) : (
-        <ScrollView contentContainerStyle={s.list}>
+        <ScrollView style={s.contentScroll} contentContainerStyle={s.list}>
           {books.map((book, index) => (
             <Pressable accessibilityRole="button"
               accessibilityLabel={t('openExploreBook', { name: book.name })}
@@ -197,6 +217,8 @@ export function Explore({ open }: { open: (book: SearchBook) => void }) {
 
 const s = StyleSheet.create({
   flex: { flex: 1 },
+  filterHeader: { flexShrink: 0, paddingBottom: 8 },
+  contentScroll: { flex: 1 },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -206,7 +228,8 @@ const s = StyleSheet.create({
   },
   empty: { fontSize: 19, fontWeight: '700' },
   muted: {},
-  tabs: { paddingHorizontal: 12, gap: 8, alignItems: 'center' },
+  horizontalRail: { flexGrow: 0 },
+  tabs: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
   chip: {
     minHeight: 44,
     paddingHorizontal: 16,
@@ -215,13 +238,22 @@ const s = StyleSheet.create({
   },
   chipText: {},
   chipTextActive: { color: '#fff', fontWeight: '700' },
-  categories: { paddingHorizontal: 12, gap: 6 },
+  categories: { paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
   warning: { paddingHorizontal: 16, paddingTop: 4 },
-  category: { minHeight: 44, paddingHorizontal: 12, justifyContent: 'center' },
+  category: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 18 },
   categoryActive: { fontWeight: '700' },
-  statusRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center' },
+  statusRow: {
+    minHeight: 52,
+    marginHorizontal: 16,
+    marginBottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   message: { flex: 1, paddingLeft: 16, paddingVertical: 8 },
   refresh: { minWidth: 64, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  pressed: { opacity: 0.56 },
   loading: { marginTop: 40 },
   list: { padding: 12, gap: 10 },
   book: { padding: 14, borderRadius: 10, gap: 6 },

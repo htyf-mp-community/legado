@@ -24,7 +24,6 @@ const ruleKeys: Record<QrRuleKind, MessageKey> = {
   txtTocRule: 'qrTxtTocRule',
   dictRule: 'qrDictRule',
   highlightRule: 'qrHighlightRule',
-  httpTtsRule: 'qrHttpTtsRule',
   autoTask: 'qrAutoTask',
   ruleSubscription: 'qrRuleSubscription',
 };

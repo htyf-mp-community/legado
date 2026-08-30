@@ -1,10 +1,10 @@
 import { resolveRemoteQueueIndex } from '../src/core/audioRemoteNavigation';
 
 const queue = [
-  { id: 'book:0:tts:0' },
-  { id: 'book:0:tts:1' },
-  { id: 'book:1:tts:0' },
-  { id: 'book:1:tts:1' },
+  { id: 'book:0:segment:0' },
+  { id: 'book:0:segment:1' },
+  { id: 'book:1:segment:0' },
+  { id: 'book:1:segment:1' },
   { id: 'book:2:0' },
 ];
 

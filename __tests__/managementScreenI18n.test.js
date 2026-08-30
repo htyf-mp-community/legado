@@ -23,7 +23,6 @@ const screens = [
   'DownloadManager',
   'Explore',
   'HighlightRuleManager',
-  'HttpTtsRuleManager',
   'LauncherIconSettings',
   'OnlineBookDetail',
   'QrImport',

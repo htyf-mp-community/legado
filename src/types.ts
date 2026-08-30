@@ -211,21 +211,6 @@ export type HighlightRule = {
   applyToTitle: boolean;
   applyToBody: boolean;
 };
-export type HttpTtsRule = {
-  id: number;
-  name: string;
-  url: string;
-  contentType?: string;
-  pauseDuration: number;
-  concurrentRate?: string;
-  loginUrl?: string;
-  loginUi?: string;
-  header?: string;
-  jsLib?: string;
-  enabledCookieJar: boolean;
-  loginCheckJs?: string;
-  lastUpdateTime: number;
-};
 export type CoverRule = {
   enable: boolean;
   searchUrl: string;
