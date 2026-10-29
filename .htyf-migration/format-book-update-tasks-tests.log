@@ -1,0 +1,10 @@
+src/core/autoTaskProtocol.ts 279ms (unchanged)
+src/data/autoTasks.ts 67ms
+src/services/autoTaskScheduler.ts 13ms
+src/screens/BookshelfManage.tsx 70ms
+src/screens/AutoTaskManager.tsx 42ms (unchanged)
+__tests__/bookUpdateTasks.test.ts 14ms
+__tests__/autoTaskProtocol.test.ts 6ms
+__tests__/autoTaskRunState.test.ts 7ms
+__tests__/autoTaskProtocolService.test.ts 11ms
+__tests__/autoTaskScheduler.test.ts 6ms

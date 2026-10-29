@@ -1,0 +1,39 @@
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      13 | test('a delayed native presentation cannot reopen a sheet that was closed while mounting',()=>{
+      14 |  (globalThis as {IS_REACT_ACT_ENVIRONMENT?:boolean}).IS_REACT_ACT_ENVIRONMENT=true;jest.useFakeTimers();mockNative.visible=false;const cancel=jest.fn();let tree:ReturnType<typeof create>;
+    > 15 |  act(()=>{tree=create(<InTreeSheet visible onDismiss={cancel}>loading</InTreeSheet>)});
+         |                      ^
+      16 |  act(()=>tree.update(<InTreeSheet visible={false} onDismiss={cancel}>loading</InTreeSheet>));
+      17 |  act(()=>jest.runOnlyPendingTimers());expect(mockNative.visible).toBe(false);expect(cancel).not.toHaveBeenCalled();
+      18 |  act(()=>tree.unmount());jest.useRealTimers();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/inTreeSheet.test.tsx:15:22
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/inTreeSheet.test.tsx:15:5)
+
+FAIL __tests__/inTreeSheet.test.tsx
+  ● a delayed native presentation cannot reopen a sheet that was closed while mounting
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      15 |  act(()=>{tree=create(<InTreeSheet visible onDismiss={cancel}>loading</InTreeSheet>)});
+      16 |  act(()=>tree.update(<InTreeSheet visible={false} onDismiss={cancel}>loading</InTreeSheet>));
+    > 17 |  act(()=>jest.runOnlyPendingTimers());expect(mockNative.visible).toBe(false);expect(cancel).not.toHaveBeenCalled();
+         |                                                                  ^
+      18 |  act(()=>tree.unmount());jest.useRealTimers();
+      19 | });
+      20 |
+
+      at Object.toBe (__tests__/inTreeSheet.test.tsx:17:66)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.594 s
+Ran all test suites matching __tests__/inTreeSheet.test.tsx.

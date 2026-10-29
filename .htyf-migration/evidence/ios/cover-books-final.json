@@ -1,0 +1,153 @@
+{
+  "isSuccess": true,
+  "data": [
+    {
+      "id": "remote:http%3A%2F%2F127.0.0.1%3A18198:http%3A%2F%2F127.0.0.1%3A18198%2Fbook",
+      "name": "iOS书单验收",
+      "author": "验收作者",
+      "intro": "这是书源返回的简介。",
+      "chapterTitle": "第二章 延迟目录",
+      "content": "这是第二章正文。\n目录、阅读位置和原有分组应继续保留。",
+      "chapters": [
+        {
+          "id": "http://127.0.0.1:18198/chapter/1",
+          "title": "第一章 书单导入",
+          "content": "这是从书单精确搜索并加载目录后取得的第一章正文。\n书单本身只包含书名、作者和简介。",
+          "url": "http://127.0.0.1:18198/chapter/1",
+          "baseUrl": "http://127.0.0.1:18198/toc",
+          "isVolume": false,
+          "isVip": false,
+          "isPay": false
+        },
+        {
+          "id": "http://127.0.0.1:18198/chapter/2",
+          "title": "第二章 延迟目录",
+          "content": "这是第二章正文。\n目录、阅读位置和原有分组应继续保留。",
+          "url": "http://127.0.0.1:18198/chapter/2",
+          "baseUrl": "http://127.0.0.1:18198/toc",
+          "isVolume": false,
+          "isVip": false,
+          "isPay": false
+        },
+        {
+          "id": "http://127.0.0.1:18198/chapter/3",
+          "title": "第三章 定时更新",
+          "content": "",
+          "url": "http://127.0.0.1:18198/chapter/3",
+          "baseUrl": "http://127.0.0.1:18198/toc",
+          "isVolume": false,
+          "isVip": false,
+          "isPay": false
+        }
+      ],
+      "currentChapterIndex": 1,
+      "progress": 1,
+      "updatedAt": 1793184000211,
+      "origin": "http://127.0.0.1:18198",
+      "originName": "iOS 书单验收源",
+      "bookUrl": "http://127.0.0.1:18198/book",
+      "sourceType": 0,
+      "pendingCatalog": false,
+      "latestChapterTime": 1793184000211,
+      "durChapterTime": 1793177155335,
+      "groupIds": [
+        "1"
+      ],
+      "notShelf": false,
+      "lastCheckCount": 1,
+      "tocUrl": "http://127.0.0.1:18198/toc",
+      "latestChapterTitle": "第三章 定时更新"
+    },
+    {
+      "id": "local:file%3A%2F%2F%2FUsers%2Fdgz%2FLibrary%2FDeveloper%2FCoreSimulator%2FDevices%2F8338CC2C-E716-4B2B-BC30-CC5C777CB2FD%2Fdata%2FContainers%2FData%2FApplication%2F8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14%2FLibrary%2FCaches%2Flegado-web-1793165283286-ios-parity-fixture.txt",
+      "name": "ios-parity-fixture",
+      "author": "本地导入",
+      "intro": "本地 TXT · 2 章",
+      "chapterTitle": "第二章 夜读",
+      "content": "长按书籍可以打开详情页。\n这份文本只用于本次调试，不会作为默认书架内容。",
+      "chapters": [
+        {
+          "id": "chapter-0",
+          "title": "第一章 清晨",
+          "content": "这是独立 iOS 模拟器的导入验收文本。\n书架应保留导入的书籍，点击后直接进入阅读。"
+        },
+        {
+          "id": "chapter-51",
+          "title": "第二章 夜读",
+          "content": "长按书籍可以打开详情页。\n这份文本只用于本次调试，不会作为默认书架内容。"
+        }
+      ],
+      "currentChapterIndex": 1,
+      "progress": 1,
+      "updatedAt": 1793165484320,
+      "localUri": "file:///Users/dgz/Library/Developer/CoreSimulator/Devices/8338CC2C-E716-4B2B-BC30-CC5C777CB2FD/data/Containers/Data/Application/8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14/Documents/167A3444-B70D-47E6-8FD6-AA9702273B93/legado-txt-1793165283293-ios-parity-fixture.txt",
+      "origin": "local",
+      "originName": "ios-parity-fixture.txt",
+      "charset": "UTF-8",
+      "durChapterTime": 1793165484320,
+      "notShelf": false
+    },
+    {
+      "id": "local:file%3A%2F%2F%2FUsers%2Fdgz%2FLibrary%2FDeveloper%2FCoreSimulator%2FDevices%2F8338CC2C-E716-4B2B-BC30-CC5C777CB2FD%2Fdata%2FContainers%2FData%2FApplication%2F8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14%2FLibrary%2FCaches%2Flegado-web-1793167592635-ios-live-import.txt",
+      "name": "ios-live-import",
+      "author": "本地导入",
+      "intro": "本地 TXT · 2 章",
+      "chapterTitle": "第一章 即时导入",
+      "content": "本书通过本机 Web 接口导入。\n书架应在保持打开时立即更新。",
+      "chapters": [
+        {
+          "id": "chapter-0",
+          "title": "第一章 即时导入",
+          "content": "本书通过本机 Web 接口导入。\n书架应在保持打开时立即更新。"
+        },
+        {
+          "id": "chapter-42",
+          "title": "第二章 数据保留",
+          "content": "更新其他书籍的进度时，本书仍应保留。"
+        }
+      ],
+      "currentChapterIndex": 0,
+      "progress": 0,
+      "updatedAt": 1793167592667,
+      "localUri": "file:///Users/dgz/Library/Developer/CoreSimulator/Devices/8338CC2C-E716-4B2B-BC30-CC5C777CB2FD/data/Containers/Data/Application/8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14/Documents/2F0DB621-CEA6-4564-8F76-0D007337C0B7/legado-txt-1793167592641-ios-live-import.txt",
+      "origin": "local",
+      "originName": "ios-live-import.txt",
+      "charset": "UTF-8",
+      "durChapterTime": 1793167592667,
+      "notShelf": false,
+      "groupIds": [
+        "1"
+      ]
+    },
+    {
+      "id": "remote:http%3A%2F%2F127.0.0.1%3A18199:http%3A%2F%2F127.0.0.1%3A18199%2Fbook",
+      "bookUrl": "http://127.0.0.1:18199/book",
+      "origin": "http://127.0.0.1:18199",
+      "originName": "iOS 封面验收源",
+      "name": "iOS封面验收",
+      "author": "封面作者",
+      "intro": "仅用于独立 iOS 的封面分层与文件保存验收。",
+      "coverUrl": "http://127.0.0.1:18199/source.png",
+      "chapterTitle": "封面验收章",
+      "content": "封面操作应保留本文、阅读位置和分组。",
+      "chapters": [
+        {
+          "id": "cover-chapter",
+          "title": "封面验收章",
+          "content": "封面操作应保留本文、阅读位置和分组。",
+          "url": "http://127.0.0.1:18199/chapter/1"
+        }
+      ],
+      "currentChapterIndex": 0,
+      "progress": 0.35,
+      "groupIds": [
+        "1"
+      ],
+      "updatedAt": 1793185210460,
+      "sourceType": 0,
+      "durChapterTime": 1793185210460,
+      "notShelf": false,
+      "persistedCoverUrl": "/Users/dgz/Library/Developer/CoreSimulator/Devices/8338CC2C-E716-4B2B-BC30-CC5C777CB2FD/data/Containers/Data/Application/8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14/Documents/covers/c36355d7cec679b68d548ef3d18a2db8.cover"
+    }
+  ]
+}

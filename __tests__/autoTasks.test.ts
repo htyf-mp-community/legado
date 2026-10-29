@@ -1,6 +1,9 @@
 jest.mock('react-native-mmkv', () => ({
   createMMKV: () => ({ getString: jest.fn(), set: jest.fn() }),
 }));
+jest.mock('../src/services/autoTaskProtocol', () => ({
+  executeAutoTaskProtocolAction: jest.fn(async () => 'Protocol result'),
+}));
 import {
   dueAutoTasks,
   runAutoTask,

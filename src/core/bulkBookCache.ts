@@ -1,5 +1,6 @@
 import type { Book, BookChapter, BookSource } from '../types';
 import type { BookGroupSort } from '../data/bookshelf';
+import { sortShelfBooks } from './bookshelfGroups';
 import { cacheBookChapters } from './bookCache';
 import { loadChapterContent } from './webBook';
 
@@ -15,31 +16,7 @@ export function filterBulkBooksByGroup(
 }
 
 export function sortBulkBooks(books: Book[], sort: BookGroupSort) {
-  return [...books].sort((left, right) => {
-    if (sort === 1)
-      return (
-        (right.latestChapterTime ?? right.updatedAt) -
-        (left.latestChapterTime ?? left.updatedAt)
-      );
-    if (sort === 2)
-      return left.name.localeCompare(right.name, undefined, { numeric: true });
-    if (sort === 3) return (left.order ?? 0) - (right.order ?? 0);
-    if (sort === 4)
-      return (
-        Math.max(
-          right.latestChapterTime ?? 0,
-          right.durChapterTime ?? right.updatedAt,
-        ) -
-        Math.max(
-          left.latestChapterTime ?? 0,
-          left.durChapterTime ?? left.updatedAt,
-        )
-      );
-    return (
-      (right.durChapterTime ?? right.updatedAt) -
-      (left.durChapterTime ?? left.updatedAt)
-    );
-  });
+  return sortShelfBooks(books, sort);
 }
 
 export type BulkBookCacheProgress = {

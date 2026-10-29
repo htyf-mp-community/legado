@@ -1,0 +1,187 @@
+FAIL __tests__/readerPositionBridge.test.tsx
+  ● Console
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      56 |   const props = base();
+      57 |   act(() => {
+    > 58 |     tree = create(<ReaderPositionBridge {...props} />);
+         |                  ^
+      59 |   });
+      60 |   expect(props.setPageIndex).toHaveBeenCalledWith(1);
+      61 |   expect(props.commit).not.toHaveBeenCalled();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:58:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:57:6)
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      76 |   const props = base();
+      77 |   act(() => {
+    > 78 |     tree = create(<ReaderPositionBridge {...props} />);
+         |                  ^
+      79 |   });
+      80 |   const setPageIndex = jest.fn();
+      81 |   act(() =>
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:78:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:77:6)
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      106 |     });
+      107 |   act(() => {
+    > 108 |     tree = create(<ReaderPositionBridge ref={ref} {...props} />);
+          |                  ^
+      109 |   });
+      110 |   act(() => {
+      111 |     ref.current!.onExtent(1000);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:108:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:107:6)
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      145 |     });
+      146 |   act(() => {
+    > 147 |     tree = create(<ReaderPositionBridge key="old" ref={ref} {...props} />);
+          |                  ^
+      148 |   });
+      149 |   act(() => {
+      150 |     ref.current!.onExtent(1000);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:147:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:146:6)
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      178 |   const props = base();
+      179 |   act(() => {
+    > 180 |     tree = create(<ReaderPositionBridge {...props} />);
+          |                  ^
+      181 |   });
+      182 |   act(() => tree!.update(<ReaderPositionBridge {...props} pageIndex={1} />));
+      183 |   const setPageIndex = jest.fn();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:180:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:179:6)
+
+    console.error
+      react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      199 | test('reflow within the same page still allows the next user page to be saved', () => {
+      200 |   const props = base({book: {...book, readingPosition: {chapterId: 'c', position: 3}}});
+    > 201 |   act(() => { tree = create(<ReaderPositionBridge {...props} />); });
+          |                            ^
+      202 |   act(() => tree!.update(<ReaderPositionBridge {...props} layoutKey="same-page-reflow" />));
+      203 |   act(() => tree!.update(<ReaderPositionBridge {...props} layoutKey="same-page-reflow" pageIndex={1} />));
+      204 |   act(() => jest.runOnlyPendingTimers());
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:201:28
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:201:6)
+
+  ● reflow within the same page still allows the next user page to be saved
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: ObjectContaining {"readingPosition": {"chapterId": "c", "position": 6, "titleVisible": true}}
+
+    Number of calls: 0
+
+      203 |   act(() => tree!.update(<ReaderPositionBridge {...props} layoutKey="same-page-reflow" pageIndex={1} />));
+      204 |   act(() => jest.runOnlyPendingTimers());
+    > 205 |   expect(props.commit).toHaveBeenCalledWith(expect.objectContaining({readingPosition: {chapterId:'c', position:6, titleVisible:true}}));
+          |                        ^
+      206 | });
+      207 |
+
+      at Object.toHaveBeenCalledWith (__tests__/readerPositionBridge.test.tsx:205:24)
+
+FAIL __tests__/bookUpdate.test.ts
+  ● an old chapter cursor flushed after a same-book chapter jump cannot replace the destination cursor
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "chapterId": "two",
+    -   "position": 420,
+    +   "chapterId": "one",
+    +   "position": 31,
+      }
+
+      126 |   const result = applyBookUpdate(current, before, {...before, readingPosition:{chapterId:'one',position:31}});
+      127 |   expect(result.currentChapterIndex).toBe(1);
+    > 128 |   expect(result.readingPosition).toEqual(current.readingPosition);
+          |                                  ^
+      129 | });
+      130 | test('an old-source cursor cannot replace a newer source cursor', () => {
+      131 |   const current = {...before, origin:'new-source', bookUrl:'/new', chapters:[chapter('new')], readingPosition:{chapterId:'new',position:92}};
+
+      at Object.toEqual (__tests__/bookUpdate.test.ts:128:34)
+
+  ● an old-source cursor cannot replace a newer source cursor
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "chapterId": "new",
+    -   "position": 92,
+    +   "chapterId": "one",
+    +   "position": 31,
+      }
+
+      130 | test('an old-source cursor cannot replace a newer source cursor', () => {
+      131 |   const current = {...before, origin:'new-source', bookUrl:'/new', chapters:[chapter('new')], readingPosition:{chapterId:'new',position:92}};
+    > 132 |   expect(applyBookUpdate(current, before, {...before, readingPosition:{chapterId:'one',position:31}}).readingPosition).toEqual(current.readingPosition);
+          |                                                                                                                        ^
+      133 | });
+      134 |
+
+      at Object.toEqual (__tests__/bookUpdate.test.ts:132:120)
+
+FAIL __tests__/readerPosition.test.ts
+  ● enabled native page-break markers consume no position while retaining display slice offsets
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 14
+    Received: 4
+
+      40 | test('enabled native page-break markers consume no position while retaining display slice offsets', () => {
+      41 |   const text = 'abc\n[newpage]\ndef';
+    > 42 |   expect(displayTextOffset('T', text, 6, '', true, true)).toBe(14);
+         |                                                           ^
+      43 |   expect(nativeTextOffset('T', text, 14, '', true, true)).toBe(6);
+      44 |   expect(displayTextOffset('T', text, 6, '', true, false)).toBe(4);
+      45 |   expect(nativeTextOffset('T', 'abc\n\ndef', 5, '', true, true)).toBe(6);
+
+      at Object.toBe (__tests__/readerPosition.test.ts:42:59)
+
+Test Suites: 3 failed, 3 total
+Tests:       4 failed, 13 passed, 17 total
+Snapshots:   0 total
+Time:        0.769 s, estimated 1 s
+Ran all test suites matching __tests__/readerPosition.test.ts|__tests__/readerPositionBridge.test.tsx|__tests__/bookUpdate.test.ts.

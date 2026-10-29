@@ -137,8 +137,8 @@ test('matches Android cache-list sort modes', () => {
     'Book 10',
   ]);
   expect(sortBulkBooks(books, 2).map(book => book.id)).toEqual([
-    'Book 2',
     'Book 10',
+    'Book 2',
   ]);
   expect(sortBulkBooks(books, 3).map(book => book.id)).toEqual([
     'Book 2',

@@ -1,10 +1,5 @@
 import type { Book, BookChapter, SearchBook } from '../types';
-
-const comparableChapterTitle = (value: string) =>
-  value
-    .normalize('NFKC')
-    .toLocaleLowerCase()
-    .replace(/[\s\p{P}\p{S}]+/gu, '');
+import { migrationChapterIndex } from './chapterMigration';
 
 export function onlineBookId(book: SearchBook) {
   return `remote:${encodeURIComponent(book.origin)}:${encodeURIComponent(book.bookUrl)}`;
@@ -54,27 +49,53 @@ export function switchLibraryBookSource(
   chapters: BookChapter[],
 ): Book {
   const switched = toLibraryBook(remote, chapters),
-    matchedIndex =
-      switched.chapters?.findIndex(
-        chapter =>
-          comparableChapterTitle(chapter.title) ===
-          comparableChapterTitle(current.chapterTitle),
-      ) ?? -1,
-    currentIndex = Math.max(
-      0,
-      Math.min(
-        (switched.chapters?.length ?? 1) - 1,
-        matchedIndex >= 0
-          ? matchedIndex
-          : Math.round(current.progress * (switched.chapters?.length ?? 1)),
-      ),
-    ),
+    currentIndex = chapters.length
+      ? migrationChapterIndex(
+          current.currentChapterIndex ?? 0,
+          current.chapterTitle,
+          chapters,
+          current.chapters?.length ?? 0,
+        )
+      : 0,
     chapter = switched.chapters?.[currentIndex];
+  const config: Partial<Book> = {};
+  for (const key of [
+    'reSegment',
+    'deleteRubyTag',
+    'deleteHeadingTag',
+    'imageStyle',
+    'removeDuplicateTitle',
+    'removeDuplicateTitleChapterIds',
+    'manualReplaceRuleIds',
+    'useReplaceRules',
+    'reverseToc',
+    'tocExpanded',
+    'simulatedReading',
+  ] as const)
+    Object.assign(config, { [key]: current[key] });
+  const sourceType = remote.sourceType ?? current.sourceType ?? 0;
   return {
     ...switched,
+    ...config,
     id: current.id,
     groupIds: current.groupIds,
-    progress: current.progress,
+    order: current.order,
+    canUpdate: current.canUpdate ?? true,
+    customCoverUrl: current.customCoverUrl,
+    persistedCoverUrl: current.persistedCoverUrl,
+    customIntro: current.customIntro,
+    customTag: current.customTag,
+    kind: remote.kind,
+    wordCount: remote.wordCount,
+    sourceType,
+    nativeType: [8, 32, 64, 128, 4][sourceType] ?? 8,
+    updateError: false,
+    notShelf: false,
+    durChapterTime: current.durChapterTime ?? current.updatedAt,
+    latestChapterTime: switched.updatedAt,
+    lastCheckCount: 0,
+    latestChapterTitle: remote.latestChapterTitle ?? chapters.at(-1)?.title,
+    progress: chapters.length ? current.progress : 0,
     currentChapterIndex: currentIndex,
     chapterTitle: chapter?.title ?? switched.chapterTitle,
     content: chapter?.content ?? '',

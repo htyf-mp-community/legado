@@ -1,0 +1,25 @@
+{
+  "root": "/Users/dgz/Library/Developer/CoreSimulator/Devices/8338CC2C-E716-4B2B-BC30-CC5C777CB2FD/data/Containers/Data/Application/8DBD7B88-B4A2-4BB6-98A5-9C1948D24A14/Documents/LegadoRestoredMedia/1793195030891-8t0351ac2em",
+  "files": [
+    {
+      "path": "covers/a77e965967ebf53f86642bbf20c22e8b.cover",
+      "sha256": "7e5dcd4595478aa135e75c9ad016467c32baae62acecc5db5dd33d763701da59",
+      "size": 361
+    },
+    {
+      "path": "covers/c36355d7cec679b68d548ef3d18a2db8.cover",
+      "sha256": "9aed7e7e0566fe5ada41b9837307bc0f831078e1943ad461363b638ea141cbf9",
+      "size": 360
+    },
+    {
+      "path": "covers/other image.png",
+      "sha256": "7e5dcd4595478aa135e75c9ad016467c32baae62acecc5db5dd33d763701da59",
+      "size": 361
+    },
+    {
+      "path": "bg/paper image.png",
+      "sha256": "7e5dcd4595478aa135e75c9ad016467c32baae62acecc5db5dd33d763701da59",
+      "size": 361
+    }
+  ]
+}

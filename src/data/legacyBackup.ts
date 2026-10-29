@@ -1,3 +1,5 @@
+import { parseLegacyJson } from '../core/legacyJson';
+import { isLocalBook, sourceTypeFromLegacyBookType } from '../core/bookKinds';
 import type {
   Book,
   BookGroup,
@@ -16,18 +18,21 @@ import { parseHighlightRules } from './highlightRules';
 import { parseKeyboardAssists } from './keyboardAssists';
 import { parseRuleSubscriptions } from './ruleSubscriptions';
 import { parseAutoTasks } from './autoTasks';
+import { HTTP_TTS_KEY, parseHttpTts } from './httpTts';
 import {
   normalizeReaderPreferences,
   type ReaderPreferences,
 } from './readerPreferences';
 import { legacyReaderInfoTemplate } from '../core/readerInfoTemplate';
+import { coverImageUri, normalizeLegacyCover } from '../core/bookCover';
+import { localMediaPath } from '../core/backupMediaPaths';
 
 type Entry = { type: 'string'; value: string };
 type ObjectValue = Record<string, unknown>;
 const array = (raw: string, name: string): ObjectValue[] => {
   let value: unknown;
   try {
-    value = JSON.parse(raw);
+    value = parseLegacyJson(raw);
   } catch {
     throw new Error(`${name} 不是有效的 JSON`);
   }
@@ -68,6 +73,7 @@ function cookies(raw: string): Record<string, Entry> {
 export type LegacyMediaMapping = {
   coverRoot?: string;
   coverFiles?: Record<string, string>;
+  existingCoverFiles?: Record<string, string>;
   bgRoot?: string;
   bgFiles?: Record<string, string>;
 };
@@ -155,67 +161,130 @@ export function convertLegacyReaderPreferences(
   });
 }
 
-function books(raw: string, media?: LegacyMediaMapping): Book[] {
+function remapLegacyMediaCover(
+  value: string | undefined,
+  media?: LegacyMediaMapping,
+) {
+  if (!value || !media) return value;
+  const path = localMediaPath(value);
+  if (!path || !/\/covers\/[^/]+$/.test(path)) return value;
+  const name = baseName(path),
+    relative = media.coverFiles?.[name];
+  if (relative && media.coverRoot)
+    return coverImageUri(`${media.coverRoot}/${relative}`);
+  const existing = media.existingCoverFiles?.[name];
+  return existing ? coverImageUri(existing) : undefined;
+}
+
+function books(
+  raw: string,
+  media?: LegacyMediaMapping,
+  titleVisible = true,
+): Book[] {
   return array(raw, 'bookshelf.json').map((value, index) => {
     const id = stableId(text(value.bookUrl), `legacy-book-${index}`),
       chapterIndex = Math.max(0, number(value.durChapterIndex)),
       chapterTitle =
         text(value.durChapterTitle) || text(value.latestChapterTitle) || '正文',
-      legacyCover = text(value.persistedCoverUrl) || text(value.customCoverUrl),
-      relative = legacyCover && media?.coverFiles?.[baseName(legacyCover)],
-      coverUrl =
-        relative && media?.coverRoot
-          ? `file://${media.coverRoot}/${relative}`
-          : legacyCover || text(value.coverUrl) || undefined,
-      durChapterTime = number(value.durChapterTime, Date.now());
+      layers = normalizeLegacyCover({
+        coverUrl: text(value.coverUrl) || undefined,
+        customCoverUrl: text(value.customCoverUrl) || undefined,
+        persistedCoverUrl: text(value.persistedCoverUrl) || undefined,
+      }),
+      durChapterTime = number(value.durChapterTime, Date.now()),
+      totalChapters = Math.max(0, Math.trunc(number(value.totalChapterNum))),
+      position = Math.max(0, Math.trunc(number(value.durChapterPos))),
+      sourceType = sourceTypeFromLegacyBookType(number(value.type)),
+      pendingCatalog =
+        Boolean(value.origin) &&
+        !isLocalBook({
+          origin: text(value.origin),
+          nativeType: number(value.type),
+        }) &&
+        sourceType !== 3;
     return {
       id,
       name: text(value.name) || '未命名书籍',
       author: text(value.author),
-      intro: text(value.customIntro) || text(value.intro),
+      intro: text(value.intro),
+      customIntro: text(value.customIntro) || undefined,
+      customTag: text(value.customTag) || undefined,
       chapterTitle,
       content: '',
-      chapters: [
-        {
-          id: `${id}#${chapterIndex}`,
-          title: chapterTitle,
-          content: '',
-          url: text(value.durChapterUrl) || undefined,
-        },
-      ],
+      pendingCatalog,
+      pendingReadingPosition: {
+        chapterIndex,
+        chapterTitle,
+        totalChapters,
+        position,
+        titleVisible,
+      },
+      chapters: pendingCatalog
+        ? []
+        : [
+            {
+              id: `${id}#${chapterIndex}`,
+              title: chapterTitle,
+              content: '',
+              url: text(value.durChapterUrl) || undefined,
+            },
+          ],
       currentChapterIndex: 0,
-      progress: Math.max(0, number(value.durChapterPos)),
+      progress: totalChapters ? Math.min(1, chapterIndex / totalChapters) : 0,
       updatedAt: durChapterTime,
       durChapterTime,
       latestChapterTime: number(value.latestChapterTime, durChapterTime),
+      lastCheckCount: number(value.lastCheckCount, 0),
       order: number(value.order, index),
       origin: text(value.origin) || undefined,
       originName: text(value.originName) || undefined,
       bookUrl: text(value.bookUrl) || undefined,
       tocUrl: text(value.tocUrl) || undefined,
-      coverUrl,
-      sourceType: number(value.type),
+      coverUrl: layers.coverUrl,
+      customCoverUrl: remapLegacyMediaCover(layers.customCoverUrl, media),
+      persistedCoverUrl: remapLegacyMediaCover(layers.persistedCoverUrl, media),
+      sourceType,
+      nativeType: number(value.type),
+      updateError: !!(number(value.type) & 16),
+      notShelf: !!(number(value.type) & 1024),
+      canUpdate: value.canUpdate !== false,
     };
   });
 }
-function groups(raw: string): BookGroup[] {
+function groups(raw: string, media?: LegacyMediaMapping): BookGroup[] {
   return array(raw, 'bookGroup.json')
-    .filter(value => number(value.groupId) > 0)
+    .filter(value =>
+      /^(?:-1|-2|-3|-4|-5|-6|-11|[1-9]\d*)$/.test(String(value.groupId)),
+    )
     .map((value, index) => ({
       id: String(value.groupId),
       name: text(value.groupName) || `分组 ${index + 1}`,
       order: number(value.order, index),
       show: value.show !== false,
       enableRefresh: value.enableRefresh !== false,
+      bookSort: number(value.bookSort, -1),
+      onlyUpdateRead: value.onlyUpdateRead === true,
+      cover: remapLegacyMediaCover(text(value.cover) || undefined, media),
     }));
 }
-const groupIds = (mask: number, items: BookGroup[]) =>
-  items
+const groupIds = (mask: unknown, items: BookGroup[]) => {
+  let bits: bigint;
+  try {
+    bits = BigInt(String(mask ?? 0));
+  } catch {
+    bits = 0n;
+  }
+  return items
     .filter(item => {
-      const id = Number(item.id);
-      return Number.isSafeInteger(id) && id > 0 && (mask & id) === id;
+      try {
+        const id = BigInt(item.id);
+        return id > 0n && (bits & id) === id;
+      } catch {
+        return false;
+      }
     })
     .map(item => item.id);
+};
 function marks(raw: string, library: Book[]): Bookmark[] {
   return array(raw, 'bookmark.json').map((value, index) => {
     const book = library.find(
@@ -313,7 +382,7 @@ export function convertLegacyBackup(
   };
   if (files['bookGroup.json']) {
     try {
-      bookGroups = groups(files['bookGroup.json']);
+      bookGroups = groups(files['bookGroup.json'], media);
       entries['bookshelf.groups.v1'] = entry(bookGroups);
       importedFiles.push('bookGroup.json');
     } catch (error) {
@@ -324,11 +393,19 @@ export function convertLegacyBackup(
   }
   if (files['bookshelf.json']) {
     try {
-      library = books(files['bookshelf.json'], media);
+      let titleVisible = true;
+      if (files['readConfig.json']) {
+        try {
+          titleVisible =
+            array(files['readConfig.json'], 'readConfig.json')[0]?.titleMode !==
+            2;
+        } catch {}
+      }
+      library = books(files['bookshelf.json'], media, titleVisible);
       const originals = array(files['bookshelf.json'], 'bookshelf.json');
       library = library.map((book, index) => ({
         ...book,
-        groupIds: groupIds(number(originals[index]?.group), bookGroups),
+        groupIds: groupIds(originals[index]?.group, bookGroups),
       }));
       entries['library.v1'] = entry(library);
       importedFiles.push('bookshelf.json');
@@ -360,6 +437,7 @@ export function convertLegacyBackup(
     parseRuleSubscriptions(raw),
   );
   add('autoTask.json', 'auto.tasks.v1', raw => parseAutoTasks(raw));
+  add('httpTTS.json', HTTP_TTS_KEY, raw => parseHttpTts(raw));
   add('runtimeSourceCache.json', 'legacy.runtime-source-cache.v1', raw =>
     array(raw, 'runtimeSourceCache.json'),
   );

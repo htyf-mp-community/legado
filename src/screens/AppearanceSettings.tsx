@@ -49,6 +49,7 @@ export function AppearanceSettings({ back, openBottomBarSkins }: { back: () => v
       ['system', t('themeSystem')],
       ['light', t('themeLight')],
       ['dark', t('themeDark')],
+      ['eink', t('mineThemeEink')],
     ],
     languages: Array<[LanguageMode, string]> = [
       ['system', t('languageSystem')],

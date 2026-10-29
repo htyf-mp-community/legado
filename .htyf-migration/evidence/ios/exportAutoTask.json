@@ -1,0 +1,10 @@
+[
+  {
+    "id": "book_update:9f59eeedeeb0a4cd",
+    "name": "更新 iOS书单验收",
+    "enable": true,
+    "cron": "* * * * *",
+    "script": "({\"type\":\"refreshToc\",\"bookUrl\":\"http://127.0.0.1:18198/book\",\"bookName\":\"iOS书单验收\",\"bookAuthor\":\"验收作者\",\"generatedBy\":\"bookUpdate\",\"respectCanUpdate\":true,\"notify\":{\"enable\":true,\"minCount\":1},\"cache\":{\"enable\":false}})",
+    "enabledCookieJar": true
+  }
+]

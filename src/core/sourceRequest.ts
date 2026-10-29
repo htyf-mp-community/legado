@@ -5,6 +5,7 @@ import { loadGeneralPreferences } from '../data/generalPreferences';
 import { addHttpLog } from '../data/httpLog';
 import { addAppLog } from '../data/appLog';
 import iconv from 'iconv-lite';
+import { checkCancelled } from './cancellation';
 export type SourceRequest = {
   url: string;
   method: 'GET' | 'POST' | 'HEAD';
@@ -161,11 +162,13 @@ const encodeFormBody = (value: string, charset: string) =>
         : `${percentEncode(name, charset)}=${percentEncode(content, charset)}`;
     })
     .join('&');
+/** Build a declarative source request; non-search consumers can disable search-token substitution. */
 export function buildSourceRequest(
   source: BookSource,
   rule: string,
   key = '',
   page = 1,
+  interpolateSearch = true,
 ): SourceRequest {
   if (!rule.trim())
     throw new SourceRuleError('请求地址为空', source.bookSourceName);
@@ -174,16 +177,18 @@ export function buildSourceRequest(
     throw new UnsupportedRuleError('JavaScript URL', source.bookSourceName);
   const [urlPart, optionPart] = splitRule(safeRule),
     url = absolute(
-      replaceVars(urlPart.trim(), key, page),
+      interpolateSearch
+        ? replaceVars(urlPart.trim(), key, page)
+        : urlPart.trim(),
       source.bookSourceUrl,
     );
   let option: Record<string, unknown> = {};
   if (optionPart) {
     try {
-      option = replaceDeep(
-        parseRequestOptions(optionPart),
-        key,
-        page,
+      option = (
+        interpolateSearch
+          ? replaceDeep(parseRequestOptions(optionPart), key, page)
+          : parseRequestOptions(optionPart)
       ) as Record<string, unknown>;
     } catch {
       throw new SourceRuleError('URL 参数 JSON 无效', source.bookSourceName);
@@ -264,12 +269,17 @@ export function buildSourceRequest(
 export async function executeSourceRequest(
   request: SourceRequest,
   timeout = 15000,
+  signal?: AbortSignal,
 ) {
   const controller = new AbortController(),
     started = Date.now(),
     timer = setTimeout(() => controller.abort(), timeout);
+  const cancelled = () => controller.abort();
+  signal?.addEventListener('abort', cancelled);
+  if (signal?.aborted) cancelled();
   let recorded = false;
   try {
+    checkCancelled(controller.signal);
     const preferredUrl = preferredSourceTransportUrl(request.url),
       options = {
         method: request.method,
@@ -292,7 +302,11 @@ export async function executeSourceRequest(
     // where the host supports it, but do not treat an HTTPS error page as the
     // source response: some legacy hosts expose HTTPS without serving the same
     // paths. The original request remains the authoritative fallback.
-    if (!response.ok && preferredUrl !== request.url && !controller.signal.aborted)
+    if (
+      !response.ok &&
+      preferredUrl !== request.url &&
+      !controller.signal.aborted
+    )
       response = await fetch(request.url, options);
     // NSURLSession may retain a transient 404 for chapter pages even after the
     // origin starts serving them. Retry idempotent GETs once while explicitly
@@ -304,7 +318,9 @@ export async function executeSourceRequest(
       !controller.signal.aborted
     ) {
       const retryUrl = cacheBypassUrl(response.url || request.url);
-      addAppLog(`[source-request] retry cached 404 url=${response.url || request.url} retryUrl=${retryUrl}`);
+      addAppLog(
+        `[source-request] retry cached 404 url=${response.url || request.url} retryUrl=${retryUrl}`,
+      );
       response = await fetch(retryUrl, {
         ...options,
         headers: {
@@ -313,7 +329,9 @@ export async function executeSourceRequest(
           Pragma: 'no-cache',
         },
       });
-      addAppLog(`[source-request] retry complete status=${response.status} url=${response.url || retryUrl}`);
+      addAppLog(
+        `[source-request] retry complete status=${response.status} url=${response.url || retryUrl}`,
+      );
     }
     const responseHeaders: Record<string, string> = {};
     if (typeof response.headers?.forEach === 'function')
@@ -336,6 +354,7 @@ export async function executeSourceRequest(
           request.charset,
         )
       : await response.text();
+    checkCancelled(controller.signal);
     addHttpLog({
       method: request.method,
       url: response.url || request.url,
@@ -370,5 +389,6 @@ export async function executeSourceRequest(
     throw error;
   } finally {
     clearTimeout(timer);
+    signal?.removeEventListener('abort', cancelled);
   }
 }

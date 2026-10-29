@@ -1,0 +1,3 @@
+src/core/coverThumbnail.ts 69ms
+src/components/CoverThumbnailRenderer.tsx 21ms
+src/services/webBookCover.ts 16ms

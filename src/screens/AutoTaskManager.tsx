@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -14,7 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import jssdk from '@htyf-mp/js-sdk';
 import { InTreeSheet } from '../components/InTreeSheet';
 import { PageHeader } from '../components/PageHeader';
-import { dueAutoTasks, nextAutoTaskAt, runAutoTask } from '../core/autoTask';
+import { executeDueAutoTasks, nextAutoTaskAt } from '../core/autoTask';
 import {
   fetchAutoTaskJson,
   pickAutoTaskJson,
@@ -30,7 +30,8 @@ import {
   moveAutoTask,
   parseAutoTasks,
   patchAutoTasks,
-  saveAutoTasks,
+  updateAutoTasks,
+  subscribeAutoTasks,
   saveAutoTaskServiceEnabled,
   type AutoTaskRule,
 } from '../data/autoTasks';
@@ -70,9 +71,26 @@ export function AutoTaskManager({
     }, []),
   );
   const visible = useMemo(() => filterAutoTasks(tasks, query), [tasks, query]);
-  const commit = (next: AutoTaskRule[]) => {
-    setTasks(next);
-    saveAutoTasks(next);
+  useEffect(
+    () =>
+      subscribeAutoTasks(() => {
+        setTasks(loadAutoTasks());
+        setServiceEnabled(loadAutoTaskServiceEnabled());
+      }),
+    [],
+  );
+  const commit = (transform: (current: AutoTaskRule[]) => AutoTaskRule[]) => {
+    try {
+      setTasks(updateAutoTasks(transform));
+      return true;
+    } catch (cause) {
+      void jssdk.showToast({
+        type: 'error',
+        title: t('saveFailed'),
+        description: cause instanceof Error ? cause.message : String(cause),
+      });
+      return false;
+    }
   };
   const toast = (
     type: 'success' | 'error',
@@ -80,7 +98,7 @@ export function AutoTaskManager({
     description?: string,
   ) => void jssdk.showToast({ type, title, description });
   const mergeIncoming = (incoming: AutoTaskRule[]) => {
-    commit(mergeAutoTasks(tasks, incoming));
+    if (!commit(current => mergeAutoTasks(current, incoming))) return;
     setTransfer(false);
     toast('success', t('autoTasksImported', { count: incoming.length }));
   };
@@ -104,25 +122,8 @@ export function AutoTaskManager({
     if (running) return;
     setRunning(true);
     try {
-      let next = [...tasks],
-        count = 0;
-      for (const task of dueAutoTasks(tasks)) {
-        const result = await runAutoTask(task),
-          lastRunAt = Date.now();
-        next = next.map(item =>
-          item.id === task.id
-            ? {
-                ...item,
-                lastRunAt,
-                lastResult: result.result,
-                lastError: result.error,
-                lastLog: result.log,
-              }
-            : item,
-        );
-        count++;
-      }
-      commit(next);
+      const count = await executeDueAutoTasks();
+      setTasks(loadAutoTasks());
       toast(
         'success',
         count ? t('dueTasksExecuted', { count }) : t('noDueTasks'),
@@ -146,7 +147,7 @@ export function AutoTaskManager({
   const patchSelected = (
     patch: Partial<Pick<AutoTaskRule, 'enable' | 'cron'>>,
   ) => {
-    commit(patchAutoTasks(tasks, selected, patch));
+    commit(current => patchAutoTasks(current, selected, patch));
     setSelected(new Set());
   };
   const nextAt = nextAutoTaskAt(tasks);
@@ -333,8 +334,8 @@ export function AutoTaskManager({
               })}
               value={task.enable}
               onValueChange={enable =>
-                commit(
-                  tasks.map(item =>
+                void commit(current =>
+                  current.map(item =>
                     item.id === task.id ? { ...item, enable } : item,
                   ),
                 )
@@ -378,14 +379,14 @@ export function AutoTaskManager({
             <Action
               label={t('moveUp')}
               onPress={() => {
-                commit(moveAutoTask(tasks, sheet.id, -1));
+                commit(current => moveAutoTask(current, sheet.id, -1));
                 setSheet(null);
               }}
             />
             <Action
               label={t('moveDown')}
               onPress={() => {
-                commit(moveAutoTask(tasks, sheet.id, 1));
+                commit(current => moveAutoTask(current, sheet.id, 1));
                 setSheet(null);
               }}
             />
@@ -409,8 +410,8 @@ export function AutoTaskManager({
               danger
               label={t('clearLog')}
               onPress={() => {
-                commit(
-                  tasks.map(item =>
+                commit(current =>
+                  current.map(item =>
                     item.id === sheet.id
                       ? {
                           ...item,
@@ -519,7 +520,9 @@ export function AutoTaskManager({
                 accessibilityRole="button"
                 style={[s.confirmButton, { backgroundColor: colors.danger }]}
                 onPress={() => {
-                  commit(tasks.filter(item => !removeIds.has(item.id)));
+                  commit(current =>
+                    current.filter(item => !removeIds.has(item.id)),
+                  );
                   setSelected(new Set());
                   setRemoveIds(null);
                 }}

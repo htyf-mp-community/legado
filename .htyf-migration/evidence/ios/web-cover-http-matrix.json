@@ -1,0 +1,100 @@
+[
+  {
+    "case": "web-cover-public-page",
+    "status": 200,
+    "seconds": 0.017,
+    "bytes": 3651,
+    "contentType": "text/html; charset=utf-8"
+  },
+  {
+    "case": "web-cover-no-token",
+    "status": 401,
+    "seconds": 0.008,
+    "bytes": 45,
+    "contentType": "application/json; charset=utf-8"
+  },
+  {
+    "case": "web-cover-no-token-books",
+    "status": 401,
+    "seconds": 0.001,
+    "bytes": 45,
+    "contentType": "application/json; charset=utf-8"
+  },
+  {
+    "case": "web-cover-custom-red",
+    "status": 200,
+    "seconds": 0.296,
+    "bytes": 523,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-source-blue",
+    "status": 200,
+    "seconds": 0.033,
+    "bytes": 522,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-wide",
+    "status": 200,
+    "seconds": 0.028,
+    "bytes": 522,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-tall",
+    "status": 200,
+    "seconds": 0.021,
+    "bytes": 522,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-option-green",
+    "status": 200,
+    "seconds": 0.027,
+    "bytes": 522,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-default-control",
+    "status": 200,
+    "seconds": 0.061,
+    "bytes": 14128,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-invalid",
+    "status": 200,
+    "seconds": 0.013,
+    "bytes": 14128,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-broken-data",
+    "status": 200,
+    "seconds": 0.011,
+    "bytes": 14128,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-unknown-local",
+    "status": 200,
+    "seconds": 0.003,
+    "bytes": 14128,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-slow",
+    "status": 200,
+    "seconds": 3.025,
+    "bytes": 14128,
+    "contentType": "image/png"
+  },
+  {
+    "case": "web-cover-too-large",
+    "status": 200,
+    "seconds": 3.009,
+    "bytes": 14128,
+    "contentType": "image/png"
+  }
+]

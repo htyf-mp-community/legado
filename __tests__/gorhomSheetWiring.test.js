@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-test('shared bottom sheets use in-tree Gorhom BottomSheet without modal portals', () => {
+test('shared sheets use the Gorhom host owned by this application root', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '../src/components/InTreeSheet.tsx'),
     'utf8',
@@ -12,8 +12,15 @@ test('shared bottom sheets use in-tree Gorhom BottomSheet without modal portals'
   expect(source).toContain('nestedScrollEnabled');
   expect(source).toContain('contentContainerStyle');
   expect(source).toContain('enablePanDownToClose');
-  expect(source).toContain('onClose={onDismiss}');
-  expect(source).not.toMatch(/BottomSheetModal|BottomSheetModalProvider|\bModal\b|Portal/);
+  expect(source).toContain('onDismiss=');
+  expect(source).toContain('<BottomSheetModal');
+  expect(source).toContain('containerComponent={SheetLayer}');
+  expect(source).toMatch(/<View\s+accessibilityViewIsModal/);
+  expect(source).not.toMatch(/\bModal\b|FullWindowOverlay/);
+  const app = fs.readFileSync(path.join(__dirname, '../src/index.tsx'), 'utf8');
+  expect(app).toMatch(
+    /<AppThemeProvider>\s*<View[^>]*>\s*<BottomSheetModalProvider>\s*<AppNavigation/,
+  );
 });
 
 test('the application root provides the gesture-handler host required by Gorhom', () => {

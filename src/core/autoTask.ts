@@ -4,9 +4,11 @@ import {
   loadAutoTasks,
   loadAutoTaskServiceEnabled,
   normalizeAutoTaskScript,
-  saveAutoTasks,
+  updateAutoTasks,
 } from '../data/autoTasks';
 import { addAppLog } from '../data/appLog';
+import { taskActions, taskString } from './autoTaskProtocol';
+import { executeAutoTaskProtocolAction } from '../services/autoTaskProtocol';
 
 export const FIRST_RUN_GRACE_MS = 5 * 60_000;
 const baseTime = (task: AutoTaskRule, now: number) =>
@@ -34,7 +36,11 @@ export function nextAutoTaskAt(
     .filter((time): time is number => time !== undefined);
   return times.length ? Math.max(now, Math.min(...times)) : undefined;
 }
-const formatTime = (value: number) => new Date(value).toLocaleString();
+const formatTime = (value: number) => {
+  const date = new Date(value),
+    pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+};
 export type AutoTaskRunResult = {
   success: boolean;
   result?: string;
@@ -49,6 +55,7 @@ export async function runAutoTask(
   const started = Date.now();
   try {
     const script = normalizeAutoTaskScript(task.script);
+    if (!script) throw new Error('Task script is empty');
     let raw: unknown;
     const body =
       script.startsWith('(') && script.endsWith(')')
@@ -58,32 +65,36 @@ export async function runAutoTask(
       raw = JSON.parse(body);
     } catch {
       throw new Error(
-        '当前 HTYF 运行时未提供 QuickJS，暂不能执行任意 JavaScript；可调试声明式 JSON HTTP 任务',
+        '当前 HTYF 运行时未提供 QuickJS，暂不能执行任意 JavaScript；可运行声明式 JSON 日志、HTTP 和目录更新任务',
       );
     }
-    if (!raw || typeof raw !== 'object')
-      throw new Error('任务必须返回声明式 JSON 对象');
-    const action = raw as Record<string, unknown>;
-    if (action.type === 'http') {
-      const url = String(action.url ?? '');
-      if (!/^https?:\/\//i.test(url)) throw new Error('HTTP 任务缺少有效 URL');
-      const response = await fetcher(url, {
-        method: String(action.method ?? 'GET'),
-        headers: action.headers as Record<string, string> | undefined,
-        body: typeof action.body === 'string' ? action.body : undefined,
-      });
-      const result = (await response.text()).slice(0, 500);
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${result}`);
-      raw = result;
-    } else if (action.type === 'log') raw = String(action.message ?? '');
-    else
-      throw new Error(
-        `暂不支持的声明式任务类型: ${String(action.type ?? '未知')}`,
-      );
-    const result = String(raw ?? '').slice(0, 500),
+    const actions = taskActions(raw),
+      summaries: string[] = [];
+    for (const action of actions) {
+      const type = taskString(action, 'type')?.toLowerCase();
+      if (type === 'http') {
+        const url = String(action.url ?? '');
+        if (!/^https?:\/\//i.test(url))
+          throw new Error('HTTP 任务缺少有效 URL');
+        const response = await fetcher(url, {
+          method: String(action.method ?? 'GET'),
+          headers: action.headers as Record<string, string> | undefined,
+          body: typeof action.body === 'string' ? action.body : undefined,
+        });
+        const result = (await response.text()).slice(0, 500);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${result}`);
+        if (actions.length === 1) raw = result;
+      } else if (type === 'log') {
+        if (actions.length === 1) raw = String(action.message ?? '');
+      } else summaries.push(await executeAutoTaskProtocolAction(action, task));
+    }
+    const result =
+        raw === null || raw === undefined
+          ? undefined
+          : String(raw).slice(0, 500),
       elapsed = Date.now() - started,
       log =
-        `[OK] ${formatTime(Date.now())}\nElapsed: ${elapsed}ms\nResult: ${result}`.slice(
+        `[OK] ${formatTime(Date.now())}\nElapsed: ${elapsed}ms${summaries.map(summary => `\n- ${summary}`).join('')}${result && result !== summaries.join(' | ') ? `\nResult: ${result}` : ''}`.slice(
           0,
           4000,
         );
@@ -103,28 +114,43 @@ export async function runAutoTask(
 }
 
 let activeBatch: Promise<number> | undefined;
-// TODO(htyf-native): Cron tasks run only on foreground/resume until an approved background scheduler is configured; see docs/htyf-migration-gaps.md.
-export function runDueAutoTasks(now = Date.now()): Promise<number> {
-  if (!loadAutoTaskServiceEnabled()) return Promise.resolve(0);
+export function recordAutoTaskRun(
+  id: string,
+  result: AutoTaskRunResult,
+  lastRunAt = Date.now(),
+) {
+  return updateAutoTasks(current =>
+    current.map(task =>
+      task.id === id
+        ? {
+            ...task,
+            lastRunAt,
+            lastResult: result.result,
+            lastError: result.error,
+            lastLog: result.log,
+          }
+        : task,
+    ),
+  );
+}
+export function executeDueAutoTasks(
+  now = Date.now(),
+  respectService = false,
+): Promise<number> {
   if (activeBatch) return activeBatch;
   activeBatch = (async () => {
-    let tasks = loadAutoTasks(),
-      count = 0;
-    for (const task of dueAutoTasks(tasks, now)) {
-      const result = await runAutoTask(task),
-        lastRunAt = Date.now();
-      tasks = tasks.map(item =>
-        item.id === task.id
-          ? {
-              ...item,
-              lastRunAt,
-              lastResult: result.result,
-              lastError: result.error,
-              lastLog: result.log,
-            }
-          : item,
-      );
-      saveAutoTasks(tasks);
+    let count = 0;
+    for (const task of dueAutoTasks(loadAutoTasks(), now)) {
+      if (respectService && !loadAutoTaskServiceEnabled()) break;
+      const result = await runAutoTask(task);
+      try {
+        recordAutoTaskRun(task.id, result);
+      } catch (cause) {
+        addAppLog(
+          `AutoTask[${task.id}] could not persist run state; original data retained`,
+          cause,
+        );
+      }
       count++;
     }
     return count;
@@ -132,4 +158,9 @@ export function runDueAutoTasks(now = Date.now()): Promise<number> {
     activeBatch = undefined;
   });
   return activeBatch;
+}
+// TODO(htyf-native): Cron tasks run only on foreground/resume until an approved background scheduler is configured; see docs/htyf-migration-gaps.md.
+export function runDueAutoTasks(now = Date.now()): Promise<number> {
+  if (!loadAutoTaskServiceEnabled()) return Promise.resolve(0);
+  return executeDueAutoTasks(now, true);
 }

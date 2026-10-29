@@ -1,0 +1,9 @@
+/private/tmp/legado-ios-debug/decode-qr-cpu.swift:6:9: warning: 'usesCPUOnly' was deprecated in macOS 14.0 [#DeprecatedDeclaration]
+ 4 | let file = URL(fileURLWithPath: CommandLine.arguments[1])
+ 5 | let request = VNDetectBarcodesRequest()
+ 6 | request.usesCPUOnly = true
+   |         `- warning: 'usesCPUOnly' was deprecated in macOS 14.0 [#DeprecatedDeclaration]
+ 7 | try VNImageRequestHandler(url: file).perform([request])
+ 8 | for result in request.results ?? [] {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>

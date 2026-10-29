@@ -1,0 +1,102 @@
+[
+  {
+    "time": "2026-10-28T14:44:25.269Z",
+    "method": "GET",
+    "path": "/source.json",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:44:25.302Z",
+    "method": "GET",
+    "path": "/book.json",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.125Z",
+    "method": "GET",
+    "path": "/custom.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.395Z",
+    "method": "GET",
+    "path": "/source.png",
+    "sourceHeader": true,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.423Z",
+    "method": "GET",
+    "path": "/wide.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.447Z",
+    "method": "GET",
+    "path": "/tall.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.472Z",
+    "method": "GET",
+    "path": "/option.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": true
+  },
+  {
+    "time": "2026-10-28T14:47:23.555Z",
+    "method": "GET",
+    "path": "/wide.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.561Z",
+    "method": "GET",
+    "path": "/invalid.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:23.595Z",
+    "method": "GET",
+    "path": "/slow.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:26.617Z",
+    "path": "/slow.png",
+    "closed": true,
+    "finished": false
+  },
+  {
+    "time": "2026-10-28T14:47:26.617Z",
+    "method": "GET",
+    "path": "/too-large.png",
+    "sourceHeader": false,
+    "localToken": false,
+    "optionHeader": false
+  },
+  {
+    "time": "2026-10-28T14:47:29.628Z",
+    "path": "/too-large.png",
+    "closed": true,
+    "finished": false
+  }
+]

@@ -1,0 +1,12 @@
+src/core/webBook.ts 109ms
+src/core/bookMetadata.ts 4ms (unchanged)
+src/screens/BookEditor.tsx 30ms (unchanged)
+src/index.tsx 363ms
+src/core/sourceRequest.ts 152ms
+src/core/onlineLibrary.ts 13ms (unchanged)
+src/screens/BookshelfManage.tsx 108ms (unchanged)
+src/bookshelfManagementMessages.ts 3ms (unchanged)
+__tests__/batchSourceChange.test.ts 6ms
+__tests__/batchSourceChangeService.test.ts 17ms
+__tests__/batchSourcePicker.test.ts 3ms (unchanged)
+__tests__/batchSourcePreferences.test.ts 2ms

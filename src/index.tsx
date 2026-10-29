@@ -1,3 +1,8 @@
+import { ReaderProgressSlider } from './components/ReaderProgressSlider';
+import { CoverThumbnailRenderer } from './components/CoverThumbnailRenderer';
+import { inspectWebDavBackupEntry } from './core/remoteBackupArchive';
+import { restoreBackupPreview } from './core/restoreBackupPreview';
+import { displayBookIntro } from './core/bookMetadata';
 import {
   useCallback,
   useEffect,
@@ -34,12 +39,29 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { PageHeader } from './components/PageHeader';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { MineScreen } from './screens/MineScreen';
+import { AppHelp } from './screens/AppHelp';
+import { SourceIcon } from './components/SourceIcon';
 import { InTreeSheet } from './components/InTreeSheet';
 import { BookCover } from './components/BookCover';
 import { MangaImage } from './components/MangaImage';
 import { parseMangaImages } from './core/manga';
 import { pruneMangaCache } from './core/mangaCache';
-import { loadLibrary, saveLibrary } from './data/library';
+import { loadLibrary, saveLibrary, updateLibrary } from './data/library';
+import { useLibrary } from './hooks/useLibrary';
+import { useBookVisit } from './hooks/useBookVisit';
+import { useBookCatalogue } from './hooks/useBookCatalogue';
+import {
+  ReaderPositionBridge,
+  type ReaderPositionHandle,
+} from './components/ReaderPositionBridge';
+import { readerContentSegments } from './core/readerImages';
+import { BookCatalogueStatus } from './components/BookCatalogueStatus';
+import { applyBookUpdate } from './core/bookUpdate';
+import { loadBookGroups } from './data/bookshelf';
+import { applyBookshelfRefresh } from './core/bookshelfRefresh';
+import { bookReadingScreen } from './core/bookKinds';
 import {
   listBookmarks,
   listHighlights,
@@ -54,6 +76,8 @@ import { SourceEditor } from './screens/SourceEditor';
 import { ContentSearchSheet } from './components/ContentSearchSheet';
 import { ReaderMenuConfigSheet } from './components/ReaderMenuConfigSheet';
 import { BookshelfView } from './components/BookshelfView';
+import { useBookshelfPreferences } from './hooks/useBookshelfPreferences';
+import { useBookshelfRefresh } from './hooks/useBookshelfRefresh';
 import { AnnotationManager } from './screens/AnnotationManager';
 import { BackupRestore } from './screens/BackupRestore';
 import { Explore } from './screens/Explore';
@@ -70,6 +94,9 @@ import { SourceDebug } from './screens/SourceDebug';
 import { BookSourceSwitch } from './screens/BookSourceSwitch';
 import { BookCache } from './screens/BookCache';
 import { AudioPlayer } from './screens/AudioPlayer';
+import { HttpTtsManager } from './screens/HttpTtsManager';
+import { ReadAloudSheet } from './components/ReadAloudSheet';
+import { ReadAloudIcon } from './components/ReadAloudIcon';
 import { DictRuleManager } from './screens/DictRuleManager';
 import { RuleHighlightedText } from './components/RuleHighlightedText';
 import { ReaderRichContent } from './components/ReaderRichContent';
@@ -107,7 +134,6 @@ import {
   loadBackupPreferences,
   saveBackupPreferences,
 } from './data/backupPreferences';
-import { restoreBackup } from './data/backup';
 import { restoreRemoteLocalBook } from './core/remoteLocalBookRestore';
 import { clearExpiredApplicationCache } from './core/cacheMaintenance';
 import { BookExport } from './screens/BookExport';
@@ -143,6 +169,7 @@ import { GeneralSettings } from './screens/GeneralSettings';
 import { ReaderSettings } from './screens/ReaderSettings';
 import { ReaderHelp } from './screens/ReaderHelp';
 import { BookshelfTransfer } from './screens/BookshelfTransfer';
+import { BookshelfManage } from './screens/BookshelfManage';
 import { BulkBookCache } from './screens/BulkBookCache';
 import { About } from './screens/About';
 import { AppFileManager } from './screens/AppFileManager';
@@ -171,6 +198,7 @@ import { loadDownloads, saveDownloads } from './data/downloads';
 import { runDueRuleSubscriptions } from './core/ruleSubscription';
 import { loadCoverRule } from './data/coverRule';
 import { searchBookCover } from './core/coverRule';
+import { displayBookCover } from './core/bookCover';
 import { pickReaderBackground } from './core/readerBackground';
 import {
   renderReaderInfoTemplate,
@@ -181,6 +209,7 @@ import {
   loadReaderPreferences,
   normalizeReaderPreferences,
   readerPalette,
+  readerPreferencesForAppTheme,
   saveReaderPreferences,
   type ReaderPreferences,
   type ReaderTheme,
@@ -189,6 +218,7 @@ import {
 import {
   estimatePageCapacity,
   paginateText,
+  paginateTextRanges,
   stripSpecialPageBreaks,
 } from './core/pagination';
 import {
@@ -230,7 +260,7 @@ import {
   refreshReaderToc,
 } from './core/readerRefresh';
 import { buildSourceRequest } from './core/sourceRequest';
-import { runDueAutoTasks } from './core/autoTask';
+import { startAutoTaskScheduler } from './services/autoTaskScheduler';
 import {
   normalizeSimulatedReading,
   removeDuplicateChapterTitle,
@@ -238,7 +268,6 @@ import {
   simulatedChapterCount,
 } from './core/readerAdvanced';
 import {
-  downloadWebDavBackupEntry,
   downloadWebDavBookProgress,
   loadWebDavConfig,
   uploadWebDavBookProgress,
@@ -274,6 +303,7 @@ type RootStackParamList = {
   BookSourceSwitch: { bookId: string };
   BookCache: { bookId: string };
   AudioPlayer: { bookId: string };
+  HttpTts: undefined;
   DictRules: undefined;
   HighlightRules: { ruleId?: number } | undefined;
   RssSources: undefined;
@@ -282,7 +312,9 @@ type RootStackParamList = {
   CoverSettings: undefined;
   WelcomeSettings: undefined;
   BookExport: { bookId: string };
-  QrImport: { value?: string; expectedKind?: 'bookSource' | 'rssSource' } | undefined;
+  QrImport:
+    | { value?: string; expectedKind?: 'bookSource' | 'rssSource' }
+    | undefined;
   AutoTasks: undefined;
   AutoTaskEditor: { taskId?: string } | undefined;
   AutoTaskDebug: { taskId: string };
@@ -308,73 +340,98 @@ type RootStackParamList = {
   GeneralSettings: undefined;
   ReaderSettings: undefined;
   ReaderHelp: undefined;
+  AppHelp: undefined;
   BookshelfTransfer: undefined;
+  BookshelfManage: { groupId: string };
   BulkBookCache: undefined;
   About: undefined;
 };
 const Stack = createStackNavigator<RootStackParamList>();
 function Shell() {
   const { colors, t } = useAppTheme();
+  const { books, error: storageError } = useLibrary();
   const [generalPreferences, setGeneralPreferences] = useState(
       loadGeneralPreferences,
     ),
     [tab, setTab] = useState<RootTab>(
       () => loadGeneralPreferences().defaultHomePage,
     ),
-    [books, setBooks] = useState<Book[]>([]),
     [loading, setLoading] = useState(true),
+    [readError, setLibraryError] = useState(''),
     [skinRevision, setSkinRevision] = useState(0),
+    translation = useRef(t),
     startupRedirected = useRef(false);
+  const libraryError = storageError?.message ?? readError;
+  useEffect(() => {
+    if (!storageError) setLibraryError('');
+  }, [storageError]);
+  translation.current = t;
+  const readShelf = useCallback(async () => {
+    setLoading(true);
+    setLibraryError('');
+    try {
+      const value = await loadLibrary();
+      const preferences = loadGeneralPreferences();
+      if (preferences.autoRefreshBookshelf) {
+        try {
+          await refreshBookshelf(value, await loadSources(), {
+            concurrency: preferences.threadCount,
+            onlyUpdateRead: preferences.onlyUpdateRead,
+            onBookUpdated: (before, next) =>
+              updateLibrary(current =>
+                applyBookshelfRefresh(current, [before], [next]),
+              ).then(() => undefined),
+          });
+        } catch (error) {
+          void jssdk.showToast({
+            type: 'error',
+            title: translation.current('refreshBookshelf'),
+            description: String(error),
+          });
+        }
+      }
+    } catch (error) {
+      setLibraryError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   useEffect(() => {
     if (loadGeneralPreferences().autoClearExpired)
       void clearExpiredApplicationCache().catch(() => undefined);
-    void loadLibrary()
-      .then(async value => {
-        setBooks(value);
-        const preferences = loadGeneralPreferences();
-        if (!preferences.autoRefreshBookshelf) return;
-        const result = await refreshBookshelf(value, await loadSources(), {
-          concurrency: preferences.threadCount,
-          onlyUpdateRead: preferences.onlyUpdateRead,
-        });
-        setBooks(result.books);
-        await saveLibrary(result.books);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    void readShelf();
+  }, [readShelf]);
   useEffect(() => {
-    void runDueAutoTasks();
+    const stopAutoTasks = startAutoTaskScheduler();
     void runDueRuleSubscriptions();
     void runDueAutomaticBackup().catch(() => undefined);
     const subscription = AppState.addEventListener('change', state => {
       if (state === 'active') {
-        void runDueAutoTasks();
         void runDueRuleSubscriptions();
         void runDueAutomaticBackup().catch(() => undefined);
       }
     });
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      stopAutoTasks();
+    };
   }, []);
-  const update = useCallback(
-    (book: Book) =>
-      setBooks(old => {
-        const next = old.map(x => (x.id === book.id ? book : x));
-        void saveLibrary(next);
-        return next;
-      }),
-    [],
-  );
+  const update = useCallback((book: Book, before?: Book) => {
+    void updateLibrary(current =>
+      current.map(item =>
+        item.id === book.id ? applyBookUpdate(item, before, book) : item,
+      ),
+    ).catch(error => setLibraryError(String(error)));
+  }, []);
   const replaceBooks = useCallback((next: Book[]) => {
-    setBooks(next);
-    void saveLibrary(next);
+    void saveLibrary(next).catch(error => setLibraryError(String(error)));
   }, []);
-  const upsertBook = useCallback(
-    (book: Book) => {
-      const next = [...books.filter(item => item.id !== book.id), book];
-      replaceBooks(next);
-    },
-    [books, replaceBooks],
-  );
+  const upsertBook = useCallback((book: Book) => {
+    void updateLibrary(current => [
+      ...current.filter(item => item.id !== book.id),
+      book,
+    ]).catch(error => setLibraryError(String(error)));
+  }, []);
   if (loading)
     return (
       <View style={s.center}>
@@ -388,94 +445,170 @@ function Shell() {
       screenOptions={{ headerShown: false, gestureEnabled: true }}
     >
       <Stack.Screen name="Home">
-        {({ navigation }) => (
-          <View style={s.flex}>
-            <StartupReaderRedirect
-              books={books}
-              enabled={generalPreferences.defaultToRead}
-              redirected={startupRedirected}
-              open={bookId => navigation.navigate('Reader', { bookId })}
-            />
-            <PageHeader
-              title={t(
-                tab === 'bookshelf'
-                  ? 'bookshelf'
-                  : tab === 'explore'
-                    ? 'explore'
-                    : tab === 'rss'
-                      ? 'subscriptions'
-                      : 'mine',
-              )}
-              action={
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t('search')}
-                  style={({ pressed }) => pressed && s.iconPressed}
-                  onPress={() => navigation.navigate('Search')}
-                >
-                  <Svg width={24} height={24} viewBox="0 0 24 24">
-                    <Circle cx={10.5} cy={10.5} r={6.5} fill="none" stroke={colors.text} strokeWidth={2} />
-                    <Path d="M15.5 15.5L21 21" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" />
-                  </Svg>
-                </Pressable>
-              }
-            />
-            <View style={s.flex}>
-              {tab === 'bookshelf' ? (
-                <BookshelfView
-                  books={books}
-                  open={bookId => navigation.navigate('Book', { bookId })}
-                  onChange={replaceBooks}
-                  importBooks={() => navigation.navigate('LocalBookImport')}
-                  addByUrl={() => navigation.navigate('AddBookByUrl')}
-                  refresh={async () => {
-                    const result = await refreshBookshelf(
-                      books,
-                      await loadSources(),
-                      {
-                        concurrency: generalPreferences.threadCount,
-                        onlyUpdateRead: generalPreferences.onlyUpdateRead,
-                      },
-                    );
-                    replaceBooks(result.books);
-                    void jssdk.showToast({
-                      type: result.failed ? 'error' : 'success',
-                      title: t('bookshelfRefreshComplete'),
-                      description: t('bookshelfRefreshSummary', {
-                        attempted: result.attempted,
-                        updated: result.updated,
-                        failed: result.failed,
-                      }),
-                    });
-                  }}
-                  openRemote={() => navigation.navigate('RemoteBooks')}
-                  openTransfer={() => navigation.navigate('BookshelfTransfer')}
-                  openLogs={() => navigation.navigate('AppLogs')}
-                  openBulkCache={() => navigation.navigate('BulkBookCache')}
-                />
-              ) : tab === 'explore' ? (
-                <Explore
-                  open={book => navigation.navigate('OnlineBook', { book })}
-                />
-              ) : tab === 'rss' ? (
-                <Rss
-                  open={articleId =>
-                    navigation.navigate('RssReader', { articleId })
-                  }
-                  manage={() => navigation.navigate('RssSources')}
-                />
-              ) : (
-                <Mine navigate={screen => navigation.navigate(screen)} />
-              )}
+        {({ navigation }) =>
+          libraryError ? (
+            <View style={s.center}>
+              <Text accessibilityRole="alert" style={{ color: colors.text }}>
+                {libraryError}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                style={s.headerAction}
+                onPress={() => void readShelf()}
+              >
+                <Text>{t('retry')}</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                style={s.headerAction}
+                onPress={() => navigation.navigate('Backup')}
+              >
+                <Text>{t('backupRestore')}</Text>
+              </Pressable>
             </View>
-            <TabBar
-              active={tab}
-              select={setTab}
-              preferences={generalPreferences}
-              skinRevision={skinRevision}
-            />
-          </View>
-        )}
+          ) : (
+            <View style={s.flex}>
+              <StartupReaderRedirect
+                books={books}
+                enabled={generalPreferences.defaultToRead}
+                redirected={startupRedirected}
+                open={bookId => navigation.navigate('Reader', { bookId })}
+              />
+              {tab !== 'bookshelf' ? (
+                <PageHeader
+                  sourceTone
+                  title={t(
+                    tab === 'explore'
+                      ? 'explore'
+                      : tab === 'rss'
+                        ? 'subscriptions'
+                        : 'mine',
+                  )}
+                  action={
+                    tab === 'mine' ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t('mineHelpTitle')}
+                        style={s.headerAction}
+                        onPress={() => navigation.navigate('AppHelp')}
+                      >
+                        <SourceIcon name="ic_help" color={colors.toolbarText} />
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t('search')}
+                        style={s.headerAction}
+                        onPress={() => navigation.navigate('Search')}
+                      >
+                        <Svg width={24} height={24} viewBox="0 0 24 24">
+                          <Circle
+                            cx={10.5}
+                            cy={10.5}
+                            r={6.5}
+                            fill="none"
+                            stroke={colors.toolbarText}
+                            strokeWidth={2}
+                          />
+                          <Path
+                            d="M15.5 15.5L21 21"
+                            fill="none"
+                            stroke={colors.toolbarText}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                          />
+                        </Svg>
+                      </Pressable>
+                    )
+                  }
+                />
+              ) : null}
+              <View style={s.flex}>
+                {tab === 'bookshelf' ? (
+                  <BookshelfView
+                    books={books}
+                    open={bookId => {
+                      const book = books.find(item => item.id === bookId);
+                      if (!book) return;
+                      void restoreRemoteLocalBook(book)
+                        .then(restored => {
+                          if (restored) update(restored);
+                          navigation.navigate(
+                            bookReadingScreen(restored ?? book),
+                            { bookId },
+                          );
+                        })
+                        .catch(() =>
+                          navigation.navigate(bookReadingScreen(book), {
+                            bookId,
+                          }),
+                        );
+                    }}
+                    openDetails={bookId =>
+                      navigation.navigate('Book', { bookId })
+                    }
+                    search={() => navigation.navigate('Search')}
+                    onChange={replaceBooks}
+                    importBooks={() => navigation.navigate('LocalBookImport')}
+                    addByUrl={() => navigation.navigate('AddBookByUrl')}
+                    refresh={async group => {
+                      const result = await refreshBookshelf(
+                        books,
+                        await loadSources(),
+                        {
+                          concurrency: generalPreferences.threadCount,
+                          onlyUpdateRead: group.onlyUpdateRead === true,
+                          groupId: group.id,
+                          groups: loadBookGroups(),
+                          onBookUpdated: (before, next) =>
+                            updateLibrary(current =>
+                              applyBookshelfRefresh(current, [before], [next]),
+                            ).then(() => undefined),
+                        },
+                      );
+                      void jssdk.showToast({
+                        type: result.failed ? 'error' : 'success',
+                        title: t('bookshelfRefreshComplete'),
+                        description: t('bookshelfRefreshSummary', {
+                          attempted: result.attempted,
+                          updated: result.updated,
+                          failed: result.failed,
+                        }),
+                      });
+                    }}
+                    openRemote={() => navigation.navigate('RemoteBooks')}
+                    openLogs={() => navigation.navigate('AppLogs')}
+                    openBulkCache={() => navigation.navigate('BulkBookCache')}
+                    openManage={groupId =>
+                      navigation.navigate('BookshelfManage', { groupId })
+                    }
+                  />
+                ) : tab === 'explore' ? (
+                  <Explore
+                    open={book => navigation.navigate('OnlineBook', { book })}
+                  />
+                ) : tab === 'rss' ? (
+                  <Rss
+                    open={articleId =>
+                      navigation.navigate('RssReader', { articleId })
+                    }
+                    manage={() => navigation.navigate('RssSources')}
+                  />
+                ) : (
+                  <MineScreen
+                    navigate={screen => navigation.navigate(screen)}
+                  />
+                )}
+              </View>
+              <TabBar
+                active={tab}
+                select={setTab}
+                preferences={generalPreferences}
+                skinRevision={skinRevision}
+              />
+            </View>
+          )
+        }
       </Stack.Screen>
       <Stack.Screen name="Book">
         {({ navigation, route }) => (
@@ -492,12 +625,12 @@ function Shell() {
               void restoreRemoteLocalBook(current)
                 .then(restored => {
                   if (restored) update(restored);
-                  navigation.navigate('Reader', {
+                  navigation.navigate(bookReadingScreen(restored ?? current), {
                     bookId: route.params.bookId,
                   });
                 })
                 .catch(() =>
-                  navigation.navigate('Reader', {
+                  navigation.navigate(bookReadingScreen(current), {
                     bookId: route.params.bookId,
                   }),
                 );
@@ -555,6 +688,16 @@ function Shell() {
             books={books}
             back={() => navigation.goBack()}
             imported={replaceBooks}
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="BookshelfManage">
+        {({ navigation, route }) => (
+          <BookshelfManage
+            initialGroupId={route.params.groupId}
+            back={() => navigation.goBack()}
+            open={bookId => navigation.navigate('Book', { bookId })}
+            onBooksChange={replaceBooks}
           />
         )}
       </Stack.Screen>
@@ -616,6 +759,7 @@ function Shell() {
             openLogs={() => navigation.navigate('AppLogs')}
             openReaderSettings={() => navigation.navigate('ReaderSettings')}
             openHelp={() => navigation.navigate('ReaderHelp')}
+            openSpeechEngines={() => navigation.navigate('HttpTts')}
           />
         )}
       </Stack.Screen>
@@ -647,6 +791,11 @@ function Shell() {
             back={() => navigation.goBack()}
             update={update}
           />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="HttpTts">
+        {({ navigation }) => (
+          <HttpTtsManager back={() => navigation.goBack()} />
         )}
       </Stack.Screen>
       <Stack.Screen name="Search">
@@ -699,6 +848,37 @@ function Shell() {
             openReaderSettings={() => navigation.navigate('ReaderSettings')}
             openAbout={() => navigation.navigate('About')}
             openKeyboardAssists={() => navigation.navigate('KeyboardAssists')}
+            openSpeechEngines={() => navigation.navigate('HttpTts')}
+            extraEntries={[
+              {
+                label: t('bookListLegacyBackup'),
+                open: () => navigation.navigate('BookshelfTransfer'),
+              },
+              {
+                label: t('rssSources'),
+                open: () => navigation.navigate('RssSources'),
+              },
+              {
+                label: t('downloads'),
+                open: () => navigation.navigate('Downloads'),
+              },
+              {
+                label: t('browser'),
+                open: () => navigation.navigate('Browser'),
+              },
+              {
+                label: t('localWebService'),
+                open: () => navigation.navigate('LocalWebService'),
+              },
+              {
+                label: t('remoteBooks'),
+                open: () => navigation.navigate('RemoteBooks'),
+              },
+              {
+                label: t('launcherIcon'),
+                open: () => navigation.navigate('LauncherIcon'),
+              },
+            ]}
           />
         )}
       </Stack.Screen>
@@ -716,7 +896,10 @@ function Shell() {
               navigation.navigate('SourceDebug', { sourceUrl })
             }
             search={sourceUrl => navigation.navigate('Search', { sourceUrl })}
-            openQr={() => navigation.navigate('QrImport', { expectedKind: 'bookSource' })}
+            openQr={() =>
+              navigation.navigate('QrImport', { expectedKind: 'bookSource' })
+            }
+            openSubscriptions={() => navigation.navigate('RuleSubscriptions')}
           />
         )}
       </Stack.Screen>
@@ -773,7 +956,10 @@ function Shell() {
         {({ navigation }) => (
           <BackupRestore
             back={() => navigation.goBack()}
-            onRestored={async () => setBooks(await loadLibrary())}
+            onRestored={async () => {
+              await loadLibrary();
+              setLibraryError('');
+            }}
             openDirectLink={() => navigation.navigate('DirectLinkUpload')}
           />
         )}
@@ -858,7 +1044,9 @@ function Shell() {
             debug={sourceUrl =>
               navigation.navigate('RssSourceDebug', { sourceUrl })
             }
-            openQr={() => navigation.navigate('QrImport', { expectedKind: 'rssSource' })}
+            openQr={() =>
+              navigation.navigate('QrImport', { expectedKind: 'rssSource' })
+            }
           />
         )}
       </Stack.Screen>
@@ -937,14 +1125,24 @@ function Shell() {
       </Stack.Screen>
       <Stack.Screen name="Appearance">
         {({ navigation }) => (
-          <AppearanceSettings back={() => navigation.goBack()} openBottomBarSkins={() => navigation.navigate('BottomBarSkins')} />
+          <AppearanceSettings
+            back={() => navigation.goBack()}
+            openBottomBarSkins={() => navigation.navigate('BottomBarSkins')}
+          />
         )}
       </Stack.Screen>
       <Stack.Screen name="BottomBarSkins">
-        {({ navigation }) => <BottomBarSkins back={() => navigation.goBack()} changed={() => setSkinRevision(value => value + 1)} />}
+        {({ navigation }) => (
+          <BottomBarSkins
+            back={() => navigation.goBack()}
+            changed={() => setSkinRevision(value => value + 1)}
+          />
+        )}
       </Stack.Screen>
       <Stack.Screen name="KeyboardAssists">
-        {({ navigation }) => <KeyboardAssists back={() => navigation.goBack()} />}
+        {({ navigation }) => (
+          <KeyboardAssists back={() => navigation.goBack()} />
+        )}
       </Stack.Screen>
       <Stack.Screen name="AppLogs">
         {({ navigation }) => <AppLogs back={() => navigation.goBack()} />}
@@ -1063,6 +1261,8 @@ function Shell() {
       <Stack.Screen name="GeneralSettings">
         {({ navigation }) => (
           <GeneralSettings
+            openMore={() => navigation.navigate('Settings')}
+            openServices={() => navigation.navigate('LocalWebService')}
             back={() => navigation.goBack()}
             changed={value => {
               setGeneralPreferences(value);
@@ -1078,6 +1278,14 @@ function Shell() {
       <Stack.Screen name="ReaderSettings">
         {({ navigation }) => (
           <ReaderSettings back={() => navigation.goBack()} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="AppHelp">
+        {({ navigation }) => (
+          <AppHelp
+            back={() => navigation.goBack()}
+            open={url => navigation.navigate('Browser', { url })}
+          />
         )}
       </Stack.Screen>
       <Stack.Screen name="ReaderHelp">
@@ -1144,7 +1352,7 @@ function Bookshelf({
           <BookCover
             name={book.name}
             author={book.author}
-            uri={book.coverUrl}
+            book={book}
             style={s.cover}
           />
           <View style={s.bookText}>
@@ -1153,7 +1361,7 @@ function Bookshelf({
               {book.author} · {book.chapterTitle}
             </Text>
             <Text numberOfLines={2} style={s.intro}>
-              {book.intro}
+              {displayBookIntro(book)}
             </Text>
           </View>
         </Pressable>
@@ -1169,7 +1377,7 @@ function BookDetail({
   cache,
   playAudio,
   playVideo,
-  update,
+  update: commitBook,
   exportBook,
   edit,
   refresh,
@@ -1183,13 +1391,17 @@ function BookDetail({
   cache: () => void;
   playAudio: () => void;
   playVideo: () => void;
-  update: (book: Book) => void;
+  update: (book: Book, before?: Book) => void;
   exportBook: () => void;
   edit: () => void;
   refresh: () => Promise<void>;
   top: () => void;
   openLogs: () => void;
 }) {
+  const update = useCallback(
+    (next: Book) => commitBook(next, book),
+    [commitBook, book],
+  );
   const { t, colors } = useAppTheme();
   const [coverLoading, setCoverLoading] = useState(false);
   const [coverMessage, setCoverMessage] = useState('');
@@ -1202,8 +1414,13 @@ function BookDetail({
     setCoverMessage('');
     try {
       const coverUrl = await searchBookCover(book, loadCoverRule());
-      if (coverUrl && coverUrl !== book.coverUrl)
-        update({ ...book, coverUrl, updatedAt: Date.now() });
+      if (coverUrl && coverUrl !== displayBookCover(book))
+        update({
+          ...book,
+          customCoverUrl: coverUrl,
+          persistedCoverUrl: undefined,
+          updatedAt: Date.now(),
+        });
       else if (!coverUrl) setCoverMessage(t('coverRuleNoImage'));
     } catch (error) {
       setCoverMessage(error instanceof Error ? error.message : String(error));
@@ -1212,7 +1429,8 @@ function BookDetail({
     }
   }, [book, coverLoading, t, update]);
   useEffect(() => {
-    if (book && !book.coverUrl && loadCoverRule().enable) void refreshCover();
+    if (book && !displayBookCover(book)?.trim() && loadCoverRule().enable)
+      void refreshCover();
   }, [book?.id]);
   if (!book)
     return (
@@ -1375,7 +1593,7 @@ function BookDetail({
           <BookCover
             name={book.name}
             author={book.author}
-            uri={book.coverUrl}
+            book={book}
             style={[s.cover, s.largeCover]}
           />
           <View style={s.bookText}>
@@ -1403,7 +1621,7 @@ function BookDetail({
           </Text>
         ) : null}
         <Text style={s.sectionTitle}>{t('introduction')}</Text>
-        <Text style={s.body}>{book.intro}</Text>
+        <Text style={s.body}>{displayBookIntro(book)}</Text>
         <Text style={s.sectionTitle}>{t('latestChapter')}</Text>
         <Text style={s.body}>{book.chapterTitle}</Text>
         {book.bookUrl ? (
@@ -1486,7 +1704,7 @@ function Reader({
   book,
   initialChapterIndex,
   back,
-  update,
+  update: commitBook,
   openReviews,
   openEditor,
   openSourceSwitch,
@@ -1497,11 +1715,12 @@ function Reader({
   openLogs,
   openReaderSettings,
   openHelp,
+  openSpeechEngines,
 }: {
   book?: Book;
   initialChapterIndex?: number;
   back: () => void;
-  update: (b: Book) => void;
+  update: (b: Book, before?: Book) => void;
   openReviews: (chapterIndex: number, paragraphIndex?: number) => void;
   openEditor: () => void;
   openSourceSwitch: () => void;
@@ -1512,10 +1731,19 @@ function Reader({
   openLogs: () => void;
   openReaderSettings: () => void;
   openHelp: () => void;
+  openSpeechEngines: () => void;
 }) {
-  const { t, colors } = useAppTheme();
+  const update = useCallback(
+    (next: Book) => commitBook(next, book),
+    [commitBook, book],
+  );
+  const { t, colors, preferences: appPreferences } = useAppTheme();
   const focused = useIsFocused();
+  useBookVisit(book?.id);
   const [controls, setControls] = useState(true),
+    [readAloudVisible, setReadAloudVisible] = useState(false),
+    [readerToolsVisible, setReaderToolsVisible] = useState(false),
+    [quickStyleVisible, setQuickStyleVisible] = useState(false),
     [config, setConfig] = useState(false),
     [toc, setToc] = useState(false),
     [tocTab, setTocTab] = useState<'toc' | 'bookmarks' | 'highlights'>('toc'),
@@ -1554,7 +1782,9 @@ function Reader({
     ),
     [replaceRules, setReplaceRules] = useState(loadReplaceRules),
     [highlightRules, setHighlightRules] = useState(loadHighlightRules),
-    [prefs, setPrefs] = useState<ReaderPreferences>(defaultReaderPreferences),
+    [storedPrefs, setPrefs] = useState<ReaderPreferences>(
+      defaultReaderPreferences,
+    ),
     [backgroundMessage, setBackgroundMessage] = useState(''),
     [clock, setClock] = useState(Date.now()),
     [pageIndex, setPageIndex] = useState(0),
@@ -1566,6 +1796,11 @@ function Reader({
     [advancedMessage, setAdvancedMessage] = useState(''),
     [pendingProgress, setPendingProgress] = useState<RemoteBookProgress>(),
     [pendingChapterJump, setPendingChapterJump] = useState<number>(),
+    [chapterTransition, setChapterTransition] = useState<{
+      targetIndex: number;
+      title: string;
+      error?: string;
+    }>(),
     [chapterJumpConfirmed, setChapterJumpConfirmed] = useState(false),
     [simulationDate, setSimulationDate] = useState(
       book?.simulatedReading?.startDate ??
@@ -1607,8 +1842,12 @@ function Reader({
     ),
     replacePreviewGesture = useRef(false),
     replacePreviewTouches = useRef<Array<{ x: number; y: number }>>([]),
+    chapterSwitchingRef = useRef(false),
+    chapterSwitchRequest = useRef(0),
     readerScrollAtTop = useRef(true),
     mangaScroll = useRef<ScrollView>(null),
+    textScroll = useRef<ScrollView>(null),
+    readingPosition = useRef<ReaderPositionHandle>(null),
     mangaOffset = useRef(0),
     mangaExtent = useRef(0),
     mangaViewport = useRef(0),
@@ -1618,6 +1857,7 @@ function Reader({
     nextPageRef = useRef<() => void>(() => undefined),
     pageMotion = useRef(new Animated.Value(1)).current,
     pageDirection = useRef<1 | -1>(1),
+    prefs = readerPreferencesForAppTheme(storedPrefs, appPreferences.themeMode),
     pageColumns =
       prefs.mode === 'page'
         ? readerPageColumns(prefs.doublePageMode, window.width, window.height)
@@ -1630,6 +1870,7 @@ function Reader({
     ),
     previousPageCapacity = useRef(pageCapacity),
     safeLayout = readerSafeLayout(insets, capsuleLayout.capsule, window.width);
+  const catalogue = useBookCatalogue(book, setIndex);
   const mangaSpecialUi =
       book?.sourceType === 2 && loadGeneralPreferences().showMangaUi,
     mangaHorizontal = mangaSpecialUi ? prefs.mangaHorizontal : true;
@@ -1638,13 +1879,21 @@ function Reader({
   useEffect(() => {
     if (focused) setReplaceRules(loadReplaceRules());
   }, [focused]);
+  useEffect(
+    () => () => {
+      chapterSwitchRequest.current++;
+      chapterSwitchingRef.current = false;
+    },
+    [],
+  );
   useEffect(() => {
     const previous = previousPageCapacity.current;
     previousPageCapacity.current = pageCapacity;
+    if (readingPosition.current) return;
     setPageIndex(value =>
       reflowPageIndex(value, previous, pageCapacity, pageColumns),
     );
-  }, [pageCapacity, pageColumns]);
+  }, [pageCapacity, pageColumns, book?.sourceType]);
   useEffect(() => {
     if (!book?.origin) {
       setMangaHeaders({});
@@ -1728,13 +1977,8 @@ function Reader({
   }, []);
   useEffect(() => {
     if (!focused) return;
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () =>
-        shouldBlockReaderHardwareBack(
-          prefs.disableReturnKey,
-          controls,
-        ),
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () =>
+      shouldBlockReaderHardwareBack(prefs.disableReturnKey, controls),
     );
     return () => subscription.remove();
   }, [controls, focused, prefs.disableReturnKey]);
@@ -1891,7 +2135,7 @@ function Reader({
     };
   }, [focused, prefs.volumeKeyPage]);
   useEffect(() => {
-    if (!book) return;
+    if (!book || catalogue.needed) return;
     const chapters = book.chapters ?? [],
       safeIndex = Math.max(0, Math.min(index, chapters.length - 1)),
       chapter = chapters[safeIndex];
@@ -1915,7 +2159,7 @@ function Reader({
         });
       })
       .then(content => {
-        if (!active) return;
+        if (!active || chapterSwitchingRef.current) return;
         const nextChapters = chapters.map((item, chapterIndex) =>
           chapterIndex === safeIndex ? { ...item, content } : item,
         );
@@ -1928,8 +2172,11 @@ function Reader({
         });
       })
       .catch(async reason => {
-        if (!active) return;
-        addAppLog(`[reader-content] primary load failed book=${JSON.stringify(book.name)} chapterIndex=${safeIndex} chapter=${JSON.stringify(chapter.title)} origin=${book.origin ?? ''} bookUrl=${book.bookUrl ?? ''} chapterUrl=${chapter.url ?? ''}`, reason);
+        if (!active || chapterSwitchingRef.current) return;
+        addAppLog(
+          `[reader-content] primary load failed book=${JSON.stringify(book.name)} chapterIndex=${safeIndex} chapter=${JSON.stringify(chapter.title)} origin=${book.origin ?? ''} bookUrl=${book.bookUrl ?? ''} chapterUrl=${chapter.url ?? ''}`,
+          reason,
+        );
         if (loadGeneralPreferences().autoChangeSource && book.origin) {
           setRemoteLoading(chapter.id);
           setRemoteError(t('autoChangingSource'));
@@ -1946,7 +2193,10 @@ function Reader({
             return;
           } catch (switchError) {
             if (!active) return;
-            addAppLog(`[reader-content] automatic source switch failed book=${JSON.stringify(book.name)} chapter=${JSON.stringify(chapter.title)}`, switchError);
+            addAppLog(
+              `[reader-content] automatic source switch failed book=${JSON.stringify(book.name)} chapter=${JSON.stringify(chapter.title)}`,
+              switchError,
+            );
             setRemoteError(
               t('autoChangeSourceFailed', {
                 error:
@@ -1968,9 +2218,14 @@ function Reader({
     return () => {
       active = false;
     };
-  }, [book, index, remoteRetry, update]);
+  }, [book, index, remoteRetry, update, catalogue.needed]);
   useEffect(() => {
-    if (!book?.origin || !book.chapters?.[index]?.content) return;
+    if (
+      chapterSwitchingRef.current ||
+      !book?.origin ||
+      !book.chapters?.[index]?.content
+    )
+      return;
     const preferences = loadGeneralPreferences();
     if (!preferences.preDownloadNum) return;
     let active = true;
@@ -1997,7 +2252,8 @@ function Reader({
         );
       })
       .then(next => {
-        if (active && next !== book) update(next);
+        if (active && !chapterSwitchingRef.current && next !== book)
+          update(next);
       })
       .catch(() => undefined);
     return () => {
@@ -2137,11 +2393,12 @@ function Reader({
     scrollDisplayContent = prefs.adaptSpecialStyle
       ? stripSpecialPageBreaks(displayContent)
       : displayContent,
-    pages = paginateText(
+    pageRanges = paginateTextRanges(
       displayContent,
       pageCapacity,
       prefs.adaptSpecialStyle,
     ),
+    pages = pageRanges.map(page => page.text),
     readerInfoValues: ReaderInfoValues = {
       bookName: book.name,
       chapterTitle: replacedTitle,
@@ -2183,7 +2440,18 @@ function Reader({
       { background: colors.surface, foreground: colors.text },
     ),
     change = (next: Partial<ReaderPreferences>) => {
-      const value = normalizeReaderPreferences({ ...prefs, ...next });
+      const value = normalizeReaderPreferences({
+        ...storedPrefs,
+        ...next,
+        ...(appPreferences.themeMode === 'eink'
+          ? {
+              theme: storedPrefs.theme,
+              pageAnimation: storedPrefs.pageAnimation,
+              epaperPageAnimation:
+                next.pageAnimation ?? storedPrefs.epaperPageAnimation,
+            }
+          : {}),
+      });
       setPrefs(value);
       void saveReaderPreferences(value);
     },
@@ -2207,30 +2475,148 @@ function Reader({
       else change({ paperBackgroundImage: '' });
       setBackgroundMessage(t('solidBackgroundRestored'));
     },
-    persistChapter = (nextIndex: number) => {
+    persistChapter = (
+      nextIndex: number,
+      edge: 'start' | 'end' = 'start',
+      restoredPosition?: number,
+    ) => {
+      if (chapterSwitchingRef.current) return;
       const safe = readableChapterIndex(
           chapters,
           nextIndex,
           nextIndex < index ? -1 : nextIndex > index ? 1 : 0,
         ),
         next = chapters[safe];
-      setIndex(safe);
-      setPageIndex(0);
+      if (!next) return;
+      const commit = (
+        updatedBook: Book,
+        chapterIndex: number,
+        content: string,
+      ) => {
+        const updatedChapters = updatedBook.chapters ?? chapters,
+          resolvedChapter = updatedChapters[chapterIndex] ?? next,
+          nextPageIndex =
+            edge === 'end'
+              ? spreadStart(
+                  Math.max(
+                    0,
+                    paginateText(
+                      applyReplaceRules(content, replaceRules, 'content', {
+                        name: book.name,
+                        origin: book.id,
+                      }),
+                      pageCapacity,
+                      prefs.adaptSpecialStyle,
+                    ).length - 1,
+                  ),
+                  pageColumns,
+                )
+              : 0;
+        readingPosition.current?.flush();
+        update({
+          ...updatedBook,
+          currentChapterIndex: chapterIndex,
+          readingPosition: {
+            chapterId: resolvedChapter.id,
+            position: restoredPosition ?? (edge === 'end' ? 2147483647 : 0),
+            titleVisible: true,
+          },
+          chapterTitle: resolvedChapter.title,
+          content,
+          progress: (chapterIndex + 1) / updatedChapters.length,
+          updatedAt: Date.now(),
+        });
+        setIndex(chapterIndex);
+        // A text bridge restores the explicit cursor (including a same-position seek).
+        // Forcing page zero here would be interpreted as a fresh user movement.
+        if (!readingPosition.current || resolvedChapter.id !== chapter.id)
+          setPageIndex(nextPageIndex);
+        setChapterTransition(undefined);
+      };
+      if (safe === index || next.content || !next.url || next.isVolume) {
+        commit(book, safe, next.content ?? '');
+        return;
+      }
+
+      chapterSwitchingRef.current = true;
+      const request = ++chapterSwitchRequest.current;
+      setChapterTransition({ targetIndex: safe, title: next.title });
+      void (async () => {
+        try {
+          let content: string;
+          try {
+            const sources = await loadSources(),
+              source = sources.find(item => item.bookSourceUrl === book.origin);
+            if (!source) throw new Error(t('sourceMissing'));
+            content = await loadChapterContent(source, {
+              url: next.url!,
+              title: next.title,
+              index: safe,
+              bookUrl: book.bookUrl ?? '',
+              baseUrl: next.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
+              isVolume: !!next.isVolume,
+              isVip: !!next.isVip,
+              isPay: !!next.isPay,
+            });
+            if (request !== chapterSwitchRequest.current) return;
+            const nextChapters = chapters.map((chapterItem, chapterIndex) =>
+              chapterIndex === safe ? { ...chapterItem, content } : chapterItem,
+            );
+            commit({ ...book, chapters: nextChapters }, safe, content);
+          } catch (primaryError) {
+            if (request !== chapterSwitchRequest.current) return;
+            addAppLog(
+              `[reader-content] chapter transition failed book=${JSON.stringify(book.name)} chapterIndex=${safe} chapter=${JSON.stringify(next.title)} origin=${book.origin ?? ''} chapterUrl=${next.url ?? ''}`,
+              primaryError,
+            );
+            if (!loadGeneralPreferences().autoChangeSource || !book.origin)
+              throw primaryError;
+            const switched = await autoSwitchSourceForChapter(
+              book,
+              safe,
+              await loadSources(),
+            );
+            if (request !== chapterSwitchRequest.current) return;
+            const resolvedIndex = switched.currentChapterIndex ?? safe,
+              resolved = switched.chapters?.[resolvedIndex];
+            if (!resolved?.content)
+              throw new Error(t('chapterSwitchNoContent'));
+            commit(switched, resolvedIndex, resolved.content);
+          }
+        } catch (error) {
+          if (request !== chapterSwitchRequest.current) return;
+          addAppLog(
+            `[reader-content] chapter transition exhausted book=${JSON.stringify(book.name)} chapter=${JSON.stringify(next.title)}`,
+            error,
+          );
+          setChapterTransition({
+            targetIndex: safe,
+            title: next.title,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        } finally {
+          if (request === chapterSwitchRequest.current)
+            chapterSwitchingRef.current = false;
+        }
+      })();
+    },
+    saveCurrentChapter = () => {
+      readingPosition.current?.flush();
       update({
         ...book,
-        currentChapterIndex: safe,
-        chapterTitle: next.title,
-        content: next.content,
-        progress: (safe + 1) / chapters.length,
+        currentChapterIndex: index,
+        chapterTitle: chapter.title,
+        content: chapter.content,
+        progress: (index + 1) / chapters.length,
         updatedAt: Date.now(),
       });
     },
     leave = () => {
-      persistChapter(index);
+      saveCurrentChapter();
       back();
     },
     leaveFor = (open: () => void) => {
-      persistChapter(index);
+      saveCurrentChapter();
       setAdvanced(false);
       open();
     },
@@ -2253,24 +2639,17 @@ function Reader({
       setBookmarks(listBookmarks(book.id));
     },
     previousPage = () => {
+      if (chapterSwitchingRef.current) return;
       pageDirection.current = -1;
       if (pageIndex > 0)
         setPageIndex(value => Math.max(0, value - pageColumns));
       else if (index > 0) {
         const previous = index - 1;
-        persistChapter(previous);
-        const previousChapter = chapters[previous];
-        const previousPages = paginateText(
-          applyReplaceRules(previousChapter.content, replaceRules, 'content', {
-            name: book.name,
-            origin: book.id,
-          }),
-          pageCapacity,
-        );
-        setPageIndex(spreadStart(previousPages.length - 1, pageColumns));
+        persistChapter(previous, 'end');
       }
     },
     nextPage = () => {
+      if (chapterSwitchingRef.current) return;
       pageDirection.current = 1;
       if (pageIndex + pageColumns < pages.length)
         setPageIndex(value => value + pageColumns);
@@ -2520,6 +2899,18 @@ function Reader({
   };
   previousPageRef.current = previousPage;
   nextPageRef.current = nextPage;
+  const seekReaderProgress = (value: number) => {
+    const target = normalizeReaderProgressTarget(value, progressState.max);
+    if (prefs.progressBarBehavior === 'page') {
+      const page = spreadStart(target, pageColumns);
+      if (prefs.mode === 'scroll' && readingPosition.current)
+        readingPosition.current.seekPage(page);
+      else setPageIndex(page);
+    } else if (target !== index) {
+      if (chapterJumpConfirmed) persistChapter(target);
+      else setPendingChapterJump(target);
+    }
+  };
   return (
     <View
       style={[
@@ -2542,6 +2933,48 @@ function Reader({
           source={{ uri: backgroundImage }}
           resizeMode="cover"
           style={StyleSheet.absoluteFill}
+        />
+      ) : null}
+      <BookCatalogueStatus state={catalogue} />
+      {chapter.content.trim() &&
+      book.sourceType !== 2 &&
+      readerContentSegments(displayContent).every(
+        segment => segment.type === 'text',
+      ) ? (
+        <ReaderPositionBridge
+          key={`${book.id}:${chapter.id}`}
+          ref={readingPosition}
+          book={book}
+          chapterId={chapter.id}
+          title={replacedTitle}
+          text={prefs.mode === 'scroll' ? scrollDisplayContent : displayContent}
+          pageText={displayContent}
+          indent={prefs.paragraphIndent}
+          honorSpecialPageBreaks={prefs.adaptSpecialStyle}
+          mode={prefs.mode}
+          pageIndex={pageIndex}
+          columns={pageColumns}
+          ranges={pageRanges}
+          layoutKey={JSON.stringify([
+            prefs.mode,
+            displayContent,
+            pageCapacity,
+            pageColumns,
+            window.width,
+            window.height,
+            prefs.fontSize,
+            prefs.lineHeight,
+            prefs.letterSpacing,
+            prefs.textBold,
+            prefs.textFullJustify,
+            prefs.contentInsetHorizontal,
+            prefs.contentInsetVertical,
+            prefs.paragraphSpacing,
+          ])}
+          contentTop={64 + prefs.contentInsetVertical}
+          setPageIndex={setPageIndex}
+          scrollTo={y => textScroll.current?.scrollTo({ y, animated: false })}
+          commit={update}
         />
       ) : null}
       {prefs.showReaderHeader ? (
@@ -2789,10 +3222,26 @@ function Reader({
           </View>
         ) : prefs.mode === 'scroll' ? (
           <ScrollView
+            ref={textScroll}
             key={chapter.id}
+            onLayout={event =>
+              readingPosition.current?.onViewport(
+                event.nativeEvent.layout.height,
+              )
+            }
+            onContentSizeChange={(_width, height) =>
+              readingPosition.current?.onExtent(height)
+            }
+            onScrollBeginDrag={() =>
+              readingPosition.current?.onScrollBeginDrag()
+            }
+            onMomentumScrollEnd={() => readingPosition.current?.flush()}
             onScroll={event => {
               readerScrollAtTop.current =
                 event.nativeEvent.contentOffset.y <= 0.5;
+              readingPosition.current?.onScroll(
+                event.nativeEvent.contentOffset.y,
+              );
             }}
             scrollEventThrottle={32}
             contentContainerStyle={[
@@ -2816,52 +3265,64 @@ function Reader({
             {scrollDisplayContent
               .split(/\n{2,}/)
               .map((paragraph, paragraphIndex) => (
-              // TODO(htyf-native): React Native can expose normal selection but cannot programmatically expand the native selection range to this whole paragraph; see docs/htyf-migration-gaps.md.
-              <View
-                key={`${paragraphIndex}:${paragraph.length}`}
-                style={[
-                  s.reviewParagraph,
-                  { marginBottom: prefs.paragraphSpacing },
-                ]}
-              >
-                <ReaderRichContent
-                  text={paragraph}
-                  rules={highlightRules}
-                  context={`${book.name} ${book.origin ?? ''}`}
-                  selectable={prefs.selectText}
-                  imageClickMode={prefs.imageClickMode}
-                  imageStyle={book.imageStyle}
-                  imageHeaders={mangaHeaders}
-                  onPreview={setPreviewReaderImage}
-                  onOpenLink={setPendingReaderLink}
-                  highlightActionTrigger={prefs.highlightActionTrigger}
-                  onHighlightRule={setActiveHighlightRule}
+                // TODO(htyf-native): React Native can expose normal selection but cannot programmatically expand the native selection range to this whole paragraph; see docs/htyf-migration-gaps.md.
+                <View
+                  key={`${paragraphIndex}:${paragraph.length}`}
+                  onLayout={event =>
+                    readingPosition.current?.onParagraphLayout(
+                      paragraphIndex,
+                      event.nativeEvent.layout.y,
+                    )
+                  }
                   style={[
-                    s.readerText,
-                    {
-                      color: palette.foreground,
-                      fontSize: prefs.fontSize,
-                      lineHeight: prefs.lineHeight,
-                      letterSpacing: prefs.letterSpacing,
-                      fontWeight: prefs.textBold ? '700' : '400',
-                      textAlign: prefs.textFullJustify ? 'justify' : 'left',
-                    },
+                    s.reviewParagraph,
+                    { marginBottom: prefs.paragraphSpacing },
                   ]}
-                />
-                {reviewCounts[paragraphIndex + 1] ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    style={s.reviewCount}
-                    onPress={() => openReviews(index, paragraphIndex + 1)}
-                  >
-                    <Text style={{ color: palette.foreground }}>
-                      {t('reviewCount', {
-                        count: reviewCounts[paragraphIndex + 1],
-                      })}
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </View>
+                >
+                  <ReaderRichContent
+                    text={paragraph}
+                    rules={highlightRules}
+                    context={`${book.name} ${book.origin ?? ''}`}
+                    selectable={prefs.selectText}
+                    imageClickMode={prefs.imageClickMode}
+                    imageStyle={book.imageStyle}
+                    imageHeaders={mangaHeaders}
+                    onPreview={setPreviewReaderImage}
+                    onOpenLink={setPendingReaderLink}
+                    highlightActionTrigger={prefs.highlightActionTrigger}
+                    onHighlightRule={setActiveHighlightRule}
+                    onTextLayout={event =>
+                      readingPosition.current?.onTextLayout(
+                        paragraphIndex,
+                        event.nativeEvent.lines,
+                      )
+                    }
+                    style={[
+                      s.readerText,
+                      {
+                        color: palette.foreground,
+                        fontSize: prefs.fontSize,
+                        lineHeight: prefs.lineHeight,
+                        letterSpacing: prefs.letterSpacing,
+                        fontWeight: prefs.textBold ? '700' : '400',
+                        textAlign: prefs.textFullJustify ? 'justify' : 'left',
+                      },
+                    ]}
+                  />
+                  {reviewCounts[paragraphIndex + 1] ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      style={s.reviewCount}
+                      onPress={() => openReviews(index, paragraphIndex + 1)}
+                    >
+                      <Text style={{ color: palette.foreground }}>
+                        {t('reviewCount', {
+                          count: reviewCounts[paragraphIndex + 1],
+                        })}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               ))}
           </ScrollView>
         ) : (
@@ -2948,9 +3409,7 @@ function Reader({
                       imageStyle={book.imageStyle}
                       specialHtmlPageHeight={Math.max(
                         120,
-                        window.height -
-                          160 -
-                          prefs.contentInsetVertical * 2,
+                        window.height - 160 - prefs.contentInsetVertical * 2,
                       )}
                       imageHeaders={mangaHeaders}
                       onPreview={setPreviewReaderImage}
@@ -2976,6 +3435,78 @@ function Reader({
           </Animated.View>
         )}
       </View>
+      {chapterTransition ? (
+        <View
+          accessibilityLiveRegion="polite"
+          style={[
+            s.chapterTransition,
+            {
+              top: safeLayout.top + 76,
+              backgroundColor: readerChrome.background,
+              borderColor: `${readerChrome.foreground}22`,
+            },
+          ]}
+        >
+          {chapterTransition.error ? (
+            <>
+              <Text
+                style={{ color: readerChrome.foreground, fontWeight: '700' }}
+              >
+                {t('chapterSwitchFailed', { chapter: chapterTransition.title })}
+              </Text>
+              <Text
+                numberOfLines={2}
+                style={{ color: readerChrome.foreground, opacity: 0.75 }}
+              >
+                {chapterTransition.error}
+              </Text>
+              <View style={s.chapterTransitionActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('retry')}
+                  style={s.chapterTransitionButton}
+                  onPress={() => {
+                    const target = chapterTransition.targetIndex;
+                    setChapterTransition(undefined);
+                    persistChapter(target);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: readerChrome.foreground,
+                      fontWeight: '700',
+                    }}
+                  >
+                    {t('retry')}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('close')}
+                  style={s.chapterTransitionButton}
+                  onPress={() => setChapterTransition(undefined)}
+                >
+                  <Text style={{ color: readerChrome.foreground }}>
+                    {t('close')}
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          ) : (
+            <View style={s.chapterTransitionLoading}>
+              <ActivityIndicator color={readerChrome.foreground} size="small" />
+              <Text
+                numberOfLines={1}
+                style={{ color: readerChrome.foreground, flex: 1 }}
+              >
+                {t('chapterSwitchLoading', {
+                  chapter: chapterTransition.title,
+                })}
+              </Text>
+            </View>
+          )}
+        </View>
+      ) : null}
       {pullBookmarkState !== 'none' ? (
         <View
           pointerEvents="none"
@@ -3097,38 +3628,25 @@ function Reader({
                 },
               )}
             </Text>
-            <Slider
-              accessibilityLabel={t(
+            <ReaderProgressSlider
+              label={t(
                 prefs.progressBarBehavior === 'page'
                   ? 'readerPageProgressLabel'
                   : 'readerChapterProgressLabel',
               )}
-              style={s.readerProgressSlider}
-              minimumValue={0}
-              maximumValue={progressState.max}
-              step={1}
+              max={progressState.max}
               value={progressState.value}
+              step={prefs.progressBarBehavior === 'page' ? pageColumns : 1}
               minimumTrackTintColor={readerChrome.foreground}
               maximumTrackTintColor={`${readerChrome.foreground}55`}
-              disabled={progressState.max === 0}
-              onSlidingComplete={value => {
-                const target = normalizeReaderProgressTarget(
-                  value,
-                  progressState.max,
-                );
-                if (prefs.progressBarBehavior === 'page')
-                  setPageIndex(spreadStart(target, pageColumns));
-                else if (target !== index) {
-                  if (chapterJumpConfirmed) persistChapter(target);
-                  else setPendingChapterJump(target);
-                }
-              }}
+              disabled={
+                progressState.max === 0 ||
+                (!!chapterTransition && !chapterTransition.error)
+              }
+              onSeek={seekReaderProgress}
             />
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={s.readerBottomContent}
+          <View
             style={[
               s.readerBottom,
               {
@@ -3141,17 +3659,32 @@ function Reader({
           >
             <Pressable
               accessibilityRole="button"
-              disabled={index === 0}
+              accessibilityLabel={t('previousChapter')}
+              disabled={
+                index === 0 || (!!chapterTransition && !chapterTransition.error)
+              }
               style={({ pressed }) => [
-                s.readerAction,
-                index === 0 && s.readerActionDisabled,
+                s.readerMainAction,
+                (index === 0 ||
+                  (!!chapterTransition && !chapterTransition.error)) &&
+                  s.readerActionDisabled,
                 pressed && s.readerActionPressed,
               ]}
               onPress={() => persistChapter(index - 1)}
             >
               <Text
+                style={[
+                  s.readerActionSymbol,
+                  { color: index === 0 ? '#999' : readerChrome.foreground },
+                ]}
+              >
+                ‹
+              </Text>
+              <Text
+                numberOfLines={1}
                 style={{
                   color: index === 0 ? '#999' : readerChrome.foreground,
+                  fontSize: 11,
                 }}
               >
                 {t('previousChapter')}
@@ -3159,8 +3692,9 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
+              accessibilityLabel={t('toc')}
               style={({ pressed }) => [
-                s.readerAction,
+                s.readerMainAction,
                 pressed && s.readerActionPressed,
               ]}
               onPress={() => {
@@ -3169,48 +3703,99 @@ function Reader({
                 setToc(true);
               }}
             >
-              <Text style={{ color: readerChrome.foreground }}>{t('toc')}</Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              style={({ pressed }) => [
-                s.readerAction,
-                pressed && s.readerActionPressed,
-              ]}
-              onPress={() => setContentSearch(true)}
-            >
-              <Text style={{ color: readerChrome.foreground }}>
-                {t('contentSearch')}
+              <Text
+                style={[
+                  s.readerActionSymbol,
+                  { color: readerChrome.foreground },
+                ]}
+              >
+                ☷
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={{ color: readerChrome.foreground, fontSize: 11 }}
+              >
+                {t('toc')}
               </Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
+              accessibilityLabel={t('readAloud')}
               style={({ pressed }) => [
-                s.readerAction,
+                s.readerMainAction,
                 pressed && s.readerActionPressed,
               ]}
-              onPress={() => openReviews(index)}
+              onPress={() => setReadAloudVisible(true)}
             >
-              <Text style={{ color: readerChrome.foreground }}>
-                {t('reviews')}
+              <ReadAloudIcon color={readerChrome.foreground} />
+              <Text
+                numberOfLines={1}
+                style={{ color: readerChrome.foreground, fontSize: 11 }}
+              >
+                {t('readAloud')}
               </Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              disabled={index === chapters.length - 1}
+              accessibilityLabel={t('readerSettings')}
               style={({ pressed }) => [
-                s.readerAction,
-                index === chapters.length - 1 && s.readerActionDisabled,
+                s.readerMainAction,
+                pressed && s.readerActionPressed,
+              ]}
+              onPress={() => setQuickStyleVisible(true)}
+            >
+              <Text
+                style={[
+                  s.readerActionSymbol,
+                  { color: readerChrome.foreground },
+                ]}
+              >
+                Aa
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={{ color: readerChrome.foreground, fontSize: 11 }}
+              >
+                {t('readerSettings')}
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('nextChapter')}
+              disabled={
+                index === chapters.length - 1 ||
+                (!!chapterTransition && !chapterTransition.error)
+              }
+              style={({ pressed }) => [
+                s.readerMainAction,
+                (index === chapters.length - 1 ||
+                  (!!chapterTransition && !chapterTransition.error)) &&
+                  s.readerActionDisabled,
                 pressed && s.readerActionPressed,
               ]}
               onPress={() => persistChapter(index + 1)}
             >
               <Text
+                style={[
+                  s.readerActionSymbol,
+                  {
+                    color:
+                      index === chapters.length - 1
+                        ? '#999'
+                        : readerChrome.foreground,
+                  },
+                ]}
+              >
+                ›
+              </Text>
+              <Text
+                numberOfLines={1}
                 style={{
                   color:
                     index === chapters.length - 1
                       ? '#999'
                       : readerChrome.foreground,
+                  fontSize: 11,
                 }}
               >
                 {t('nextChapter')}
@@ -3218,44 +3803,158 @@ function Reader({
             </Pressable>
             <Pressable
               accessibilityRole="button"
+              accessibilityLabel={t('readerMenuMore')}
               style={({ pressed }) => [
-                s.readerAction,
+                s.readerMainAction,
                 pressed && s.readerActionPressed,
               ]}
-              onPress={() => setConfig(true)}
+              onPress={() => setReaderToolsVisible(true)}
             >
-              <Text style={{ color: readerChrome.foreground }}>
-                {t('settings')}
+              <Text
+                style={[
+                  s.readerActionSymbol,
+                  { color: readerChrome.foreground },
+                ]}
+              >
+                •••
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={{ color: readerChrome.foreground, fontSize: 11 }}
+              >
+                {t('readerMenuMore')}
               </Text>
             </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('logs')}
-              style={({ pressed }) => [
-                s.readerAction,
-                pressed && s.readerActionPressed,
-              ]}
-              onPress={openLogs}
-            >
-              <Text style={{ color: readerChrome.foreground }}>
-                {t('logs')}
-              </Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              style={({ pressed }) => [
-                s.readerAction,
-                pressed && s.readerActionPressed,
-              ]}
-              onPress={() => setAdvanced(true)}
-            >
-              <Text style={{ color: readerChrome.foreground }}>
-                {t('advanced')}
-              </Text>
-            </Pressable>
-          </ScrollView>
+          </View>
         </>
       ) : null}
+      <ReadAloudSheet
+        visible={readAloudVisible}
+        focused={focused}
+        onDismiss={() => setReadAloudVisible(false)}
+        content={displayContent}
+        chapterTitle={chapter.title}
+        openEngines={openSpeechEngines}
+        previousChapter={
+          index > 0 ? () => persistChapter(index - 1) : undefined
+        }
+        nextChapter={
+          index < chapters.length - 1
+            ? () => persistChapter(index + 1)
+            : undefined
+        }
+      />
+      <InTreeSheet
+        visible={quickStyleVisible}
+        onDismiss={() => setQuickStyleVisible(false)}
+      >
+        <Text
+          accessibilityRole="header"
+          style={[s.sectionTitle, { color: colors.text }]}
+        >
+          {t('readerSettings')}
+        </Text>
+        <SettingStepper
+          label={t('fontSize')}
+          value={prefs.fontSize}
+          decrease={() => change({ fontSize: prefs.fontSize - 1 })}
+          increase={() => change({ fontSize: prefs.fontSize + 1 })}
+        />
+        <SettingStepper
+          label={t('lineSpacing')}
+          value={prefs.lineHeight}
+          decrease={() => change({ lineHeight: prefs.lineHeight - 2 })}
+          increase={() => change({ lineHeight: prefs.lineHeight + 2 })}
+        />
+        <Text style={[s.settingLabel, { color: colors.text }]}>
+          {t('background')}
+        </Text>
+        <View style={s.themeRow}>
+          {(
+            [
+              ['paper', t('paper')],
+              ['green', t('eyeCare')],
+              ['night', t('night')],
+              ['epaper', t('epaper')],
+            ] as Array<[ReaderTheme, string]>
+          ).map(([theme, label]) => (
+            <Pressable
+              accessibilityRole="radio"
+              accessibilityLabel={label}
+              accessibilityState={{ selected: prefs.theme === theme }}
+              key={theme}
+              style={[s.theme, prefs.theme === theme && s.themeActive]}
+              onPress={() => change({ theme })}
+            >
+              <Text>{label}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          style={[s.quickStyleMore, { borderColor: colors.border }]}
+          onPress={() => {
+            setQuickStyleVisible(false);
+            setConfig(true);
+          }}
+        >
+          <Text style={{ color: colors.primary, fontWeight: '700' }}>
+            {t('moreTypographySettings')}
+          </Text>
+          <Text style={{ color: colors.primary }}>›</Text>
+        </Pressable>
+      </InTreeSheet>
+      <InTreeSheet
+        visible={readerToolsVisible}
+        onDismiss={() => setReaderToolsVisible(false)}
+      >
+        <Text
+          accessibilityRole="header"
+          style={[s.sectionTitle, { color: colors.text }]}
+        >
+          {t('readerTools')}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          style={s.readerToolAction}
+          onPress={() => {
+            setReaderToolsVisible(false);
+            setContentSearch(true);
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('contentSearch')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={s.readerToolAction}
+          onPress={() => {
+            setReaderToolsVisible(false);
+            openReviews(index);
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('reviews')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={s.readerToolAction}
+          onPress={() => {
+            setReaderToolsVisible(false);
+            openLogs();
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('logs')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={s.readerToolAction}
+          onPress={() => {
+            setReaderToolsVisible(false);
+            setAdvanced(true);
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('advanced')}</Text>
+        </Pressable>
+      </InTreeSheet>
       <ContentSearchSheet
         visible={contentSearch}
         book={book}
@@ -4675,6 +5374,8 @@ function Reader({
                         pendingProgress.durChapterIndex,
                         chapters.length - 1,
                       ),
+                      'start',
+                      pendingProgress.durChapterPos,
                     );
                     setPendingProgress(undefined);
                     setAdvancedMessage(t('remoteProgressApplied'));
@@ -4974,6 +5675,8 @@ function Settings({
   openReaderSettings,
   openAbout,
   openKeyboardAssists,
+  openSpeechEngines,
+  extraEntries,
 }: {
   back: () => void;
   openSources: () => void;
@@ -4995,12 +5698,15 @@ function Settings({
   openReaderSettings: () => void;
   openAbout: () => void;
   openKeyboardAssists: () => void;
+  openSpeechEngines: () => void;
+  extraEntries: Array<{ label: string; open: () => void }>;
 }) {
   const { colors, t } = useAppTheme();
   const entries: Array<{ label: string; open: () => void }> = [
     { label: t('appearance'), open: openAppearance },
     { label: t('otherSettings'), open: openGeneralSettings },
     { label: t('readerSettings'), open: openReaderSettings },
+    { label: t('httpTtsEngines'), open: openSpeechEngines },
     { label: t('backupRestore'), open: openBackup },
     { label: t('sourceManagement'), open: openSources },
     { label: t('annotations'), open: openAnnotations },
@@ -5017,6 +5723,7 @@ function Settings({
     { label: t('keyboardAssistConfig'), open: openKeyboardAssists },
     { label: t('logs'), open: openLogs },
     { label: t('about'), open: openAbout },
+    ...extraEntries,
   ];
   return (
     <View style={[s.flex, { backgroundColor: colors.background }]}>
@@ -5043,95 +5750,27 @@ function Settings({
     </View>
   );
 }
-function Mine({
-  navigate,
+function HomeTabIcon({
+  tab,
+  color,
+  selected,
 }: {
-  navigate: (
-    screen:
-      | 'Settings'
-      | 'Backup'
-      | 'Sources'
-      | 'Annotations'
-      | 'ReplaceRules'
-      | 'RssSources'
-      | 'RuleSubscriptions'
-      | 'AutoTasks'
-      | 'AppLogs'
-      | 'ReadRecords'
-      | 'RemoteBooks'
-      | 'Downloads'
-      | 'LauncherIcon'
-      | 'Browser'
-      | 'LocalWebService'
-      | 'FileManager'
-      | 'About',
-  ) => void;
+  tab: RootTab;
+  color: string;
+  selected: boolean;
 }) {
-  const { colors, t } = useAppTheme(),
-    entries: Array<[string, Parameters<typeof navigate>[0]]> = [
-      [t('backupRestore'), 'Backup'],
-      [t('sourceManagement'), 'Sources'],
-      [t('annotations'), 'Annotations'],
-      [t('replaceRules'), 'ReplaceRules'],
-      [t('rssSources'), 'RssSources'],
-      [t('ruleSubscriptions'), 'RuleSubscriptions'],
-      [t('downloads'), 'Downloads'],
-      [t('browser'), 'Browser'],
-      [t('localWebService'), 'LocalWebService'],
-      [t('fileManager'), 'FileManager'],
-      [t('launcherIcon'), 'LauncherIcon'],
-      [t('autoTasks'), 'AutoTasks'],
-      [t('readRecords'), 'ReadRecords'],
-      [t('remoteBooks'), 'RemoteBooks'],
-      [t('logs'), 'AppLogs'],
-      [t('settings'), 'Settings'],
-      [t('about'), 'About'],
-    ];
+  const names = {
+    bookshelf: 'ic_bottom_books',
+    explore: 'ic_bottom_explore',
+    rss: 'ic_bottom_rss_feed',
+    mine: 'ic_bottom_person',
+  } as const;
   return (
-    <ScrollView
-      contentContainerStyle={[s.mine, { backgroundColor: colors.background }]}
-    >
-      <View style={[s.mineHero, { backgroundColor: colors.surface }]}>
-        <Text
-          accessibilityRole="header"
-          style={[s.emptyTitle, { color: colors.text }]}
-        >
-          Legado HTYF
-        </Text>
-        <Text style={{ color: colors.muted }}>{t('mineDescription')}</Text>
-      </View>
-      {entries.map(([label, screen]) => (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={label}
-          key={screen}
-          style={[
-            s.setting,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-          onPress={() => navigate(screen)}
-        >
-          <Text style={[s.bookName, { color: colors.text }]}>{label}</Text>
-          <Text style={{ color: colors.muted }}>›</Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
-}
-function HomeTabIcon({ tab, color }: { tab: RootTab; color: string }) {
-  const path =
-    tab === 'bookshelf'
-      ? 'M4 5.5C7 4.5 9.5 5 12 7v12c-2.5-2-5-2.5-8-1.5V5.5zm16 0c-3-1-5.5-.5-8 1.5v12c2.5-2 5-2.5 8-1.5V5.5z'
-      : tab === 'explore'
-        ? 'M14.8 9.2l-2 3.6-3.6 2 2-3.6 3.6-2z'
-        : tab === 'rss'
-          ? 'M5 4h14v16H5V4zm3 4h8M8 12h8M8 16h5'
-          : 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8c.8-4 3-6 7-6s6.2 2 7 6';
-  return (
-    <Svg width={23} height={23} viewBox="0 0 24 24" accessibilityElementsHidden>
-      {tab === 'explore' ? <Circle cx={12} cy={12} r={8.5} fill="none" stroke={color} strokeWidth={1.8} /> : null}
-      <Path d={path} fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
+    <SourceIcon
+      name={`${names[tab]}_${selected ? 's' : 'e'}`}
+      color={color}
+      size={24}
+    />
   );
 }
 function TabBar({
@@ -5147,32 +5786,108 @@ function TabBar({
 }) {
   const insets = useSafeAreaInsets();
   const { t, preferences: appPreferences, colors } = useAppTheme();
+  const { preferences: shelfPreferences } = useBookshelfPreferences();
+  const shelfRefresh = useBookshelfRefresh();
+  const barElevation =
+    appPreferences.themeMode === 'eink' ? 0 : appPreferences.barElevation;
   const labels: Record<RootTab, string> = {
-    bookshelf: t('bookshelf'),
-    explore: t('explore'),
-    rss: t('subscriptions'),
-    mine: t('mine'),
-  }, skin = loadActiveBottomBarSkin(), slots: Record<RootTab, 'bookshelf' | 'home' | 'notes' | 'settings'> = { bookshelf: 'bookshelf', explore: 'home', rss: 'notes', mine: 'settings' };
+      bookshelf: t('bookshelf'),
+      explore: t('explore'),
+      rss: t('subscriptions'),
+      mine: t('mine'),
+    },
+    skin = loadActiveBottomBarSkin(),
+    slots: Record<RootTab, 'bookshelf' | 'home' | 'notes' | 'settings'> = {
+      bookshelf: 'bookshelf',
+      explore: 'home',
+      rss: 'notes',
+      mine: 'settings',
+    };
   void skinRevision;
   return (
-    <View style={[s.tabs, { paddingBottom: insets.bottom, backgroundColor: colors.surface, borderColor: colors.border, elevation: appPreferences.barElevation, shadowOpacity: appPreferences.barElevation ? 0.22 : 0, shadowRadius: appPreferences.barElevation / 2, shadowOffset: { width: 0, height: -Math.max(1, appPreferences.barElevation / 4) }, shadowColor: '#000' }]}>
+    <View
+      style={[
+        s.tabs,
+        {
+          paddingBottom: insets.bottom,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          elevation: barElevation,
+          shadowOpacity: barElevation ? 0.22 : 0,
+          shadowRadius: barElevation / 2,
+          shadowOffset: { width: 0, height: -Math.max(1, barElevation / 4) },
+          shadowColor: '#000',
+        },
+      ]}
+    >
       {tabKeys
         .filter(key => key !== 'explore' || preferences.showExplore)
         .filter(key => key !== 'rss' || preferences.showRss)
         .map(key => {
           const selected = active === key;
-          return <Pressable
-            accessibilityRole="tab"
-            accessibilityState={{ selected }}
-            key={key}
-            style={({ pressed }) => [s.tab, pressed && s.iconPressed]}
-            onPress={() => select(key)}
-          >
-            {skin?.assignments[slots[key]] ? <Image source={{ uri: `file://${selected ? skin.assignments[slots[key]]!.selected : skin.assignments[slots[key]]!.normal ?? skin.assignments[slots[key]]!.selected}` }} style={[s.tabSkinIcon, !selected && !skin.assignments[slots[key]]!.normal ? s.tabSkinIconInactive : null]} /> : <HomeTabIcon tab={key} color={selected ? colors.primary : colors.muted} />}
-            <Text style={[s.tabLabel, selected && s.tabLabelActive, { color: selected ? colors.primary : colors.muted }]}>
-              {labels[key]}
-            </Text>
-          </Pressable>
+          return (
+            <Pressable
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
+              key={key}
+              style={({ pressed }) => [s.tab, pressed && s.iconPressed]}
+              onPress={() => select(key)}
+            >
+              <View style={{ position: 'relative' }}>
+                {skin?.assignments[slots[key]] ? (
+                  <Image
+                    source={{
+                      uri: `file://${selected ? skin.assignments[slots[key]]!.selected : (skin.assignments[slots[key]]!.normal ?? skin.assignments[slots[key]]!.selected)}`,
+                    }}
+                    style={[
+                      s.tabSkinIcon,
+                      !selected && !skin.assignments[slots[key]]!.normal
+                        ? s.tabSkinIconInactive
+                        : null,
+                    ]}
+                  />
+                ) : (
+                  <HomeTabIcon
+                    tab={key}
+                    selected={selected}
+                    color={selected ? colors.accent : colors.muted}
+                  />
+                )}
+                {key === 'bookshelf' &&
+                shelfPreferences.showWaitUpCount &&
+                shelfRefresh.pending > 0 ? (
+                  <Text
+                    style={{
+                      position: 'absolute',
+                      top: -4,
+                      right: -12,
+                      minWidth: 16,
+                      minHeight: 16,
+                      fontSize: 11,
+                      paddingHorizontal: 5,
+                      paddingVertical: 1,
+                      textAlign: 'center',
+                      overflow: 'hidden',
+                      borderRadius: 8,
+                      color: '#FFFFFF',
+                      backgroundColor: colors.accent,
+                    }}
+                  >
+                    {shelfRefresh.pending}
+                  </Text>
+                ) : null}
+              </View>
+              <Text
+                style={[
+                  s.tabLabel,
+                  selected && s.tabLabelActive,
+                  { color: selected ? colors.accent : colors.muted },
+                ]}
+              >
+                {labels[key]}
+              </Text>
+            </Pressable>
+          );
         })}
     </View>
   );
@@ -5221,11 +5936,11 @@ function AppNavigation() {
       setRestoringRemote(true);
       setRemoteRestoreError('');
       try {
-        const raw = await downloadWebDavBackupEntry(
+        const preview = await inspectWebDavBackupEntry(
           loadWebDavConfig(),
           newRemoteBackup,
         );
-        restoreBackup(raw);
+        await restoreBackupPreview(preview);
         const preferences = loadBackupPreferences();
         saveBackupPreferences({
           ...preferences,
@@ -5350,11 +6065,22 @@ export default function App() {
   // TODO(htyf-native): Replace the template com.apps/org.reactjs native identities only after native-project edits are separately authorized; see docs/htyf-migration-gaps.md.
   return (
     <AppThemeProvider>
-      <AppNavigation />
+      <View style={s.flex}>
+        <BottomSheetModalProvider>
+          <AppNavigation />
+          <CoverThumbnailRenderer />
+        </BottomSheetModalProvider>
+      </View>
     </AppThemeProvider>
   );
 }
 const s = StyleSheet.create({
+  headerAction: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   flex: { flex: 1 },
   backupSheetTitle: { fontSize: 20, fontWeight: '800' },
   backupActions: { flexDirection: 'row', gap: 10, marginTop: 10 },
@@ -5436,7 +6162,12 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     gap: 3,
   },
-  tabSkinIcon: { width: 30, height: 30, resizeMode: 'contain', marginBottom: 2 },
+  tabSkinIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+    marginBottom: 2,
+  },
   tabSkinIconInactive: { opacity: 0.4 },
   tabLabel: { fontSize: 12, lineHeight: 16 },
   tabLabelActive: { fontWeight: '700' },
@@ -5705,12 +6436,51 @@ const s = StyleSheet.create({
   },
   readerProgressText: { minWidth: 72, fontSize: 11, fontWeight: '600' },
   readerProgressSlider: { flex: 1, height: 44 },
+  chapterTransition: {
+    position: 'absolute',
+    zIndex: 20,
+    left: 16,
+    right: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 14,
+    gap: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  chapterTransitionLoading: {
+    minHeight: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  chapterTransitionActions: {
+    minHeight: 44,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  chapterTransitionButton: {
+    minWidth: 64,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+  },
   readerBottom: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: 68,
+    height: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 4,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -5718,7 +6488,22 @@ const s = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  readerBottomContent: { minWidth: '100%', alignItems: 'stretch' },
+  readerMainAction: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    paddingHorizontal: 2,
+  },
+  readerActionSymbol: { fontSize: 20, lineHeight: 24, fontWeight: '600' },
+  readerToolAction: {
+    minHeight: 52,
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#8884',
+  },
   readerAction: {
     minWidth: 72,
     minHeight: 68,
@@ -5818,6 +6603,16 @@ const s = StyleSheet.create({
   stepText: { fontSize: 22 },
   stepValue: { width: 48, textAlign: 'center', fontSize: 16 },
   themeRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  quickStyleMore: {
+    minHeight: 50,
+    marginTop: 14,
+    paddingHorizontal: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   theme: {
     minHeight: 44,
     flex: 1,

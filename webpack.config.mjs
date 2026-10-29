@@ -141,7 +141,10 @@ export default (env = {}) => {
       // Expo模块支持
       new ExpoModulesPlugin(),
       // Reanimated支持
-      new ReanimatedPlugin(),
+      new ReanimatedPlugin({
+        // babel-loader already compiles all remote sources with the host ABI. Do not run the pinned native compiler first.
+        unstable_disableTransform: Boolean(appExposesOptions),
+      }),
       // Module Federation V2插件，支持host和remote两种模式
       new Repack.plugins.ModuleFederationPluginV2(mpOptions.exposes ? {
         dts: false,

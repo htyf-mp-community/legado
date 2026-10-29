@@ -1,10 +1,17 @@
+import { LOCAL_WEB_PAGE } from '../core/localWebPage';
+import { webBookCover } from '../services/webBookCover';
+import { applyBookshelfRefresh } from '../core/bookshelfRefresh';
 import {
-  HttpServer,
+  localServerState,
+  startLocalServer,
+  stopLocalServer,
+} from '../services/localServerRuntime';
+import {
   type HttpResponse,
   type RequestHandler,
 } from 'react-native-nitro-http-server';
 import type { Book } from '../types';
-import { loadLibrary, normalizeBook, saveLibrary } from './library';
+import { loadLibrary, normalizeBook, updateLibrary } from './library';
 import {
   loadSources,
   mergeBookSources,
@@ -59,8 +66,6 @@ export type LocalWebServiceStatus = {
   url: string;
 };
 
-let server: HttpServer | undefined;
-
 export function loadLocalWebServiceConfig(): LocalWebServiceConfig {
   const raw = appStorage.getString(CONFIG_KEY);
   if (raw) {
@@ -98,7 +103,8 @@ function json(body: unknown, status = 200): HttpResponse {
       'content-type': 'application/json; charset=utf-8',
       'access-control-allow-origin': '*',
       'access-control-allow-methods': 'GET, POST, OPTIONS',
-      'access-control-allow-headers': 'content-type, x-legado-token',
+      'access-control-allow-headers':
+        'content-type, x-legado-token, x-upload-filename',
     },
     body: JSON.stringify(body),
   };
@@ -209,8 +215,6 @@ function parseRecord(raw: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-const WEB_APP = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Legado HTYF</title><style>body{font:16px system-ui;margin:auto;max-width:900px;padding:20px;background:#f4f4f1;color:#171717}button,input{font:inherit;min-height:44px}button{margin:4px;padding:6px 12px}.book{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d8dcd8;border-radius:10px;margin:8px 0}.book img{width:48px;height:64px;object-fit:cover;float:left;margin-right:10px}.muted{color:#6f746f}#reader{white-space:pre-wrap;line-height:1.8;background:#fff;padding:18px;border-radius:10px}#reader img{display:block;max-width:100%;height:auto;margin:auto}</style></head><body><h1>Legado HTYF Web</h1><p><input id="token" type="password" placeholder="x-legado-token（可选）"><button onclick="loadBooks()">刷新书架</button></p><p><input id="ebook" type="file" accept=".txt,.epub,.mobi,.prc,.azw"><button onclick="uploadBook()">上传本地书籍</button></p><main id="app">正在加载…</main><script>const app=document.querySelector('#app'),token=document.querySelector('#token'),ebook=document.querySelector('#ebook');token.value=localStorage.legadoToken||'';token.onchange=()=>localStorage.legadoToken=token.value;async function api(path,options={}){options.headers={...(options.headers||{}),...(token.value?{'x-legado-token':token.value}:{})};const result=await fetch(path,options);const body=await result.json();if(!body.isSuccess)throw Error(body.errorMsg||result.statusText);return body.data}const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),proxy=(path,b)=>'/image?path='+encodeURIComponent(path)+'&id='+encodeURIComponent(b.id)+(token.value?'&token='+encodeURIComponent(token.value):''),render=(content,b)=>String(content??'').split(/\n+/).map(line=>/^https?:\/\/\S+$/i.test(line.trim())?'<img loading="lazy" src="'+proxy(line.trim(),b)+'">':esc(line)).join('\n');async function uploadBook(){const file=ebook.files[0];if(!file)return;try{await api('/addLocalBook?fileName='+encodeURIComponent(file.name),{method:'POST',headers:{'content-type':'application/octet-stream'},body:await file.arrayBuffer()});ebook.value='';await loadBooks()}catch(e){app.textContent=e.message}}async function loadBooks(){try{const books=await api('/getBookshelf');app.innerHTML='<h2>书架</h2>'+books.map((b,i)=>'<button class="book" onclick="chapters('+i+')">'+(b.coverUrl?'<img src="'+proxy(b.coverUrl,b)+'">':'')+'<b>'+esc(b.name)+'</b><br><span class="muted">'+esc(b.author)+'</span><br style="clear:both"></button>').join('');window.books=books}catch(e){app.textContent=e.message}}async function chapters(i){const b=books[i],list=await api('/getChapterList?id='+encodeURIComponent(b.id));app.innerHTML='<button onclick="loadBooks()">返回书架</button><h2>'+esc(b.name)+'</h2>'+list.map((c,n)=>'<button class="book" onclick="read('+i+','+n+')">'+esc(c.title)+'</button>').join('')}async function read(i,n){const b=books[i],content=await api('/getBookContent?id='+encodeURIComponent(b.id)+'&index='+n);app.innerHTML='<button onclick="chapters('+i+')">返回目录</button><h2>'+esc((b.chapters[n]||{}).title)+'</h2><article id="reader">'+render(content,b)+'</article>';fetch('/saveBookProgress?id='+encodeURIComponent(b.id)+'&index='+n,{method:'POST',headers:{...(token.value?{'x-legado-token':token.value}:{})}})}loadBooks()</script></body></html>`;
-
 function findBook(books: Book[], url: URL) {
   const id =
     url.searchParams.get('id') ??
@@ -225,19 +229,21 @@ export function createLocalWebServiceHandler(
   return async request => {
     if (request.method === 'OPTIONS') return json({ ok: true });
     const url = new URL(request.path, `http://127.0.0.1:${config.port}`);
+    if (request.method === 'GET' && url.pathname === '/')
+      return html(LOCAL_WEB_PAGE);
     if (
       config.token &&
-      request.headers['x-legado-token'] !== config.token &&
+      Object.entries(request.headers).find(
+        ([name]) => name.toLowerCase() === 'x-legado-token',
+      )?.[1] !== config.token &&
       url.searchParams.get('token') !== config.token
     ) {
       return json({ isSuccess: false, errorMsg: 'Unauthorized' }, 401);
     }
     const books = await loadLibrary();
-    if (request.method === 'GET' && url.pathname === '/') return html(WEB_APP);
-    if (
-      request.method === 'GET' &&
-      (url.pathname === '/cover' || url.pathname === '/image')
-    )
+    if (request.method === 'GET' && url.pathname === '/cover')
+      return webBookCover(url, books);
+    if (request.method === 'GET' && url.pathname === '/image')
       return proxyImage(url, books);
     if (request.method === 'GET' && url.pathname === '/getBookshelf') {
       return success(books);
@@ -343,8 +349,8 @@ export function createLocalWebServiceHandler(
           chapters,
           updatedAt: Date.now(),
         });
-        await saveLibrary(
-          books.map(item => (item.id === book.id ? next : item)),
+        await updateLibrary(current =>
+          applyBookshelfRefresh(current, [book], [next]),
         );
         return success(chapters);
       } catch (error) {
@@ -431,8 +437,11 @@ export function createLocalWebServiceHandler(
               fileName,
               loadTxtTocRules(),
             ),
-            next = [...books.filter(item => item.id !== imported.id), imported];
-          await saveLibrary(next);
+            id = imported.id;
+          await updateLibrary(current => [
+            ...current.filter(item => item.id !== id),
+            imported,
+          ]);
           return success(imported);
         } finally {
           try {
@@ -446,8 +455,8 @@ export function createLocalWebServiceHandler(
     if (request.method === 'POST' && url.pathname === '/saveBook') {
       try {
         const value = normalizeBook(parseRecord(raw) as unknown as Book);
-        await saveLibrary([
-          ...books.filter(item => item.id !== value.id),
+        await updateLibrary(current => [
+          ...current.filter(item => item.id !== value.id),
           value,
         ]);
         return success(value);
@@ -459,11 +468,15 @@ export function createLocalWebServiceHandler(
       try {
         const value = parseRecord(raw),
           id = String(value.id ?? value.bookUrl ?? '');
-        const next = books.filter(
-          item => item.id !== id && item.bookUrl !== id,
-        );
-        await saveLibrary(next);
-        return success(books.length - next.length);
+        let removed = 0;
+        await updateLibrary(current => {
+          const next = current.filter(
+            item => item.id !== id && item.bookUrl !== id,
+          );
+          removed = current.length - next.length;
+          return next;
+        });
+        return success(removed);
       } catch (error) {
         return failure(error instanceof Error ? error.message : String(error));
       }
@@ -610,8 +623,20 @@ export function createLocalWebServiceHandler(
         ),
         updatedAt: Date.now(),
       };
-      await saveLibrary(
-        books.map(item => (item.id === target.id ? next : item)),
+      await updateLibrary(current =>
+        current.map(item =>
+          item.id === target.id
+            ? {
+                ...item,
+                currentChapterIndex: next.currentChapterIndex,
+                chapterTitle: next.chapterTitle,
+                content: next.content,
+                progress: next.progress,
+                updatedAt: next.updatedAt,
+                durChapterTime: next.updatedAt,
+              }
+            : item,
+        ),
       );
       return success(next);
     }
@@ -635,29 +660,22 @@ export function createLocalWebServiceHandler(
 export async function startLocalWebService(
   config = loadLocalWebServiceConfig(),
 ): Promise<LocalWebServiceStatus> {
-  if (server) await server.stop();
   const saved = saveLocalWebServiceConfig(config);
-  server = new HttpServer();
-  const port = await server.start(
+  const port = await startLocalServer(
+    'web',
     saved.port,
     createLocalWebServiceHandler(saved),
-    { host: '127.0.0.1', autoRestart: true },
   );
   return { running: true, port, url: `http://127.0.0.1:${port}` };
 }
 
 export async function stopLocalWebService(): Promise<LocalWebServiceStatus> {
-  if (server) await server.stop();
-  server = undefined;
+  await stopLocalServer('web');
   const port = loadLocalWebServiceConfig().port;
   return { running: false, port, url: `http://127.0.0.1:${port}` };
 }
 
 export async function localWebServiceStatus(): Promise<LocalWebServiceStatus> {
-  const port = server?.port ?? loadLocalWebServiceConfig().port;
-  return {
-    running: server ? await server.isRunning() : false,
-    port,
-    url: `http://127.0.0.1:${port}`,
-  };
+  const state = await localServerState('web', loadLocalWebServiceConfig().port);
+  return { ...state, url: `http://127.0.0.1:${state.port}` };
 }

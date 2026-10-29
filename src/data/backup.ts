@@ -6,17 +6,27 @@ import {
   appStorage,
 } from './storage';
 import { loadLocalPassword } from './localPassword';
+import { prepareRestoreEntries } from '../core/restoreBackupEntries';
+import { loadRestoreIgnore, type RestoreIgnore } from './restorePreferences';
 import {
   decryptSensitiveBackup,
   encryptSensitiveBackup,
   SENSITIVE_BACKUP_ALGORITHM,
 } from '../core/backupSensitive';
-import { loadBackupPreferences, shouldIncludeBackupKey } from './backupPreferences';
+import {
+  loadBackupPreferences,
+  shouldIncludeBackupKey,
+} from './backupPreferences';
+import {
+  mapBackupMedia,
+  validateBackupMedia,
+  type BackupMediaIndex,
+} from '../core/backupMediaPaths';
 
 const FORMAT = 'legado-htyf-backup';
 const VERSION = 1;
 
-type BackupValue =
+export type BackupValue =
   | { type: 'string'; value: string }
   | { type: 'number'; value: number }
   | { type: 'boolean'; value: boolean };
@@ -27,6 +37,7 @@ export type BackupPayload = {
   createdAt: number;
   storageId: typeof APP_STORAGE_ID;
   entries: Record<string, BackupValue>;
+  media?: BackupMediaIndex;
   encryptedEntries?: {
     algorithm: typeof SENSITIVE_BACKUP_ALGORITHM;
     value: string;
@@ -86,9 +97,12 @@ export function createBackup(
   storage: BackupStorage = appStorage,
   password = loadLocalPassword(),
 ): string {
-  const preferences=loadBackupPreferences();
-  const encrypted = readEntries(storage, key =>
-    ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix))&&shouldIncludeBackupKey(key,preferences),
+  const preferences = loadBackupPreferences();
+  const encrypted = readEntries(
+    storage,
+    key =>
+      ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)) &&
+      shouldIncludeBackupKey(key, preferences),
   );
   const payload: BackupPayload = {
     format: FORMAT,
@@ -99,21 +113,23 @@ export function createBackup(
       storage,
       key =>
         !SENSITIVE_STORAGE_KEYS.has(key) &&
-        !ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix))&&shouldIncludeBackupKey(key,preferences),
+        !ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)) &&
+        shouldIncludeBackupKey(key, preferences),
     ),
     ...(Object.keys(encrypted).length
       ? {
           encryptedEntries: {
             algorithm: SENSITIVE_BACKUP_ALGORITHM,
-            value: encryptSensitiveBackup(
-              JSON.stringify(encrypted),
-              password,
-            ),
+            value: encryptSensitiveBackup(JSON.stringify(encrypted), password),
           },
         }
       : {}),
   };
-  return JSON.stringify(payload);
+  return JSON.stringify(
+    preferences.categories.persistedCovers
+      ? payload
+      : mapBackupMedia(payload, value => value, false),
+  );
 }
 
 export function parseBackup(input: string): BackupPayload {
@@ -133,6 +149,7 @@ export function parseBackup(input: string): BackupPayload {
   if (!candidate.entries || typeof candidate.entries !== 'object')
     throw new Error('备份数据无效');
   validateEntries(candidate.entries as Record<string, BackupValue>);
+  if (candidate.media !== undefined) validateBackupMedia(candidate.media);
   if (candidate.encryptedEntries !== undefined) {
     if (
       !candidate.encryptedEntries ||
@@ -149,17 +166,15 @@ export function restoreBackup(
   input: string,
   storage: BackupStorage = appStorage,
   password = loadLocalPassword(),
+  ignore: Partial<RestoreIgnore> = loadRestoreIgnore(),
 ): BackupPayload {
   const payload = parseBackup(input);
   let encryptedEntries: Record<string, BackupValue> = {};
-  if (payload.encryptedEntries) {
+  if (payload.encryptedEntries && !ignore.ignoreCookies) {
     let decoded: unknown;
     try {
       decoded = JSON.parse(
-        decryptSensitiveBackup(
-          payload.encryptedEntries.value,
-          password,
-        ),
+        decryptSensitiveBackup(payload.encryptedEntries.value, password),
       );
     } catch (error) {
       throw error instanceof Error ? error : new Error(String(error));
@@ -173,14 +188,14 @@ export function restoreBackup(
         throw new Error('敏感备份包含不允许的条目');
   }
   const previous = readEntries(storage);
-  const localSecrets = readEntries(storage, key => SENSITIVE_STORAGE_KEYS.has(key));
+  const incoming = Object.fromEntries(
+    Object.entries({ ...payload.entries, ...encryptedEntries }).filter(
+      ([key]) => !SENSITIVE_STORAGE_KEYS.has(key),
+    ),
+  );
+  const changes = prepareRestoreEntries(previous, incoming, ignore);
   try {
-    storage.clearAll();
-    writeEntries(storage, {
-      ...payload.entries,
-      ...encryptedEntries,
-      ...localSecrets,
-    });
+    writeEntries(storage, changes);
   } catch (error) {
     storage.clearAll();
     writeEntries(storage, previous);

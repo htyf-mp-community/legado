@@ -2,7 +2,7 @@ import { getLocales } from 'react-native-localize';
 import { appStorage } from './storage';
 
 const KEY = 'app.preferences.v1';
-export type ThemeMode = 'system' | 'light' | 'dark';
+export type ThemeMode = 'system' | 'light' | 'dark' | 'eink';
 export type LanguageMode = 'system' | 'zh-CN' | 'en';
 export type AppPreferences = {
   themeMode: ThemeMode;
@@ -25,15 +25,15 @@ export const defaultAppPreferences: AppPreferences = {
   language: 'system',
   highContrast: false,
   barElevation: 4,
-  dayPrimary: '#285d42',
-  dayAccent: '#a13b3b',
-  dayBackground: '#f4f4f1',
-  dayBottomBackground: '#ffffff',
+  dayPrimary: '#795548',
+  dayAccent: '#E53935',
+  dayBackground: '#F5F5F5',
+  dayBottomBackground: '#EEEEEE',
   dayBackgroundImage: '',
-  nightPrimary: '#79c99b',
-  nightAccent: '#ff8e8e',
-  nightBackground: '#101311',
-  nightBottomBackground: '#191d1a',
+  nightPrimary: '#546E7A',
+  nightAccent: '#D84315',
+  nightBackground: '#212121',
+  nightBottomBackground: '#303030',
   nightBackgroundImage: '',
 };
 const color = (value: unknown, fallback: string) =>
@@ -44,14 +44,26 @@ export function normalizeAppPreferences(
   value: Partial<AppPreferences>,
 ): AppPreferences {
   return {
-    themeMode: ['system', 'light', 'dark'].includes(String(value.themeMode))
+    themeMode: ['system', 'light', 'dark', 'eink'].includes(
+      String(value.themeMode),
+    )
       ? (value.themeMode as ThemeMode)
       : 'system',
     language: ['system', 'zh-CN', 'en'].includes(String(value.language))
       ? (value.language as LanguageMode)
       : 'system',
     highContrast: value.highContrast === true,
-    barElevation: Math.max(0, Math.min(32, Math.round(Number.isFinite(value.barElevation) ? Number(value.barElevation) : defaultAppPreferences.barElevation))),
+    barElevation: Math.max(
+      0,
+      Math.min(
+        32,
+        Math.round(
+          Number.isFinite(value.barElevation)
+            ? Number(value.barElevation)
+            : defaultAppPreferences.barElevation,
+        ),
+      ),
+    ),
     dayPrimary: color(value.dayPrimary, defaultAppPreferences.dayPrimary),
     dayAccent: color(value.dayAccent, defaultAppPreferences.dayAccent),
     dayBackground: color(

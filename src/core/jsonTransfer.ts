@@ -2,6 +2,7 @@ import { Share } from 'react-native';
 import { saveDocuments } from '@react-native-documents/picker';
 import {
   TemporaryDirectoryPath,
+  mkdir,
   unlink,
   writeFile,
 } from '@dr.pogodin/react-native-fs';
@@ -14,11 +15,15 @@ const safeFileName = (value: string) => {
 
 export async function saveJsonDocument(content: string, fileName: string) {
   const safe = safeFileName(fileName),
-    path = `${TemporaryDirectoryPath}/${Date.now()}-${safe}`;
-  await writeFile(path, content, 'utf8');
+    directory = `${TemporaryDirectoryPath}/json-export-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    path = `${directory}/${safe}`;
+  await mkdir(directory);
   try {
+    await writeFile(path, content, 'utf8');
     const result = await saveDocuments({
-        sourceUris: [`file://${path}`],
+        sourceUris: [
+          `file://${path.split('/').map(encodeURIComponent).join('/')}`,
+        ],
         mimeType: 'application/json',
         fileName: safe,
         copy: true,
@@ -28,7 +33,7 @@ export async function saveJsonDocument(content: string, fileName: string) {
     if (saved.error) throw new Error(saved.error);
     return saved;
   } finally {
-    await unlink(path).catch(() => undefined);
+    await unlink(directory).catch(() => undefined);
   }
 }
 

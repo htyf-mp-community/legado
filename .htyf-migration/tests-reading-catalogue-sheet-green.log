@@ -1,0 +1,21 @@
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      37 |   let tree: ReturnType<typeof create>;
+      38 |   act(() => {
+    > 39 |     tree = create(<BookCatalogueStatus state={state} />);
+         |                  ^
+      40 |   });
+      41 |   expect(mockPortalVisible).toBe(true);
+      42 |   act(() =>
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/bookCatalogueStatus.test.tsx:39:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/bookCatalogueStatus.test.tsx:38:6)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        0.531 s, estimated 1 s
+Ran all test suites matching __tests__/bookCatalogueStatus.test.tsx.

@@ -1,0 +1,3 @@
+src/services/webBookCover.ts 85ms
+src/data/localWebService.ts 58ms
+__tests__/webBookCover.test.ts 26ms

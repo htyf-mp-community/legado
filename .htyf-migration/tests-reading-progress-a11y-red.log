@@ -1,0 +1,21 @@
+FAIL __tests__/readerProgressSlider.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module '../src/components/ReaderProgressSlider' from '__tests__/readerProgressSlider.test.tsx'
+
+      3 | jest.mock('react-native',()=>({View:'View',StyleSheet:{create:(value:unknown)=>value}}));
+      4 | jest.mock('@react-native-community/slider',()=>({__esModule:true,default:'NativeSlider'}));
+    > 5 | import {ReaderProgressSlider} from '../src/components/ReaderProgressSlider';
+        | ^
+      6 | test('accessible page increments and touch completion share the seek boundary',()=>{
+      7 |  (globalThis as {IS_REACT_ACT_ENVIRONMENT?:boolean}).IS_REACT_ACT_ENVIRONMENT=true;const seek=jest.fn();let tree:ReturnType<typeof create>;
+      8 |  act(()=>{tree=create(<ReaderProgressSlider value={9} max={29} step={1} label="页码" disabled={false} onSeek={seek} minimumTrackTintColor="#000" maximumTrackTintColor="#888"/>)});
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.require (__tests__/readerProgressSlider.test.tsx:5:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.531 s
+Ran all test suites matching __tests__/readerProgressSlider.test.tsx.

@@ -1,5 +1,10 @@
 import type { LanguageMode } from './data/appPreferences';
 import { resolvedLanguage } from './data/appPreferences';
+import { readAloudMessages } from './readAloudMessages';
+import { homeMessages } from './homeMessages';
+import { bookshelfMessages } from './bookshelfMessages';
+import { bookListMessages } from './bookListMessages';
+import { bookshelfManagementMessages } from './bookshelfManagementMessages';
 
 const workflowMessages = {
   'zh-CN': {
@@ -52,6 +57,8 @@ const workflowMessages = {
     mangaImageSaved: '漫画图片已保存',
     mangaImageSavedPath: '图片已保存到：{path}',
     advanced: '高级',
+    readerTools: '更多阅读操作',
+    moreTypographySettings: '更多排版设置',
     readerAdvancedActions: '阅读器高级操作',
     reverseCurrentContent: '反转当前章节正文行序',
     contentReversed: '当前章节正文已反转',
@@ -197,7 +204,7 @@ const workflowMessages = {
     actionFailed: '{name}失败',
     fullLocalData: '完整本地数据',
     backupDescription:
-      '包含书架、阅读进度、书源、分组、书签、高亮和阅读设置。书源 Cookie 使用本地密码加密；本地密码和 WebDAV 密码不会写入备份。',
+      '包含书架、阅读进度、书源、分组、书签、高亮和阅读设置。ZIP 与 WebDAV 备份包含所选封面和阅读背景文件；剪贴板只保存数据。书源 Cookie 使用本地密码加密；本地密码和 WebDAV 密码不会写入备份。',
     copyFullBackup: '复制完整备份',
     saveZipBackup: '保存压缩 ZIP 备份',
     restoreClipboard: '从剪贴板恢复',
@@ -205,8 +212,16 @@ const workflowMessages = {
     legacyPassword: '旧版备份密码',
     legacyPasswordHint: '旧版备份密码（加密 Cookie 等需要）',
     restoreHtyfZip: '恢复 Legado HTYF ZIP 备份',
-    restoreWarning: '恢复会替换当前本地数据，操作前会再次确认。',
-    webDavHelp: '上传和下载 backup-htyf.json。下载完成后仍会先校验并要求确认。',
+    restoreWarning: '恢复会合并备份数据，同标识记录使用备份内容，未备份的类别和本机独有记录保留。键盘辅助和高亮规则按备份替换。',
+    restoreIgnore: '恢复忽略列表',
+    restoreIgnoreSummary: '恢复时忽略一些内容不恢复，方便不同手机配置不同',
+    restoreIgnoreRead: '阅读界面设置',
+    restoreIgnoreThemeMode: '主题模式',
+    restoreIgnoreThemeConfig: '主题配置',
+    restoreIgnoreShelfLayout: '书架布局',
+    restoreIgnoreLocalBooks: '本地书籍',
+    mergeAndRestore: '合并并恢复',
+    webDavHelp: '上传包含所选媒体文件的 ZIP 备份，兼容旧 JSON 备份。下载后先校验并确认，再恢复。',
     serverUrl: '服务器地址',
     account: '账号',
     appPassword: '应用密码',
@@ -220,7 +235,7 @@ const workflowMessages = {
     downloadBackup: '下载备份',
     download: '下载',
     configureDirectLink: '配置直链上传',
-    confirmRestore: '确认恢复完整备份？',
+    confirmRestore: '确认恢复备份？',
     backupSummary: '{date} · {count} 项数据',
     recognizedFiles: '已识别：{files}',
     replaceAndRestore: '替换并恢复',
@@ -304,6 +319,8 @@ const workflowMessages = {
     mangaImageSaved: 'Manga image saved',
     mangaImageSavedPath: 'Image saved to: {path}',
     advanced: 'Advanced',
+    readerTools: 'More reader tools',
+    moreTypographySettings: 'More typography settings',
     readerAdvancedActions: 'Advanced reader actions',
     reverseCurrentContent: 'Reverse current chapter lines',
     contentReversed: 'Current chapter content reversed',
@@ -425,7 +442,7 @@ const workflowMessages = {
     actionFailed: '{name} failed',
     fullLocalData: 'Complete local data',
     backupDescription:
-      'Includes bookshelf, progress, sources, groups, bookmarks, highlights, and reader settings. Source cookies are encrypted with the local password; local and WebDAV passwords are never backed up.',
+      'Includes bookshelf, progress, sources, groups, bookmarks, highlights, and reader settings. ZIP and WebDAV backups include selected cover and reading-background files; clipboard backups contain data only. Source cookies are encrypted with the local password; local and WebDAV passwords are never backed up.',
     copyFullBackup: 'Copy full backup',
     saveZipBackup: 'Save compressed ZIP backup',
     restoreClipboard: 'Restore from clipboard',
@@ -433,9 +450,17 @@ const workflowMessages = {
     legacyPassword: 'Legacy backup password',
     legacyPasswordHint: 'Legacy backup password (needed for encrypted cookies)',
     restoreHtyfZip: 'Restore Legado HTYF ZIP backup',
-    restoreWarning: 'Restoring replaces current local data after confirmation.',
+    restoreWarning: 'Restore merges matching records and retains categories and local-only records absent from the backup. Keyboard assists and highlight rules are replaced.',
+    restoreIgnore: 'Ignore during restore',
+    restoreIgnoreSummary: 'Keep selected settings and data on this device when restoring a backup.',
+    restoreIgnoreRead: 'Reader settings',
+    restoreIgnoreThemeMode: 'Theme mode',
+    restoreIgnoreThemeConfig: 'Theme configuration',
+    restoreIgnoreShelfLayout: 'Bookshelf layout',
+    restoreIgnoreLocalBooks: 'Local books',
+    mergeAndRestore: 'Merge and restore',
     webDavHelp:
-      'Upload and download backup-htyf.json. Downloads are validated before confirmation.',
+      'Upload ZIP backups with selected media files; older JSON backups remain supported. Downloads are validated before confirmation.',
     serverUrl: 'Server URL',
     account: 'Account',
     appPassword: 'App password',
@@ -449,7 +474,7 @@ const workflowMessages = {
     downloadBackup: 'Download backup',
     download: 'Download',
     configureDirectLink: 'Configure direct-link upload',
-    confirmRestore: 'Restore complete backup?',
+    confirmRestore: 'Restore this backup?',
     backupSummary: '{date} · {count} data entries',
     recognizedFiles: 'Recognized: {files}',
     replaceAndRestore: 'Replace and restore',
@@ -473,6 +498,7 @@ const managementMessages = {
     sourceNeedsJs: '需要 JS 运行时',
     sourceImportFailed: '导入失败',
     importBookSources: '导入书源', onlineSourceUrl: '在线书源 JSON 地址', importOnlineSource: '从在线地址导入', importSourceFile: '从本地文件导入', importSourceQr: '扫描二维码导入',
+    moreSourceActions: '更多操作',
     checkSources: '校验书源', check: '校验', checkSourcesHelp: '校验当前筛选的 {count} 个书源（包括已禁用书源）', checkKeyword: '测试搜索关键词', checkProgress: '{completed} / {total}', startCheck: '开始校验', sourceCheck_success: '正常', sourceCheck_empty: '无结果', sourceCheck_unsupported: '规则不兼容', sourceCheck_failed: '失败',
     manageSources: '管理书源', manage: '管理', selectedSources: '已选择 {count} 个书源', addGroup: '添加分组', ascending: '升序', descending: '降序', sourceSort_manual: '手动顺序', sourceSort_weight: '权重', sourceSort_name: '名称', sourceSort_url: '地址', sourceSort_updated: '更新时间', sourceSort_respond: '响应时间', sourceSort_enabled: '启用状态', sourceFilter_all: '全部', sourceFilter_enabled: '已启用', sourceFilter_disabled: '已禁用', sourceFilter_login: '需登录', sourceFilter_ungrouped: '未分组', sourceFilter_exploreEnabled: '发现已启用', sourceFilter_exploreDisabled: '发现已禁用', sourceBatch_enable: '批量启用', sourceBatch_disable: '批量禁用', sourceBatch_enableExplore: '启用发现', sourceBatch_disableExplore: '禁用发现', sourceBatch_top: '移到顶部', sourceBatch_bottom: '移到底部', removeGroup: '移除分组', clearSelection: '清除选择', exportSelection: '导出所选',
     enableDomainGrouping: '按域名分组', disableDomainGrouping: '取消域名分组', sourceGroupManager: '书源分组管理', sourceGroupManagerHelp: '新建分组会把当前未分组书源加入该分组；重命名和删除只修改精确匹配的分组。', renameGroup: '重命名分组', assignUngrouped: '新建并归入未分组书源',
@@ -710,6 +736,7 @@ const managementMessages = {
     sourceNeedsJs: 'JS runtime required',
     sourceImportFailed: 'Import failed',
     importBookSources: 'Import book sources', onlineSourceUrl: 'Online book-source JSON URL', importOnlineSource: 'Import from URL', importSourceFile: 'Import local file', importSourceQr: 'Scan QR code',
+    moreSourceActions: 'More actions',
     checkSources: 'Check sources', check: 'Check', checkSourcesHelp: 'Check {count} currently filtered sources, including disabled sources', checkKeyword: 'Test search keyword', checkProgress: '{completed} / {total}', startCheck: 'Start check', sourceCheck_success: 'Working', sourceCheck_empty: 'No results', sourceCheck_unsupported: 'Unsupported rule', sourceCheck_failed: 'Failed',
     manageSources: 'Manage sources', manage: 'Manage', selectedSources: '{count} sources selected', addGroup: 'Add group', ascending: 'Ascending', descending: 'Descending', sourceSort_manual: 'Manual order', sourceSort_weight: 'Weight', sourceSort_name: 'Name', sourceSort_url: 'URL', sourceSort_updated: 'Updated', sourceSort_respond: 'Response time', sourceSort_enabled: 'Enabled', sourceFilter_all: 'All', sourceFilter_enabled: 'Enabled', sourceFilter_disabled: 'Disabled', sourceFilter_login: 'Needs login', sourceFilter_ungrouped: 'Ungrouped', sourceFilter_exploreEnabled: 'Explore enabled', sourceFilter_exploreDisabled: 'Explore disabled', sourceBatch_enable: 'Enable selected', sourceBatch_disable: 'Disable selected', sourceBatch_enableExplore: 'Enable explore', sourceBatch_disableExplore: 'Disable explore', sourceBatch_top: 'Move to top', sourceBatch_bottom: 'Move to bottom', removeGroup: 'Remove group', clearSelection: 'Clear selection', exportSelection: 'Export selected',
     enableDomainGrouping: 'Group by domain', disableDomainGrouping: 'Stop domain grouping', sourceGroupManager: 'Source group manager', sourceGroupManagerHelp: 'Creating a group assigns currently ungrouped sources. Rename and delete only change exact group matches.', renameGroup: 'Rename group', assignUngrouped: 'Create and assign ungrouped',
@@ -1184,7 +1211,7 @@ const autoTaskMessages = {
   'zh-CN': {
     autoTaskTitle: '定时任务 ({count})',
     autoTaskService: '自动任务服务',
-    autoTaskServiceDescription: '应用启动或回到前台时自动运行到期任务',
+    autoTaskServiceDescription: '应用在前台时按计划执行，启动或回到前台时检查到期任务',
     autoTaskServicePaused: '自动任务服务已暂停，可仍手动运行到期任务',
     exportAutoTasks: '导出定时任务',
     importAutoTasks: '导入定时任务',
@@ -1227,7 +1254,7 @@ const autoTaskMessages = {
     enableCookieManagement: '启用 Cookie 管理',
     saveAndDebug: '保存并调试',
     autoTaskJsBlocked:
-      '当前运行时未配置 QuickJS；任意 JavaScript 会安全失败，声明式 JSON 日志/HTTP 任务可运行。',
+      '当前运行时未配置 QuickJS；任意 JavaScript 会安全失败，声明式 JSON 日志、HTTP 和目录更新任务可运行。',
     taskNotFound: '任务不存在',
     runAgain: '再次运行',
     runningNamedTask: '正在运行 {name}…',
@@ -1267,7 +1294,7 @@ const autoTaskMessages = {
     autoTaskTitle: 'Scheduled tasks ({count})',
     autoTaskService: 'Automatic task service',
     autoTaskServiceDescription:
-      'Run due tasks when the app starts or returns to the foreground',
+      'Run on schedule while foregrounded, and check due tasks on startup or resume',
     autoTaskServicePaused:
       'Automatic task service is paused; due tasks can still be run manually',
     exportAutoTasks: 'Export scheduled tasks',
@@ -1313,7 +1340,7 @@ const autoTaskMessages = {
     enableCookieManagement: 'Enable cookie management',
     saveAndDebug: 'Save and debug',
     autoTaskJsBlocked:
-      'QuickJS is not configured in this runtime. Arbitrary JavaScript fails safely; declarative JSON log/HTTP tasks remain available.',
+      'QuickJS is not configured in this runtime. Arbitrary JavaScript fails safely; declarative JSON log, HTTP and catalogue-update tasks remain available.',
     taskNotFound: 'Task not found',
     runAgain: 'Run again',
     runningNamedTask: 'Running {name}…',
@@ -2241,6 +2268,11 @@ const secondaryMessages = {
 
 const messages = {
   'zh-CN': {
+    ...readAloudMessages['zh-CN'],
+    ...homeMessages['zh-CN'],
+    ...bookshelfMessages['zh-CN'],
+    ...bookListMessages['zh-CN'],
+    ...bookshelfManagementMessages['zh-CN'],
     settings: '设置',
     appearance: '主题与语言',
     themeList: '主题列表',
@@ -2365,6 +2397,9 @@ const messages = {
     backupRules: '规则、订阅与自动任务',
     backupHistory: '阅读、RSS、浏览与下载记录',
     backupSettings: '应用与阅读设置',
+    backupPersistedCovers: '书籍固化封面',
+    backupOtherCovers: '其他封面文件',
+    backupBackgrounds: '阅读背景',
     backupCookies: '书源 Cookie（使用本地密码加密）',
     backupSourceVariables: '书源运行变量',
     automaticBackup: '每日自动备份到 WebDAV',
@@ -2403,7 +2438,7 @@ const messages = {
     newRemoteBackupSummary:
       '{name}\n修改时间：{date}\n恢复会替换当前本地数据。',
     notNow: '暂不恢复',
-    onlyLatestBackup: '本地备份使用固定文件名（仅保留最新）',
+    onlyLatestBackup: '备份使用固定文件名（仅保留最新）',
     webDavDeviceName: 'WebDAV 备份设备名',
     syncBookProgress: '退出阅读时同步书籍进度',
     syncBookProgressPlus: '增强同步：进入阅读时检查远端新进度',
@@ -2439,6 +2474,9 @@ const messages = {
     backgroundSaved: '背景图片已保存',
     solidBackgroundRestored: '已恢复纯色背景',
     loadingChapter: '正在加载章节正文…',
+    chapterSwitchLoading: '正在打开：{chapter}',
+    chapterSwitchFailed: '打开“{chapter}”失败，当前章节未改变。',
+    chapterSwitchNoContent: '换源后仍未取得章节正文',
     retry: '重试',
     noMangaImages: '本章没有解析到图片',
     reviewCount: '评 {count}',
@@ -2583,6 +2621,11 @@ const messages = {
   },
   en: {
     settings: 'Settings',
+    ...readAloudMessages.en,
+    ...homeMessages.en,
+    ...bookshelfMessages.en,
+    ...bookListMessages.en,
+    ...bookshelfManagementMessages.en,
     appearance: 'Appearance & language',
     themeList: 'Theme list',
     themeName: 'Theme name',
@@ -2706,6 +2749,9 @@ const messages = {
     backupRules: 'Rules, subscriptions, and automatic tasks',
     backupHistory: 'Reading, RSS, browser, and download history',
     backupSettings: 'Application and reader settings',
+    backupPersistedCovers: 'Persisted book covers',
+    backupOtherCovers: 'Other cover files',
+    backupBackgrounds: 'Reading backgrounds',
     backupCookies: 'Source cookies (encrypted with the local password)',
     backupSourceVariables: 'Source runtime variables',
     automaticBackup: 'Back up to WebDAV daily',
@@ -2744,7 +2790,7 @@ const messages = {
     newRemoteBackupSummary:
       '{name}\nModified: {date}\nRestoring will replace current local data.',
     notNow: 'Not now',
-    onlyLatestBackup: 'Use a fixed local filename (latest backup only)',
+    onlyLatestBackup: 'Use a fixed filename (latest backup only)',
     webDavDeviceName: 'WebDAV backup device name',
     syncBookProgress: 'Sync book progress when leaving the reader',
     syncBookProgressPlus: 'Enhanced sync: check newer remote progress on entry',
@@ -2781,6 +2827,9 @@ const messages = {
     backgroundSaved: 'Background image saved',
     solidBackgroundRestored: 'Solid background restored',
     loadingChapter: 'Loading chapter…',
+    chapterSwitchLoading: 'Opening: {chapter}',
+    chapterSwitchFailed: 'Could not open “{chapter}”. You are still on the current chapter.',
+    chapterSwitchNoContent: 'The alternate source returned no chapter content',
     retry: 'Retry',
     noMangaImages: 'No images were parsed from this chapter',
     reviewCount: '{count} reviews',

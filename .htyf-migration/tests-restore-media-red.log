@@ -1,0 +1,57 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/legacyBackupArchive.test.ts
+  ● ignoring reader configuration activates covers without copying background files
+
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+
+    Expected number of calls: 1
+    Received number of calls: 2
+
+      49 |   (readDir as jest.Mock).mockImplementation(async (path: string) => [{ name: 'a.png', path: `${path}/a.png`, isFile: () => true, isDirectory: () => false }]);
+      50 |   await activateLegacyMedia({ workingDirectory: '/stage', targetDirectory: '/target', directories: ['covers', 'bg'] }, ['bg']);
+    > 51 |   expect(copyFile).toHaveBeenCalledTimes(1);
+         |                    ^
+      52 |   expect(copyFile).toHaveBeenCalledWith('/stage/covers/a.png', '/target/covers/a.png');
+      53 | });
+      54 | test('ignored encrypted legacy cookies are not decrypted or warned about', async () => {
+
+      at Object.toHaveBeenCalledTimes (__tests__/legacyBackupArchive.test.ts:51:20)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● ignored encrypted legacy cookies are not decrypted or warned about
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "未导入加密数据（cookies.json：该旧版备份数据需要密码）",
+    + ]
+
+      62 |   (readFile as jest.Mock).mockImplementation(async (path: string) => path.endsWith('bookshelf.json') ? '[{"bookUrl":"b","name":"book"}]' : 'encrypted-with-another-password');
+      63 |   const preview = await inspectLegacyBackupArchive('content://ignored', 'backup.zip', '', { ignoreCookies: true });
+    > 64 |   expect(preview.warnings).toEqual([]);
+         |                            ^
+      65 |   expect(readFile).toHaveBeenCalledTimes(1);
+      66 | });
+      67 |
+
+      at Object.toEqual (__tests__/legacyBackupArchive.test.ts:64:28)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       2 failed, 3 passed, 5 total
+Snapshots:   0 total
+Time:        0.656 s, estimated 1 s
+Ran all test suites matching __tests__/legacyBackupArchive.test.ts|__tests__/restorePreferences.test.ts.

@@ -60,7 +60,31 @@ test('creates nested WebDAV directories then uploads a validated backup', async 
   );
 });
 
-test('uploads an encoded dated device backup and parses WebDAV history safely',async()=>{const fetchMock=jest.fn().mockResolvedValueOnce({status:201}).mockResolvedValueOnce({status:405}).mockResolvedValueOnce({ok:true,status:201});globalThis.fetch=fetchMock as typeof fetch;await uploadWebDavBackup(config,validBackup,'backup2026-08-29-我的设备.json');expect(fetchMock.mock.calls[2][0]).toContain('backup2026-08-29-%E6%88%91%E7%9A%84%E8%AE%BE%E5%A4%87.json');const root='https://dav.example.com/root/legado/',xml=`<d:multistatus xmlns:d="DAV:"><d:response><d:href>/root/legado/</d:href><d:propstat><d:prop><d:resourcetype><d:collection/></d:resourcetype></d:prop></d:propstat></d:response><d:response><d:href>/root/legado/backup2026-08-29-phone.json</d:href><d:propstat><d:prop><d:displayname>backup2026-08-29-phone.json</d:displayname><d:getlastmodified>Sat, 29 Aug 2026 08:00:00 GMT</d:getlastmodified></d:prop></d:propstat></d:response><d:response><d:href>https://evil.test/backup2026-08-30.json</d:href></d:response></d:multistatus>`;expect(parseWebDavBackupList(xml,root)).toEqual([{name:'backup2026-08-29-phone.json',url:'https://dav.example.com/root/legado/backup2026-08-29-phone.json',modifiedAt:Date.parse('Sat, 29 Aug 2026 08:00:00 GMT')}])});
+test('uploads an encoded dated device backup and parses WebDAV history safely', async () => {
+  const fetchMock = jest
+    .fn()
+    .mockResolvedValueOnce({ status: 201 })
+    .mockResolvedValueOnce({ status: 405 })
+    .mockResolvedValueOnce({ ok: true, status: 201 });
+  globalThis.fetch = fetchMock as typeof fetch;
+  await uploadWebDavBackup(
+    config,
+    validBackup,
+    'backup2026-08-29-我的设备.json',
+  );
+  expect(fetchMock.mock.calls[2][0]).toContain(
+    'backup2026-08-29-%E6%88%91%E7%9A%84%E8%AE%BE%E5%A4%87.json',
+  );
+  const root = 'https://dav.example.com/root/legado/',
+    xml = `<d:multistatus xmlns:d="DAV:"><d:response><d:href>/root/legado/</d:href><d:propstat><d:prop><d:resourcetype><d:collection/></d:resourcetype></d:prop></d:propstat></d:response><d:response><d:href>/root/legado/backup2026-08-29-phone.json</d:href><d:propstat><d:prop><d:displayname>backup2026-08-29-phone.json</d:displayname><d:getlastmodified>Sat, 29 Aug 2026 08:00:00 GMT</d:getlastmodified></d:prop></d:propstat></d:response><d:response><d:href>https://evil.test/backup2026-08-30.json</d:href></d:response></d:multistatus>`;
+  expect(parseWebDavBackupList(xml, root)).toEqual([
+    {
+      name: 'backup2026-08-29-phone.json',
+      url: 'https://dav.example.com/root/legado/backup2026-08-29-phone.json',
+      modifiedAt: Date.parse('Sat, 29 Aug 2026 08:00:00 GMT'),
+    },
+  ]);
+});
 
 test('validates downloaded backup before returning it', async () => {
   globalThis.fetch = jest.fn().mockResolvedValue({
@@ -131,7 +155,9 @@ test('downloads and validates per-book progress without auto-applying it', async
   await expect(downloadWebDavBookProgress(config, book)).resolves.toMatchObject(
     { durChapterIndex: 3, durChapterPos: 42 },
   );
-  globalThis.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404 }) as typeof fetch;
+  globalThis.fetch = jest
+    .fn()
+    .mockResolvedValue({ ok: false, status: 404 }) as typeof fetch;
   await expect(downloadWebDavBookProgress(config, book)).resolves.toBeNull();
 });
 jest.mock('react-native-quick-crypto', () => ({
@@ -139,3 +165,33 @@ jest.mock('react-native-quick-crypto', () => ({
   createCipheriv: jest.fn(),
   createDecipheriv: jest.fn(),
 }));
+
+test('lists the native stable backup.zip alongside dated and HTYF archives', () => {
+  const root = 'https://dav.example.com/root/legado/',
+    xml =
+      '<d:multistatus xmlns:d="DAV:"><d:response><d:href>/root/legado/backup.zip</d:href><d:propstat><d:prop><d:displayname>backup.zip</d:displayname></d:prop></d:propstat></d:response></d:multistatus>';
+  expect(parseWebDavBackupList(xml, root)[0].name).toBe('backup.zip');
+});
+
+test('uploads the matching chapter UTF-16 cursor instead of resetting the remote position to zero', async () => {
+  const fetchMock = jest.fn().mockResolvedValue({ status: 201, ok: true });
+  globalThis.fetch = fetchMock as typeof fetch;
+  const updated = {
+    ...book,
+    readingPosition: { chapterId: '2', position: 420 },
+  };
+  const uploaded = await uploadWebDavBookProgress(config, updated);
+  expect(uploaded.durChapterPos).toBe(420);
+  expect(JSON.parse(fetchMock.mock.calls[3][1].body).durChapterPos).toBe(420);
+});
+
+test('flat legacy books without a chapter array or reading cursor still upload position zero', async () => {
+  const fetchMock = jest.fn().mockResolvedValue({ status: 201, ok: true });
+  globalThis.fetch = fetchMock as typeof fetch;
+  const result = await uploadWebDavBookProgress(config, {
+    ...book,
+    chapters: undefined,
+    readingPosition: undefined,
+  });
+  expect(result.durChapterPos).toBe(0);
+});

@@ -17,6 +17,7 @@ import {
   type AppPreferences,
 } from '../data/appPreferences';
 import { translator } from '../i18n';
+import { resolveAppColors } from './appColors';
 export type AppColors = {
   background: string;
   surface: string;
@@ -25,25 +26,10 @@ export type AppColors = {
   border: string;
   primary: string;
   danger: string;
+  accent: string;
+  toolbarBackground: string;
+  toolbarText: string;
 };
-const light: AppColors = {
-    background: '#f4f4f1',
-    surface: '#ffffff',
-    text: '#171717',
-    muted: '#6f746f',
-    border: '#d8dcd8',
-    primary: '#285d42',
-    danger: '#a13b3b',
-  },
-  darkColors: AppColors = {
-    background: '#101311',
-    surface: '#191d1a',
-    text: '#f2f4f2',
-    muted: '#a8aea9',
-    border: '#373d38',
-    primary: '#79c99b',
-    danger: '#ff8e8e',
-  };
 type Value = {
   preferences: AppPreferences;
   setPreferences: (value: AppPreferences) => void;
@@ -60,7 +46,11 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     setPreferences = (value: AppPreferences) => {
       setState(saveAppPreferences(value));
       Appearance.setColorScheme(
-        (value.themeMode === 'system' ? null : value.themeMode) as Parameters<
+        (value.themeMode === 'system'
+          ? null
+          : value.themeMode === 'eink'
+            ? 'light'
+            : value.themeMode) as Parameters<
           typeof Appearance.setColorScheme
         >[0],
       );
@@ -69,35 +59,25 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
       const isDark =
           preferences.themeMode === 'dark' ||
           (preferences.themeMode === 'system' && system === 'dark'),
-        backgroundImage = isDark
-          ? preferences.nightBackgroundImage || preferences.dayBackgroundImage
-          : preferences.dayBackgroundImage,
-        base = isDark ? darkColors : light,
-        custom = isDark
-          ? {
-              primary: preferences.nightPrimary,
-              danger: preferences.nightAccent,
-              background: preferences.nightBackground,
-              surface: preferences.nightBottomBackground,
-            }
-          : {
-              primary: preferences.dayPrimary,
-              danger: preferences.dayAccent,
-              background: preferences.dayBackground,
-              surface: preferences.dayBottomBackground,
-            },
+        backgroundImage =
+          preferences.themeMode === 'eink'
+            ? ''
+            : isDark
+              ? preferences.nightBackgroundImage ||
+                preferences.dayBackgroundImage
+              : preferences.dayBackgroundImage,
         themed = {
-          ...base,
-          ...custom,
+          ...resolveAppColors(preferences, isDark),
           ...(backgroundImage ? { background: 'transparent' } : {}),
         },
-        colors: AppColors = preferences.highContrast
-          ? {
-              ...themed,
-              muted: isDark ? '#d9ddd9' : '#3d413e',
-              border: isDark ? '#697069' : '#999f99',
-            }
-          : themed,
+        colors: AppColors =
+          preferences.highContrast && preferences.themeMode !== 'eink'
+            ? {
+                ...themed,
+                muted: isDark ? '#d9ddd9' : '#3d413e',
+                border: isDark ? '#697069' : '#999f99',
+              }
+            : themed,
         navigationBase = isDark ? DarkTheme : DefaultTheme;
       return {
         preferences,

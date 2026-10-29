@@ -422,7 +422,7 @@ getUrl(key)`,
       author: '',
     });
     expect(result).toMatchObject({
-      name: '三体一',
+      name: '搜索名',
       tocUrl: 'https://appi.kuwo.cn/novels/api/book/101/chapters?paging=0',
     });
     const chapters = await loadChapters(kuwo, result);
@@ -479,7 +479,7 @@ getUrl(key)`,
       author: '',
     });
     expect(info).toMatchObject({
-      name: '测试书',
+      name: '搜索名',
       author: '作者',
       tocUrl: 'https://www.69shuba.com/book/8/',
     });

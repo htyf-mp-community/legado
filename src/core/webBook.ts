@@ -1,8 +1,13 @@
 import type { BookChapter, BookSource, SearchBook } from '../types';
 import { SourceRuleError, UnsupportedRuleError } from './errors';
 import { buildSourceRequest, executeSourceRequest } from './sourceRequest';
-import { sourceRuleText, sourceRuleTexts, sourceRuleValues } from './sourceRule';
+import {
+  sourceRuleText,
+  sourceRuleTexts,
+  sourceRuleValues,
+} from './sourceRule';
 import { readerHtmlToText } from './readerImages';
+import { checkCancelled } from './cancellation';
 const rule = (
   source: BookSource,
   name:
@@ -109,12 +114,18 @@ export function parseSearchBooks(
         !!book.name && !seen.has(book.bookUrl) && !!seen.add(book.bookUrl),
     );
 }
-export async function searchSource(source: BookSource, key: string, page = 1) {
+export async function searchSource(
+  source: BookSource,
+  key: string,
+  page = 1,
+  signal?: AbortSignal,
+) {
+  checkCancelled(signal);
   if (!source.enabled) return [];
   if (!source.searchUrl)
     throw new SourceRuleError('搜索 URL 为空', source.bookSourceName);
   const request = buildSourceRequest(source, source.searchUrl, key, page),
-    response = await executeSourceRequest(request);
+    response = await executeSourceRequest(request, 15000, signal);
   const books = parseSearchBooks(source, response.data, response.url);
   if (
     !books.length &&
@@ -187,19 +198,35 @@ export async function exploreSource(
   );
   return parseExploreBooks(source, response.data, response.url);
 }
-export async function loadBookInfo(source: BookSource, book: SearchBook) {
+export async function loadBookInfo(
+  source: BookSource,
+  book: SearchBook,
+  signal?: AbortSignal,
+): Promise<SearchBook> {
+  checkCancelled(signal);
   const response = await executeSourceRequest(
     buildSourceRequest(source, book.bookUrl),
+    15000,
+    signal,
   );
   const r = rule(source, 'ruleBookInfo'),
     initialized = r.init
       ? (sourceRuleValues(response.data, String(r.init))[0] ?? response.data)
       : response.data;
   const intro = sourceRuleText(initialized, r.intro);
+  const canRename = String(r.canReName ?? '').trim().length > 0;
   return {
     ...book,
-    name: sourceRuleText(initialized, r.name) || book.name,
-    author: sourceRuleText(initialized, r.author) || book.author,
+    name:
+      book.name && !canRename
+        ? book.name
+        : sourceRuleText(initialized, r.name) || book.name,
+    author:
+      book.author && !canRename
+        ? book.author
+        : sourceRuleText(initialized, r.author) || book.author,
+    kind: sourceRuleText(initialized, r.kind) || book.kind,
+    wordCount: sourceRuleText(initialized, r.wordCount) || book.wordCount,
     intro: intro ? readerHtmlToText(intro, response.url) : book.intro,
     coverUrl:
       optionalUrl(sourceRuleText(initialized, r.coverUrl), response.url) ||
@@ -257,7 +284,12 @@ export function parseChapters(
     })
     .filter(x => !!x.title);
 }
-export async function loadChapters(source: BookSource, book: SearchBook) {
+export async function loadChapters(
+  source: BookSource,
+  book: SearchBook,
+  signal?: AbortSignal,
+) {
+  checkCancelled(signal);
   const r = rule(source, 'ruleToc'),
     seenPages = new Set<string>(),
     seenChapters = new Set<string>(),
@@ -268,9 +300,12 @@ export async function loadChapters(source: BookSource, book: SearchBook) {
     page <= 50 && pageUrl && !seenPages.has(pageUrl);
     page += 1
   ) {
+    checkCancelled(signal);
     seenPages.add(pageUrl);
     const response = await executeSourceRequest(
       buildSourceRequest(source, pageUrl, '', page),
+      15000,
+      signal,
     );
     for (const chapter of parseChapters(
       source,

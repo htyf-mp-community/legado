@@ -26,5 +26,5 @@ test('home tabs provide vector icons and selected semantics', () => {
   const source = fs.readFileSync(path.join(__dirname, '../src/index.tsx'), 'utf8');
   expect(source).toContain('function HomeTabIcon');
   expect(source).toContain('accessibilityState={{ selected }}');
-  expect(source).toMatch(/<HomeTabIcon tab=\{key\}/);
+  expect(source).toMatch(/<HomeTabIcon\s+tab=\{key\}/);
 });

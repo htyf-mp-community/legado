@@ -2,10 +2,18 @@
 
 This file records features paused by the project native-modification boundary. `[!]` items remain incomplete until the required module is version-pinned or native work is separately authorized and manually accepted.
 
+## Read-aloud feature parity (2026-10-28)
+
+- Source: `model/ReadAloud.kt`, `service/HttpReadAloudService.kt`, `service/TTSReadAloudService.kt`, `ui/book/read/config/ReadAloudDialog.kt` and `SpeakEngineDialog.kt`.
+- Added: HTTP engine CRUD, default/clipboard/file/URL import, JSON export, selection, original `httpTTS.json` backup import, foreground paragraph speech through the pinned TrackPlayer, stop/pause/resume, paragraph/chapter controls, speed and minute timer. Java URL-encoding and the bundled Baidu formula are evaluated as a fixed declarative subset; no arbitrary code is evaluated.
+- Still pending: source-equivalent system TTS engine enumeration/speech (no configured TTS native module), full script/login bridge (existing sandbox blocker), book-specific engine overrides, streaming audio, chapter-count sleep timer, word-level highlighting/reader-position tracking, follow-manual-page policy, page-scoped speech, next-chapter predownload and reliable background/headset lifecycle. These remain incomplete even if the foreground flow works.
+- Current acceptance platform: dedicated iOS Simulator only, as requested by the user. No Android build/device work is required in this session.
+- Verification: HTTP engine/request/paragraph/controller tests; iOS runtime acceptance is pending until the independent simulator build runs. Existing `ios/` and `android/` source remains unchanged.
+
 ## Rule JavaScript runtime
 
 - Reason: Legado rules rely on Rhino/JavaScript, while `react-native-quickjs-sandbox` is allowlisted but not version-pinned in this target.
-- Impact: `@js:`/`<js>` source rules, subscription pre-request scripts, custom source/auto-task login UI and login checks, source `callBackJs` events (including the audio custom button and copy-play-URL interception), JS dictionary/RSS rules, arbitrary direct-link download URL expressions, and arbitrary auto-task scripts return explicit unsupported errors. The audio player still provides the safe default copy action and labels the custom button unavailable. Standard source/task WebView login and isolated Cookie synchronization remain available, as do declarative non-JS rules and the bundled direct-link fixed-prefix expression.
+- Impact: `@js:`/`<js>` source rules, coverDecodeJs image decryption, subscription pre-request scripts, custom source/auto-task login UI and login checks, source `callBackJs` events (including the audio custom button and copy-play-URL interception), JS dictionary/RSS rules, arbitrary direct-link download URL expressions, and arbitrary auto-task scripts return explicit unsupported errors. The audio player still provides the safe default copy action and labels the custom button unavailable. Standard source/task WebView login and isolated Cookie synchronization remain available, as do declarative non-JS rules and the bundled direct-link fixed-prefix expression. Cover requests with coverDecodeJs fail explicitly before an encrypted image can be installed; `src/core/bookCoverRequest.ts` records the native-runtime integration boundary.
 - Tried: pure parsing for CSS, XPath, JSONPath, regex, declarative HTTP tasks, standard WebView login with header/Cookie bridging, the bundled direct-link fixed-prefix expression, and WebView-only page injection. None safely executes the user-supplied login UI/check scripts or provides a sandboxed general rule runtime.
 - Native work: pin and configure the allowlisted QuickJS module, define host APIs, resource limits, cancellation, Cookie/request and login-UI bridges, and compatibility tests. No `ios/` or `android/` source is changed by this migration.
 - Acceptance: Android and iOS execute representative Legado JS, custom-login and source-callback fixtures deterministically; audio custom-button and copy-play-URL callbacks receive the expected book/chapter/result values; task login checks observe the isolated Cookie state; timeout, memory, network, UI-cancellation and exception paths are verified without exposing unrestricted native APIs.
@@ -45,10 +53,19 @@ This file records features paused by the project native-modification boundary. `
 ## Background auto-task scheduling
 
 - Reason: React Native timers and the HTYF JS SDK do not guarantee execution while suspended, after process death or after reboot; no approved background scheduler is version-pinned in the target.
-- Impact: enabled Cron tasks run when the application starts or returns to the foreground, but are not represented as running reliably at their scheduled wall-clock time in the background.
-- Tried: persisted five-field Cron schedules, foreground/resume due-task evaluation, first-run grace, deduplication and run logs. JavaScript timers cannot survive platform suspension or process termination.
+- Impact: enabled Cron tasks now run continuously while foregrounded, with due-task checks on launch/resume. They are not represented as running reliably at their scheduled wall-clock time in the background.
+- Tried: persisted five-field Cron schedules, foreground timers, foreground/resume due-task evaluation, first-run grace, deduplication and run logs. A real iOS minute-boundary refresh is recorded in `.htyf-migration/book-update-tasks-report.md`. JavaScript timers cannot survive platform suspension or process termination.
 - Native work: pin and configure an allowlisted background scheduler/action runtime with Android/iOS policy-compliant registration, cancellation, power handling and user-visible status.
 - Acceptance: representative tasks run once at their due time through background, restart and reboot scenarios supported by each platform; missed-run policy, duplicate prevention, cancellation, battery impact and visible failure logs are verified.
+
+## Automatic-task system notifications
+
+- Source: `model/AutoTaskProtocol.kt` notify actions and refreshToc new-chapter notifications.
+- Reason: the pinned HTYF JS SDK 0.2.25 and configured native modules provide no local OS-notification bridge. No replacement native dependency or native project change was introduced.
+- Impact: task refresh, new-chapter detection and run logs work, but system notifications are skipped. The protocol returns false/skipped and writes an application log; it never claims delivery or replaces the OS notification with a success toast.
+- Tried: checked the installed SDK declarations and pinned dependency set. Bluetooth characteristic notifications and haptics are unrelated capabilities. Payload construction retains source IDs, templates, length limits, priority and minimum new-chapter threshold behind an injectable notification boundary.
+- Native work: provide a host-supported, version-pinned local notification API with authorization/status checks, stable identifiers and lifecycle handling. `TODO(htyf-native)` is at `src/services/autoTaskProtocol.ts`.
+- Acceptance: on iOS, permitted notifications display the expected title/content and stable replacement ID; denied/unavailable delivery stays skipped, zero new chapters does not notify, and task results remain independent of notification permission. Dedicated Simulator refresh evidence does not establish OS notification delivery.
 
 ## Legacy Room/SQLite backup import
 
@@ -196,3 +213,21 @@ This file records features paused by the project native-modification boundary. `
 - Native work: provide reviewed platform diagnostic/image-cache APIs with storage limits, consent and privacy handling.
 - Manual acceptance: confirm opt-in heap capture, export/cleanup, memory limits and image-cache size behavior on physical Android devices, plus a documented iOS fallback.
 - JS integration: `src/screens/GeneralSettings.tsx` contains `TODO(htyf-native)` next to diagnostic settings.
+
+## Independent Web and MCP listeners
+
+- Evidence (iOS, 2026-10-28): starting MCP while Web was active closed port 1122 while both logical status objects still reported running. The pinned `react-native-nitro-http-server@1.9.2` JavaScript wrapper shares one hybrid object; `cpp/HybridHttpServer.cpp` uses global `g_serverContext`/`g_serverPort`, and the shipped C API has one `start_server`/`stop_server` pair.
+- Current behavior: a serialized application-owned coordinator prevents a second logical listener from replacing the active one. It reports a visible conflict and never stops the other service when an inactive service is stopped. Web remains HTTP 200 after the conflict; stopping Web allows MCP initialization at port 1236. Unit tests cover concurrent starts and startup failures.
+- Parity status: blocked for simultaneous listeners. This guard is not equivalent to the source's two independent services. An approved host runtime supporting independent listener IDs/ports is still required; existing native source/dependency pins remain unchanged.
+- Acceptance (requested iOS scope): authenticated Web and MCP operate concurrently on their configured ports, each can stop/restart without affecting the other, and foreground recovery keeps handler/port ownership correct.
+
+批量换源现已实现并在独立 iOS 验证两本章节迁移、2 秒间隔、真实取消与私有字段保留；见 ../.htyf-migration/batch-source-change-report.md。完整主题/字体/手势、备份偏好和标注映射矩阵仍待验收。构建触发 JS 刷新时旧 native Web listener 的生命周期问题已记录，冷启动可恢复但尚未修复。
+
+媒体备份跟进：HTYF ZIP/WebDAV 已携带所选固化封面、其他封面及阅读背景，独立 iOS 验证跨设备路径、摘要失败拒绝、确认前暂存/取消、恢复、分类排除及完全离线冷启动；见 ../.htyf-migration/backup-media-report.md。HTYF 当前已改为类别合并并支持十项恢复忽略；原版配置 XML/多套阅读布局、设备阅读记录、旧版章节位置、文件提供方/大文件/低空间/中断矩阵和完整 Web 图片/页面矩阵仍待完成，未据媒体子链路认定全量备份恢复通过。
+
+Web 封面跟进：原生规格 84×112 centerCrop PNG、失败默认图、三层封面以及请求凭据隔离已实现，独立 iOS 验证坏图、三秒取消、同 ID 切换固化层和断源冷启动。详情见 ../.htyf-migration/web-cover-report.md。完整 Vue Web UI、getImg 宽度/漫画处理、图片格式/大图/内存、默认封面文字及触摸/AX 矩阵仍 pending；热刷新 native listener 问题未修复。
+
+恢复策略跟进：已实现目标 JSON 类别的 upsert、替换型规则例外、十项忽略、设备配置保护、忽略背景不激活和事务回滚。实际 iOS 以单书部分备份验证七本记录保留、预览取消、主题/语言字段隔离及冷启动选择持久化；见 ../.htyf-migration/restore-policy-report.md。原版配置解析、章节/标注/设备记录和系统失败矩阵仍有缺口。
+
+
+续读跟进：旧版 JSON 在线文字书已保留原章节/字符位置并加载完整目录；普通文字分页切片、UTF-16 与真实行测量滚动定位有独立 iOS 证据，见 ../.htyf-migration/reading-position-report.md。XML/多套阅读布局、复杂富文本/媒体/旧注释坐标、物理手势与后台矩阵仍未完成。用户真机 0.0.22 layout 空事件缺陷已本地复现并修复为 0.0.23，见 ../.htyf-migration/host-layout-crash-report.md；新包真机加载仍待复测。

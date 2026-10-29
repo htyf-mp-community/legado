@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-28T15:02:36.179216+00:00",
+  "appUrlConfig": {
+    "url": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/app.json",
+    "status": 200,
+    "version": "0.0.14"
+  },
+  "zipUrl": {
+    "url": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/dist.dgz",
+    "status": 200
+  }
+}

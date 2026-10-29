@@ -10,7 +10,9 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "start:ios": "react-native start --port 8097 --host 127.0.0.1 --no-interactive",
+    "ios:sim": "node scripts/ios-simulator.mjs"
   },
   "dependencies": {
     "@callstack/repack": "5.3.0",
@@ -91,7 +93,8 @@
     "prettier": "3.8.3",
     "react-test-renderer": "19.2.0",
     "typescript": "6.0.3",
-    "webpack": "5.105.4"
+    "webpack": "5.105.4",
+    "ajv": "8.20.0"
   },
   "engines": {
     "node": ">=20"

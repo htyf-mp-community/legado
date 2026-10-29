@@ -52,6 +52,7 @@ test('switches source while preserving identity, groups and matching progress', 
     id: 'stable-book-id',
     groupIds: ['favorite'],
     chapterTitle: '第二章',
+    currentChapterIndex: 1,
     progress: 0.5,
   };
   const switched = switchLibraryBookSource(

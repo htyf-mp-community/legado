@@ -36,6 +36,7 @@ export type ReaderPreferences = {
   mangaAutoNext: boolean;
   volumeKeyPage: boolean;
   pageAnimation: PageAnimation;
+  epaperPageAnimation: PageAnimation;
   letterSpacing: number;
   paragraphSpacing: number;
   paragraphIndent: string;
@@ -95,6 +96,7 @@ export const defaultReaderPreferences: ReaderPreferences = {
   mangaAutoNext: true,
   volumeKeyPage: true,
   pageAnimation: 'slide',
+  epaperPageAnimation: 'none',
   letterSpacing: 0.1,
   paragraphSpacing: 2,
   paragraphIndent: '　　',
@@ -198,6 +200,11 @@ export function normalizeReaderPreferences(
     mangaTapScroll: value?.mangaTapScroll !== false,
     mangaAutoNext: value?.mangaAutoNext !== false,
     volumeKeyPage: value?.volumeKeyPage !== false,
+    epaperPageAnimation: ['none', 'slide', 'cover', 'fade'].includes(
+      String(value?.epaperPageAnimation),
+    )
+      ? value!.epaperPageAnimation!
+      : 'none',
     pageAnimation:
       value?.pageAnimation === 'none' ||
       value?.pageAnimation === 'cover' ||
@@ -361,4 +368,18 @@ export async function loadReaderPreferences() {
 }
 export async function saveReaderPreferences(value: ReaderPreferences) {
   appStorage.set(KEY, JSON.stringify(normalizeReaderPreferences(value)));
+}
+
+/** The source uses independent e-ink colors and animation, retaining the normal reading profile. */
+export function readerPreferencesForAppTheme(
+  preferences: ReaderPreferences,
+  themeMode: string,
+): ReaderPreferences {
+  return themeMode === 'eink'
+    ? {
+        ...preferences,
+        theme: 'epaper',
+        pageAnimation: preferences.epaperPageAnimation,
+      }
+    : preferences;
 }

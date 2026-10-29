@@ -1,0 +1,14 @@
+{
+  "cliVersion": "0.7.9",
+  "source": "/Users/dgz/code/hty/apps/htyf-cli/packages/cli",
+  "installedLayout": "/private/tmp/legado-htyf-cli-tools/node_modules/@htyf-mp/cli",
+  "extraToolDependencies": {
+    "execa": "9.6.0",
+    "cross-env": "7.0.3"
+  },
+  "dependencyResolution": "Project locked dependencies reused via temporary symlinks. Project/native dependency pins unchanged.",
+  "npxWrapper": "/private/tmp/legado-htyf-cli-tools/bin/npx (adds --prefix, --offline, --no-install)",
+  "command": "PATH=\"/private/tmp/legado-htyf-cli-tools/bin:/private/tmp/legado-htyf-cli-tools/node_modules/.bin:$PATH\" node /private/tmp/legado-htyf-cli-tools/node_modules/@htyf-mp/cli/src/index.mjs build --non-interactive --project /Users/dgz/code/github/legado/htyf --platform ios",
+  "buildLog": ".htyf-migration/production-build-isolated.log",
+  "newNativeDependencies": false
+}

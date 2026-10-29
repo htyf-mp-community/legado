@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useBookVisit } from '../hooks/useBookVisit';
+import { useBookCatalogue } from '../hooks/useBookCatalogue';
+import { BookCatalogueStatus } from '../components/BookCatalogueStatus';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   DeviceEventEmitter,
@@ -27,6 +30,7 @@ import { formatAudioTime, parseAudioContent } from '../core/audioContent';
 import { AUDIO_REMOTE_CHAPTER_EVENT } from '../core/audioRemoteNavigation';
 import { ensureAudioPlayer } from '../core/audioPlayer';
 import { buildSourceRequest } from '../core/sourceRequest';
+import { coverImageUri, displayBookCover } from '../core/bookCover';
 import { loadChapterContent } from '../core/webBook';
 import {
   clearAudioSleepDeadline,
@@ -51,17 +55,20 @@ const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
 export function AudioPlayer({
   book,
   back,
-  update,
+  update: commitBook,
 }: {
   book?: Book;
   back: () => void;
-  update: (book: Book) => void;
+  update: (book: Book, before?: Book) => void;
 }) {
+  useBookVisit(book?.id);
+  const update = useCallback((next: Book) => commitBook(next, book), [commitBook, book]);
   const { colors, t } = useAppTheme();
   const [chapterIndex, setChapterIndex] = useState(
     book?.currentChapterIndex ?? 0,
   );
   const [loading, setLoading] = useState(true);
+  const catalogue = useBookCatalogue(book, setChapterIndex);
   const [prepared, setPrepared] = useState(false);
   const [message, setMessage] = useState(() => t('audioPreparing'));
   const [activeSource, setActiveSource] = useState<BookSource>();
@@ -110,6 +117,7 @@ export function AudioPlayer({
       setMessage(t('bookOrChapterMissing'));
       return;
     }
+    if (catalogue.needed) { setLoading(false); setPrepared(false); return; }
     let active = true;
     loadingRef.current = true;
     setLoading(true);
@@ -167,7 +175,7 @@ export function AudioPlayer({
                 : chapter.title),
             artist: book.author || book.name,
             album: book.name,
-            artwork: book.coverUrl,
+            artwork: displayBookCover(book) ? coverImageUri(displayBookCover(book)!) : undefined,
             headers: { ...requestHeaders, ...segment.headers },
           })),
         );
@@ -188,7 +196,7 @@ export function AudioPlayer({
     return () => {
       active = false;
     };
-  }, [book?.id, chapterIndex, t]);
+  }, [book?.id, book?.origin, chapter?.url, chapterIndex, t, catalogue.needed]);
   useTrackPlayerEvents(
     [Event.PlaybackQueueEnded, Event.PlaybackError],
     event => {
@@ -302,6 +310,7 @@ export function AudioPlayer({
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
       <PageHeader title={t('audioPlayerTitle')} onBack={back} />
+      <BookCatalogueStatus state={catalogue} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.cover, { backgroundColor: colors.primary }]}>
           <Text style={styles.coverText}>

@@ -1,0 +1,37 @@
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      17 |   let tree: ReturnType<typeof create>;
+      18 |   act(() => {
+    > 19 |     tree = create(
+         |                  ^
+      20 |       <ReaderProgressSlider
+      21 |         value={9}
+      22 |         max={29}
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerProgressSlider.test.tsx:19:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerProgressSlider.test.tsx:18:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      54 |   let tree: ReturnType<typeof create>;
+      55 |   act(() => {
+    > 56 |     tree = create(
+         |                  ^
+      57 |       <ReaderProgressSlider
+      58 |         value={2}
+      59 |         max={4}
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerProgressSlider.test.tsx:56:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerProgressSlider.test.tsx:55:6)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.541 s
+Ran all test suites matching __tests__/readerProgressSlider.test.tsx.

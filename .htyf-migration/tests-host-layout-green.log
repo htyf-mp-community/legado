@@ -1,0 +1,39 @@
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      18 | afterEach(()=>{act(()=>tree?.unmount());tree=undefined;});
+      19 | function mount(){
+    > 20 |   act(()=>{tree=create(<BookshelfContent items={[]} preferences={preferences} selected={new Set()} running={new Set()} empty="Empty" open={jest.fn()} details={jest.fn()} openGroup={jest.fn()} editGroup={jest.fn()} refresh={jest.fn()} enableRefresh />);});
+         |                       ^
+      21 |   return tree!.root.findByType('FlatList' as never);
+      22 | }
+      23 | const fastScroller=()=>tree!.root.findByProps({accessibilityLabel:'shelfQuickScroll'});
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/bookshelfContentEvents.test.tsx:20:23
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at mount (__tests__/bookshelfContentEvents.test.tsx:20:6)
+      at Object.mount (__tests__/bookshelfContentEvents.test.tsx:25:14)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      18 | afterEach(()=>{act(()=>tree?.unmount());tree=undefined;});
+      19 | function mount(){
+    > 20 |   act(()=>{tree=create(<BookshelfContent items={[]} preferences={preferences} selected={new Set()} running={new Set()} empty="Empty" open={jest.fn()} details={jest.fn()} openGroup={jest.fn()} editGroup={jest.fn()} refresh={jest.fn()} enableRefresh />);});
+         |                       ^
+      21 |   return tree!.root.findByType('FlatList' as never);
+      22 | }
+      23 | const fastScroller=()=>tree!.root.findByProps({accessibilityLabel:'shelfQuickScroll'});
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/bookshelfContentEvents.test.tsx:20:23
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at mount (__tests__/bookshelfContentEvents.test.tsx:20:6)
+      at Object.mount (__tests__/bookshelfContentEvents.test.tsx:35:14)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.602 s, estimated 1 s
+Ran all test suites matching __tests__/bookshelfContentEvents.test.tsx.

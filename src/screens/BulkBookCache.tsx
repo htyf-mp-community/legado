@@ -36,6 +36,7 @@ import {
   type BookGroupSort,
 } from '../data/bookshelf';
 import { loadGeneralPreferences } from '../data/generalPreferences';
+import { userBookGroups } from '../core/bookshelfGroups';
 import { expandSelectionInterval } from '../core/selectionInterval';
 import { loadSources } from '../data/sources';
 import { addAppLog } from '../data/appLog';
@@ -56,7 +57,7 @@ export function BulkBookCache({
   openLogs: () => void;
 }) {
   const { colors, t } = useAppTheme();
-  const groups = useMemo(loadBookGroups, []);
+  const groups = useMemo(() => userBookGroups(loadBookGroups()), []);
   const [group, setGroup] = useState<BulkBookGroupFilter>('all'),
     [groupMenu, setGroupMenu] = useState(false),
     [sort, setSort] = useState<BookGroupSort>(() => loadBookGroupSort('all')),
@@ -278,6 +279,7 @@ export function BulkBookCache({
                   'sortBookName',
                   'sortManualOrder',
                   'sortRecentActivity',
+            'shelfSortAuthor',
                 ] as const
               )[sort],
             )}

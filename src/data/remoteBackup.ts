@@ -1,3 +1,4 @@
+import { webDavBackupHref } from '../core/webDavBackupHref';
 import { fromByteArray } from 'react-native-quick-base64';
 import { parseBackup } from './backup';
 import { appStorage } from './storage';
@@ -6,7 +7,11 @@ import type { Book } from '../types';
 const CONFIG_KEY = 'remote.webdav.config.v1';
 const PASSWORD_KEY = 'remote.webdav.password.v1';
 const BACKUP_FILE = 'backup-htyf.json';
-export type RemoteBackupEntry={name:string;url:string;modifiedAt:number};
+export type RemoteBackupEntry = {
+  name: string;
+  url: string;
+  modifiedAt: number;
+};
 
 export type WebDavConfig = {
   url: string;
@@ -67,7 +72,9 @@ function utf8Bytes(value: string) {
   return Uint8Array.from(bytes);
 }
 
-export function webDavAuthorization(config: WebDavCredentials): Record<string, string> {
+export function webDavAuthorization(
+  config: WebDavCredentials,
+): Record<string, string> {
   if (!config.username && !config.password) return {};
   const encoded = fromByteArray(
     utf8Bytes(`${config.username}:${config.password}`),
@@ -132,23 +139,87 @@ export async function testWebDav(config: WebDavCredentials) {
 export async function uploadWebDavBackup(
   config: WebDavCredentials,
   backup: string,
-  fileName=BACKUP_FILE,
+  fileName = BACKUP_FILE,
 ) {
   parseBackup(backup);
   await ensureWebDavDirectory(config);
-  const base=webDavBackupUrl(config).replace(/[^/]+$/,''),safe=fileName.replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_');
-  await request(config,`${base}${encodeURIComponent(safe)}`, {
+  const base = webDavBackupUrl(config).replace(/[^/]+$/, ''),
+    safe = fileName.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_');
+  await request(config, `${base}${encodeURIComponent(safe)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
     body: backup,
   });
 }
 
-const decodeXml=(value:string)=>value.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
-const tag=(xml:string,name:string)=>decodeXml(xml.match(new RegExp(`<(?:(?:\\w+):)?${name}\\b[^>]*>([\\s\\S]*?)<\\/(?:(?:\\w+):)?${name}>`,'i'))?.[1]?.replace(/<[^>]+>/g,'').trim()??'');
-export function parseWebDavBackupList(xml:string,rootUrl:string):RemoteBackupEntry[]{const root=new URL(rootUrl),out:RemoteBackupEntry[]=[];for(const match of xml.matchAll(/<(?:(?:\w+):)?response\b[^>]*>([\s\S]*?)<\/(?:(?:\w+):)?response>/gi)){const block=match[1],href=tag(block,'href');if(!href||/<(?:(?:\w+):)?collection\b/i.test(block))continue;const url=new URL(href,root),name=tag(block,'displayname')||decodeURIComponent(url.pathname.split('/').pop()??'');if(url.origin!==root.origin||!url.pathname.startsWith(root.pathname)||!/^backup(?:-htyf|\d{4}-\d{2}-\d{2}).*\.(?:json|zip)$/i.test(name))continue;out.push({name,url:url.toString(),modifiedAt:Date.parse(tag(block,'getlastmodified'))||0})}return out.sort((a,b)=>b.modifiedAt-a.modifiedAt)}
-export async function listWebDavBackups(configValue:WebDavCredentials){const config=normalizeWebDavConfig(configValue);await ensureWebDavDirectory(config);const root=webDavBackupUrl(config).replace(/[^/]+$/,''),response=await request(config,root,{method:'PROPFIND',headers:{Depth:'1'}});return parseWebDavBackupList(await response.text(),root)}
-export async function downloadWebDavBackupEntry(config:WebDavCredentials,entry:RemoteBackupEntry){const response=await request(config,entry.url,{method:'GET'}),backup=await response.text();parseBackup(backup);return backup}
+const decodeXml = (value: string) =>
+  value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+const tag = (xml: string, name: string) =>
+  decodeXml(
+    xml
+      .match(
+        new RegExp(
+          `<(?:(?:\\w+):)?${name}\\b[^>]*>([\\s\\S]*?)<\\/(?:(?:\\w+):)?${name}>`,
+          'i',
+        ),
+      )?.[1]
+      ?.replace(/<[^>]+>/g, '')
+      .trim() ?? '',
+  );
+export function parseWebDavBackupList(
+  xml: string,
+  rootUrl: string,
+): RemoteBackupEntry[] {
+  const root = new URL(rootUrl),
+    out: RemoteBackupEntry[] = [];
+  for (const match of xml.matchAll(
+    /<(?:(?:\w+):)?response\b[^>]*>([\s\S]*?)<\/(?:(?:\w+):)?response>/gi,
+  )) {
+    const block = match[1],
+      href = tag(block, 'href');
+    if (!href || /<(?:(?:\w+):)?collection\b/i.test(block)) continue;
+    const url = webDavBackupHref(href, rootUrl),
+      name =
+        tag(block, 'displayname') ||
+        decodeURIComponent(url.pathname.split('/').pop() ?? '');
+    if (
+      url.origin !== root.origin ||
+      !url.pathname.startsWith(root.pathname) ||
+      !/^backup(?:-htyf.*|\d{4}-\d{2}-\d{2}.*)?\.(?:json|zip)$/i.test(name)
+    )
+      continue;
+    out.push({
+      name,
+      url: url.toString(),
+      modifiedAt: Date.parse(tag(block, 'getlastmodified')) || 0,
+    });
+  }
+  return out.sort((a, b) => b.modifiedAt - a.modifiedAt);
+}
+export async function listWebDavBackups(configValue: WebDavCredentials) {
+  const config = normalizeWebDavConfig(configValue);
+  await ensureWebDavDirectory(config);
+  const root = webDavBackupUrl(config).replace(/[^/]+$/, ''),
+    response = await request(config, root, {
+      method: 'PROPFIND',
+      headers: { Depth: '1' },
+    });
+  return parseWebDavBackupList(await response.text(), root);
+}
+export async function downloadWebDavBackupEntry(
+  config: WebDavCredentials,
+  entry: RemoteBackupEntry,
+) {
+  const response = await request(config, entry.url, { method: 'GET' }),
+    backup = await response.text();
+  parseBackup(backup);
+  return backup;
+}
 
 export async function downloadWebDavBackup(config: WebDavCredentials) {
   const response = await request(config, webDavBackupUrl(config), {
@@ -192,7 +263,10 @@ export async function uploadWebDavBookProgress(
 ) {
   const config = normalizeWebDavConfig(configValue);
   await ensureWebDavDirectory(config);
-  const directoryUrl = webDavBookProgressUrl(config, book).replace(/[^/]+$/, ''),
+  const directoryUrl = webDavBookProgressUrl(config, book).replace(
+      /[^/]+$/,
+      '',
+    ),
     directory = await fetch(directoryUrl, {
       method: 'MKCOL',
       headers: webDavAuthorization(config),
@@ -204,7 +278,11 @@ export async function uploadWebDavBookProgress(
       name: book.name,
       author: book.author,
       durChapterIndex: index,
-      durChapterPos: 0,
+      durChapterPos:
+        book.readingPosition &&
+        book.readingPosition.chapterId === book.chapters?.[index]?.id
+          ? Math.max(0, Math.trunc(book.readingPosition.position))
+          : 0,
       durChapterTime: Date.now(),
       durChapterTitle: book.chapters?.[index]?.title ?? book.chapterTitle,
     };

@@ -1,0 +1,19 @@
+FAIL __tests__/readerPosition.test.ts
+  ● Test suite failed to run
+
+    Cannot find module '../src/core/readerPosition' from '__tests__/readerPosition.test.ts'
+
+    > 1 | import { nativeTextOffset, displayTextOffset } from '../src/core/readerPosition';
+        | ^
+      2 | import { paginateText, paginateTextRanges } from '../src/core/pagination';
+      3 | test('uses actual trimmed page ranges instead of page index times capacity',()=>{
+      4 |   const text='  abc\n def\n';
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.require (__tests__/readerPosition.test.ts:1:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.511 s
+Ran all test suites matching __tests__/readerPosition.test.ts.

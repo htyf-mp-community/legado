@@ -1,0 +1,21 @@
+FAIL __tests__/readerPositionBridge.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module '../src/components/ReaderPositionBridge' from '__tests__/readerPositionBridge.test.tsx'
+
+      1 | import React, { createRef } from 'react';
+      2 | import { act, create, type ReactTestRenderer } from 'react-test-renderer';
+    > 3 | import { ReaderPositionBridge, type ReaderPositionHandle, type ReaderPositionProps } from '../src/components/ReaderPositionBridge';
+        | ^
+      4 | import type { Book } from '../src/types';
+      5 | const book:Book={id:'b',name:'B',author:'A',intro:'',chapterTitle:'T',content:'',progress:.3,updatedAt:1,readingPosition:{chapterId:'c',position:9}};
+      6 | const base=(overrides:Partial<ReaderPositionProps>={}):ReaderPositionProps=>({book,chapterId:'c',title:'T',text:'abcdefghij',indent:'',mode:'page',pageIndex:0,columns:1,ranges:[{text:'abcd',start:0,end:4},{text:'efgh',start:4,end:8},{text:'ij',start:8,end:10}],layoutKey:'layout',contentTop:10,setPageIndex:jest.fn(),scrollTo:jest.fn(),commit:jest.fn(),...overrides});
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.require (__tests__/readerPositionBridge.test.tsx:3:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.623 s
+Ran all test suites matching __tests__/readerPositionBridge.test.tsx.

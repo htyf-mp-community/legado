@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-28T12:12:34.244738+00:00",
+  "remoteConfigHTTP": 200,
+  "remotePackageHTTP": 200,
+  "remoteVersion": "0.0.14",
+  "localVersion": "0.0.16",
+  "currentLocalPackagePublished": false,
+  "shareQrDecodedMatchesLocalConfiguration": true,
+  "hostScanAddOpen": "pending"
+}

@@ -1,4 +1,10 @@
-import { Text, View, type StyleProp, type TextStyle } from 'react-native';
+import {
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type TextProps,
+} from 'react-native';
 import { highlightSegments, matchHighlightRules } from '../core/highlightRules';
 import type { HighlightRule } from '../types';
 import { highlightTextStyle } from '../core/highlightTextStyle';
@@ -14,6 +20,7 @@ export function RuleHighlightedText({
   selectable = false,
   highlightActionTrigger = 'off',
   onHighlightRule,
+  onTextLayout,
 }: {
   text: string;
   rules: HighlightRule[];
@@ -23,6 +30,7 @@ export function RuleHighlightedText({
   selectable?: boolean;
   highlightActionTrigger?: HighlightActionTrigger;
   onHighlightRule?: (value: { ruleId: number; text: string }) => void;
+  onTextLayout?: TextProps['onTextLayout'];
 }) {
   const segments = highlightSegments(
     text,
@@ -86,7 +94,7 @@ export function RuleHighlightedText({
       </View>
     );
   return (
-    <Text selectable={selectable} style={style}>
+    <Text selectable={selectable} style={style} onTextLayout={onTextLayout}>
       {segments.map((segment, index) => (
         <Text
           key={`${index}:${segment.text.length}`}

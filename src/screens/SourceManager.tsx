@@ -1,6 +1,7 @@
-import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -41,6 +42,7 @@ export function SourceManager({
   debug,
   search,
   openQr,
+  openSubscriptions,
 }: {
   back: () => void;
   edit: (sourceUrl?: string) => void;
@@ -48,6 +50,7 @@ export function SourceManager({
   debug: (sourceUrl: string) => void;
   search: (sourceUrl: string) => void;
   openQr: () => void;
+  openSubscriptions: () => void;
 }) {
   const { colors, t } = useAppTheme();
   const [sources, setSources] = useState<BookSource[]>([]),
@@ -59,6 +62,7 @@ export function SourceManager({
     [checkResults, setCheckResults] = useState<SourceCheckResult[]>([]),
     [checkProgress, setCheckProgress] = useState<[number, number]>([0, 0]),
     [checking, setChecking] = useState(false);
+  const deferredQuery = useDeferredValue(query);
   const [managementVisible, setManagementVisible] = useState(false),
     [management, setManagement] = useState(loadSourceManagementPreferences),
     [selected, setSelected] = useState<Set<string>>(new Set()),
@@ -66,6 +70,7 @@ export function SourceManager({
   const [transferVisible, setTransferVisible] = useState(false),
     [onlineUrl, setOnlineUrl] = useState(''),
     [importingSources, setImportingSources] = useState(false);
+  const [moreVisible, setMoreVisible] = useState(false);
   const [groupManagerVisible, setGroupManagerVisible] = useState(false),
     [editingGroup, setEditingGroup] = useState<string>();
   const checkRun = useRef(0);
@@ -89,9 +94,9 @@ export function SourceManager({
     void saveSources(next);
   }, []);
   const filtered = useMemo(() => {
-    const visible = filterBookSources(sources, management.filter, query);
+    const visible = filterBookSources(sources, management.filter, deferredQuery);
     return management.groupByDomain ? sortBookSourcesByDomain(visible) : sortBookSources(visible, management.sort, management.ascending);
-  }, [management, query, sources]);
+  }, [deferredQuery, management, sources]);
   const setManagementPreference = (next: typeof management) => { setManagement(next); saveSourceManagementPreferences(next); };
   const applySelected = (action: Parameters<typeof updateSelectedSources>[2], group = '') => { commit(updateSelectedSources(sources, selected, action, group)); };
   const importSources = async (load: () => Promise<BookSource[]>) => {
@@ -155,45 +160,61 @@ export function SourceManager({
       <PageHeader
         title={t('sourceManagerTitle', { count: sources.length })}
         onBack={back}
-        action={
-          <View style={s.headerActions}>
-            <Pressable accessibilityRole="button" style={s.touch} accessibilityLabel={t('manageSources')} onPress={() => setManagementVisible(true)}><Text style={[s.loginText, { color: colors.primary }]}>{selected.size || t('manage')}</Text></Pressable>
-            <Pressable accessibilityRole="button" style={s.touch} accessibilityLabel={t('checkSources')} onPress={() => setCheckVisible(true)}>
-              <Text style={[s.loginText, { color: colors.primary }]}>{t('check')}</Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              style={s.touch}
-              accessibilityLabel={t('exportAllSources')}
-              onPress={() => {
-                Clipboard.setString(exportBookSources(sources));
-                void jssdk.showToast({
-                  type: 'success',
-                  title: t('sourcesCopied', { count: sources.length }),
-                });
-              }}
-            >
-              <Text style={[s.export, { color: colors.primary }]}>⇧</Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              style={s.touch}
-              accessibilityLabel={t('importSourcesClipboard')}
-              onPress={() => setTransferVisible(true)}
-            >
-              <Text style={[s.importIcon, { color: colors.primary }]}>↓</Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              style={s.touch}
-              accessibilityLabel={t('createSource')}
-              onPress={() => edit()}
-            >
-              <Text style={[s.add, { color: colors.primary }]}>＋</Text>
-            </Pressable>
-          </View>
-        }
       />
+      <View style={s.quickActions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('importBookSources')}
+          style={({ pressed }) => [
+            s.quickPrimary,
+            { backgroundColor: colors.primary, opacity: pressed ? 0.82 : 1 },
+          ]}
+          onPress={() => setTransferVisible(true)}
+        >
+          <Text style={s.quickPrimaryText}>↓</Text>
+          <Text style={s.quickPrimaryText}>{t('importBookSources')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('ruleSubscriptions')}
+          style={({ pressed }) => [
+            s.quickSecondary,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              opacity: pressed ? 0.72 : 1,
+            },
+          ]}
+          onPress={openSubscriptions}
+        >
+          <Text style={{ color: colors.primary, fontSize: 18 }}>↻</Text>
+          <Text style={[s.quickSecondaryText, { color: colors.text }]}>
+            {t('ruleSubscriptions')}
+          </Text>
+        </Pressable>
+      </View>
+      <View style={s.utilityActions}>
+        <Pressable
+          accessibilityRole="button"
+          style={({ pressed }) => [s.utilityButton, pressed && s.pressed]}
+          onPress={() => edit()}
+        >
+          <Text style={{ color: colors.primary, fontSize: 16 }}>＋</Text>
+          <Text style={[s.utilityText, { color: colors.primary }]}>
+            {t('createSource')}
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={({ pressed }) => [s.utilityButton, pressed && s.pressed]}
+          onPress={() => setMoreVisible(true)}
+        >
+          <Text style={{ color: colors.muted, fontSize: 18 }}>•••</Text>
+          <Text style={[s.utilityText, { color: colors.muted }]}>
+            {t('moreSourceActions')}
+          </Text>
+        </Pressable>
+      </View>
       <View style={s.search}>
         <TextInput
           accessibilityLabel={t('filterSources')}
@@ -216,8 +237,18 @@ export function SourceManager({
           <ActivityIndicator color={colors.primary} />
         </View>
       ) : filtered.length ? (
-        <ScrollView contentContainerStyle={s.list}>
-              {filtered.map((source, index) => (
+        <FlatList
+          style={s.flex}
+          contentContainerStyle={s.list}
+          data={filtered}
+          keyExtractor={source => source.bookSourceUrl}
+          extraData={selected}
+          keyboardShouldPersistTaps="handled"
+          initialNumToRender={12}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={40}
+          windowSize={7}
+          renderItem={({ item: source, index }) => (
             <Fragment key={source.bookSourceUrl}>
               {management.groupByDomain && (index === 0 || sourceDomain(filtered[index - 1].bookSourceUrl) !== sourceDomain(source.bookSourceUrl)) ? <Text accessibilityRole="header" style={[s.domainHeader, { color: colors.primary, borderColor: colors.border }]}>{sourceDomain(source.bookSourceUrl)}</Text> : null}
             <View
@@ -315,8 +346,8 @@ export function SourceManager({
               </Pressable>
             </View>
             </Fragment>
-          ))}
-        </ScrollView>
+          )}
+        />
       ) : (
         <View style={s.center}>
           <Text style={[s.empty, { color: colors.text }]}>
@@ -373,6 +404,45 @@ export function SourceManager({
           </Pressable>
         </View>
       </InTreeSheet>
+      <InTreeSheet visible={moreVisible} onDismiss={() => setMoreVisible(false)}>
+        <Text style={[s.sheetTitle, { color: colors.text }]}>
+          {t('moreSourceActions')}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          style={s.moreAction}
+          onPress={() => {
+            setMoreVisible(false);
+            setManagementVisible(true);
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('manageSources')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={s.moreAction}
+          onPress={() => {
+            setMoreVisible(false);
+            setCheckVisible(true);
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('checkSources')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          style={s.moreAction}
+          onPress={() => {
+            Clipboard.setString(exportBookSources(sources));
+            setMoreVisible(false);
+            void jssdk.showToast({
+              type: 'success',
+              title: t('sourcesCopied', { count: sources.length }),
+            });
+          }}
+        >
+          <Text style={{ color: colors.text }}>{t('exportAllSources')}</Text>
+        </Pressable>
+      </InTreeSheet>
       <InTreeSheet visible={checkVisible} onDismiss={() => { checkRun.current++; setChecking(false); setCheckVisible(false); }}>
         <Text style={[s.sheetTitle, { color: colors.text }]}>{t('checkSources')}</Text>
         <Text style={[s.meta, { color: colors.muted }]}>{t('checkSourcesHelp', { count: selected.size || filtered.length })}</Text>
@@ -419,9 +489,50 @@ export function SourceManager({
 }
 const s = StyleSheet.create({
   flex: { flex: 1 },
-  headerActions: { flexDirection: 'row' },
-  export: { fontSize: 23 },
-  importIcon: { fontSize: 23 },
+  quickActions: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingTop: 8,
+  },
+  quickPrimary: {
+    flex: 1.15,
+    minHeight: 52,
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+  },
+  quickPrimaryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  quickSecondary: {
+    flex: 1,
+    minHeight: 52,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 10,
+  },
+  quickSecondaryText: { fontWeight: '600', fontSize: 14 },
+  utilityActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingTop: 2,
+  },
+  utilityButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+  },
+  utilityText: { fontSize: 13, fontWeight: '600' },
+  pressed: { opacity: 0.55 },
   touch: {
     minWidth: 44,
     minHeight: 44,
@@ -495,6 +606,12 @@ const s = StyleSheet.create({
   batchWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   batchButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 10 },
   transferButton: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 10 },
+  moreAction: {
+    minHeight: 52,
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#8884',
+  },
   domainHeader: { paddingTop: 14, paddingBottom: 6, fontWeight: '800', borderBottomWidth: StyleSheet.hairlineWidth },
   groupRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth },
   groupText: { flex: 1, fontWeight: '700' },

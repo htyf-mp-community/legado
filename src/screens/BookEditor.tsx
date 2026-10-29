@@ -13,6 +13,8 @@ import type { Book } from '../types';
 import { importSupportedBook } from '../core/localBookImport';
 import { reSegmentText, TXT_CHARSETS } from '../core/txtEncoding';
 import { loadTxtTocRules } from '../data/txtTocRules';
+import { editableBookCover, editBookCover } from '../core/bookCover';
+import { displayBookIntro, editBookIntro } from '../core/bookMetadata';
 
 export function BookEditor({
   book,
@@ -26,8 +28,10 @@ export function BookEditor({
   const { colors, t } = useAppTheme();
   const [name, setName] = useState(book?.name ?? ''),
     [author, setAuthor] = useState(book?.author ?? ''),
-    [coverUrl, setCoverUrl] = useState(book?.coverUrl ?? ''),
-    [intro, setIntro] = useState(book?.intro ?? ''),
+    [coverUrl, setCoverUrl] = useState(
+      book ? (editableBookCover(book) ?? '') : '',
+    ),
+    [intro, setIntro] = useState(book ? displayBookIntro(book) : ''),
     [sourceType, setSourceType] = useState(book?.sourceType ?? 0),
     [chapterIndex, setChapterIndex] = useState(0),
     [chapters, setChapters] = useState(() => book?.chapters ?? []),
@@ -36,12 +40,13 @@ export function BookEditor({
     [error, setError] = useState(''),
     chapter = chapters[chapterIndex],
     types = useMemo(
-      () => [
-        [0, t('textBook')],
-        [1, t('audioBook')],
-        [2, t('imageBook')],
-        [4, t('videoBookType')],
-      ] as const,
+      () =>
+        [
+          [0, t('textBook')],
+          [1, t('audioBook')],
+          [2, t('imageBook')],
+          [4, t('videoBookType')],
+        ] as const,
       [t],
     );
   const commit = () => {
@@ -51,11 +56,9 @@ export function BookEditor({
       return;
     }
     saved({
-      ...book,
+      ...editBookIntro(editBookCover(book, coverUrl), intro),
       name: name.trim(),
       author: author.trim(),
-      coverUrl: coverUrl.trim() || undefined,
-      intro: intro.trim(),
       sourceType,
       charset,
       chapters,
@@ -89,7 +92,9 @@ export function BookEditor({
     return (
       <View style={[s.flex, { backgroundColor: colors.background }]}>
         <PageHeader title={t('editBook')} onBack={back} />
-        <Text style={[s.empty, { color: colors.muted }]}>{t('bookRemoved')}</Text>
+        <Text style={[s.empty, { color: colors.muted }]}>
+          {t('bookRemoved')}
+        </Text>
       </View>
     );
   return (
@@ -116,26 +121,44 @@ export function BookEditor({
               style={[s.type, sourceType === value && s.typeActive]}
               onPress={() => setSourceType(value)}
             >
-              <Text style={{ color: sourceType === value ? '#fff' : colors.text }}>{label}</Text>
+              <Text
+                style={{ color: sourceType === value ? '#fff' : colors.text }}
+              >
+                {label}
+              </Text>
             </Pressable>
           ))}
         </View>
         <Field label={t('coverUrl')} value={coverUrl} setValue={setCoverUrl} />
-        <Field label={t('introduction')} value={intro} setValue={setIntro} multiline />
+        <Field
+          label={t('introduction')}
+          value={intro}
+          setValue={setIntro}
+          multiline
+        />
         {book.localUri && /\.txt(?:$|[?#])/i.test(book.localUri) ? (
           <>
-            <Text style={[s.label, { color: colors.muted }]}>{t('txtCharset')}</Text>
+            <Text style={[s.label, { color: colors.muted }]}>
+              {t('txtCharset')}
+            </Text>
             <View style={s.typeRow}>
               {TXT_CHARSETS.map(value => (
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityState={{ selected: charset === value, disabled: running }}
+                  accessibilityState={{
+                    selected: charset === value,
+                    disabled: running,
+                  }}
                   disabled={running}
                   key={value}
                   style={[s.type, charset === value && s.typeActive]}
                   onPress={() => void reloadCharset(value)}
                 >
-                  <Text style={{ color: charset === value ? '#fff' : colors.text }}>{value}</Text>
+                  <Text
+                    style={{ color: charset === value ? '#fff' : colors.text }}
+                  >
+                    {value}
+                  </Text>
                 </Pressable>
               ))}
             </View>
@@ -143,7 +166,9 @@ export function BookEditor({
         ) : null}
         {chapters.length ? (
           <>
-            <Text style={[s.label, { color: colors.muted }]}>{t('manualChapterContent')}</Text>
+            <Text style={[s.label, { color: colors.muted }]}>
+              {t('manualChapterContent')}
+            </Text>
             <Pressable
               accessibilityRole="button"
               style={[s.reSegment, { borderColor: colors.border }]}
@@ -156,7 +181,9 @@ export function BookEditor({
                 )
               }
             >
-              <Text style={{ color: colors.primary }}>{t('reSegmentAllChapters')}</Text>
+              <Text style={{ color: colors.primary }}>
+                {t('reSegmentAllChapters')}
+              </Text>
             </Pressable>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {chapters.map((item, index) => (
@@ -167,7 +194,12 @@ export function BookEditor({
                   style={[s.chapter, chapterIndex === index && s.typeActive]}
                   onPress={() => setChapterIndex(index)}
                 >
-                  <Text style={{ color: chapterIndex === index ? '#fff' : colors.text }} numberOfLines={1}>
+                  <Text
+                    style={{
+                      color: chapterIndex === index ? '#fff' : colors.text,
+                    }}
+                    numberOfLines={1}
+                  >
                     {item.title}
                   </Text>
                 </Pressable>
@@ -177,18 +209,33 @@ export function BookEditor({
               accessibilityLabel={t('chapterTitle')}
               value={chapter?.title ?? ''}
               onChangeText={value =>
-                setChapters(old => old.map((item, index) => index === chapterIndex ? { ...item, title: value } : item))
+                setChapters(old =>
+                  old.map((item, index) =>
+                    index === chapterIndex ? { ...item, title: value } : item,
+                  ),
+                )
               }
-              style={[s.input, { color: colors.text, borderColor: colors.border }]}
+              style={[
+                s.input,
+                { color: colors.text, borderColor: colors.border },
+              ]}
             />
             <TextInput
               accessibilityLabel={t('chapterContent')}
               multiline
               value={chapter?.content ?? ''}
               onChangeText={value =>
-                setChapters(old => old.map((item, index) => index === chapterIndex ? { ...item, content: value } : item))
+                setChapters(old =>
+                  old.map((item, index) =>
+                    index === chapterIndex ? { ...item, content: value } : item,
+                  ),
+                )
               }
-              style={[s.input, s.content, { color: colors.text, borderColor: colors.border }]}
+              style={[
+                s.input,
+                s.content,
+                { color: colors.text, borderColor: colors.border },
+              ]}
             />
           </>
         ) : null}
@@ -198,7 +245,17 @@ export function BookEditor({
   );
 }
 
-function Field({ label, value, setValue, multiline = false }: { label: string; value: string; setValue: (value: string) => void; multiline?: boolean }) {
+function Field({
+  label,
+  value,
+  setValue,
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  setValue: (value: string) => void;
+  multiline?: boolean;
+}) {
   const { colors } = useAppTheme();
   return (
     <View style={s.field}>
@@ -208,7 +265,11 @@ function Field({ label, value, setValue, multiline = false }: { label: string; v
         multiline={multiline}
         value={value}
         onChangeText={setValue}
-        style={[s.input, multiline && s.multiline, { color: colors.text, borderColor: colors.border }]}
+        style={[
+          s.input,
+          multiline && s.multiline,
+          { color: colors.text, borderColor: colors.border },
+        ]}
       />
     </View>
   );
@@ -217,16 +278,48 @@ function Field({ label, value, setValue, multiline = false }: { label: string; v
 const s = StyleSheet.create({
   flex: { flex: 1 },
   form: { padding: 20, paddingBottom: 40, gap: 12 },
-  save: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  save: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   field: { gap: 6 },
   label: { fontSize: 13 },
-  input: { minHeight: 46, borderWidth: StyleSheet.hairlineWidth, borderRadius: 10, paddingHorizontal: 12 },
+  input: {
+    minHeight: 46,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+  },
   multiline: { minHeight: 110, paddingTop: 12, textAlignVertical: 'top' },
   content: { minHeight: 260, paddingTop: 12, textAlignVertical: 'top' },
   typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  type: { minHeight: 44, minWidth: 70, paddingHorizontal: 12, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ddd' },
+  type: {
+    minHeight: 44,
+    minWidth: 70,
+    paddingHorizontal: 12,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ddd',
+  },
   typeActive: { backgroundColor: '#285d42' },
-  chapter: { minHeight: 44, maxWidth: 180, paddingHorizontal: 14, marginRight: 8, borderRadius: 22, justifyContent: 'center', backgroundColor: '#ddd' },
-  reSegment: { minHeight: 44, borderWidth: StyleSheet.hairlineWidth, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  chapter: {
+    minHeight: 44,
+    maxWidth: 180,
+    paddingHorizontal: 14,
+    marginRight: 8,
+    borderRadius: 22,
+    justifyContent: 'center',
+    backgroundColor: '#ddd',
+  },
+  reSegment: {
+    minHeight: 44,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   empty: { padding: 24 },
 });

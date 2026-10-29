@@ -1,4 +1,5 @@
-import { HttpServer, type HttpResponse, type RequestHandler } from 'react-native-nitro-http-server';
+import { localServerState, startLocalServer, stopLocalServer } from '../services/localServerRuntime';
+import { type HttpResponse, type RequestHandler } from 'react-native-nitro-http-server';
 import { httpLogDetail, loadHttpLogs } from './httpLog';
 import { loadDiagnosticPreferences, saveDiagnosticPreferences } from './diagnosticPreferences';
 import { clearSourceCookies, loadSourceCookies, saveDocumentCookies } from './sourceCookies';
@@ -17,7 +18,7 @@ type RpcId = string | number | null;
 type RpcRequest = { jsonrpc?: string; id?: RpcId; method?: string; params?: Record<string, unknown> };
 type ToolResult = { content: { type: 'text'; text: string }[]; isError?: boolean };
 
-let server: HttpServer | undefined;
+
 
 export function normalizeMcpPort(value: unknown) {
   const port = Number(value);
@@ -99,6 +100,17 @@ export function createMcpServiceHandler(config: McpServiceConfig): RequestHandle
   };
 }
 
-export async function startMcpService(config = loadMcpServiceConfig()): Promise<McpServiceStatus> { if (server) await server.stop(); const saved = saveMcpServiceConfig(config); server = new HttpServer(); const port = await server.start(saved.port, createMcpServiceHandler(saved), { host: '127.0.0.1', autoRestart: true }); return { running: true, port, url: `http://127.0.0.1:${port}/mcp` }; }
-export async function stopMcpService(): Promise<McpServiceStatus> { if (server) await server.stop(); server = undefined; const port = loadMcpServiceConfig().port; return { running: false, port, url: `http://127.0.0.1:${port}/mcp` }; }
-export async function mcpServiceStatus(): Promise<McpServiceStatus> { const port = server?.port ?? loadMcpServiceConfig().port; return { running: server ? await server.isRunning() : false, port, url: `http://127.0.0.1:${port}/mcp` }; }
+export async function startMcpService(config = loadMcpServiceConfig()): Promise<McpServiceStatus> {
+  const saved = saveMcpServiceConfig(config);
+  const port = await startLocalServer('mcp', saved.port, createMcpServiceHandler(saved));
+  return { running: true, port, url: `http://127.0.0.1:${port}/mcp` };
+}
+export async function stopMcpService(): Promise<McpServiceStatus> {
+  await stopLocalServer('mcp');
+  const port = loadMcpServiceConfig().port;
+  return { running: false, port, url: `http://127.0.0.1:${port}/mcp` };
+}
+export async function mcpServiceStatus(): Promise<McpServiceStatus> {
+  const state = await localServerState('mcp', loadMcpServiceConfig().port);
+  return { ...state, url: `http://127.0.0.1:${state.port}/mcp` };
+}

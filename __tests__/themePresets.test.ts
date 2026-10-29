@@ -5,6 +5,7 @@ jest.mock('react-native-mmkv', () => ({
 import { defaultAppPreferences } from '../src/data/appPreferences';
 import {
   applyThemePreset,
+  loadThemePresets,
   mergeThemePresets,
   parseThemePresets,
   themePresetFromPreferences,
@@ -23,28 +24,55 @@ const androidTheme = {
 };
 
 test('imports Android ThemeConfig object and arrays losslessly', () => {
-  expect(parseThemePresets(JSON.stringify(androidTheme))).toEqual([androidTheme]);
-  expect(parseThemePresets(JSON.stringify([androidTheme]))).toEqual([androidTheme]);
+  expect(parseThemePresets(JSON.stringify(androidTheme))).toEqual([
+    androidTheme,
+  ]);
+  expect(parseThemePresets(JSON.stringify([androidTheme]))).toEqual([
+    androidTheme,
+  ]);
 });
 
 test('rejects malformed theme names and colors', () => {
-  expect(() => parseThemePresets(JSON.stringify({ ...androidTheme, themeName: '' }))).toThrow('name');
-  expect(() => parseThemePresets(JSON.stringify({ ...androidTheme, primaryColor: 'blue' }))).toThrow('color');
+  expect(() =>
+    parseThemePresets(JSON.stringify({ ...androidTheme, themeName: '' })),
+  ).toThrow('name');
+  expect(() =>
+    parseThemePresets(
+      JSON.stringify({ ...androidTheme, primaryColor: 'blue' }),
+    ),
+  ).toThrow('color');
 });
 
 test('overwrites presets by Android-compatible theme name identity', () => {
   expect(
-    mergeThemePresets([androidTheme], [
-      { ...androidTheme, primaryColor: '#112233' },
-    ])[0].primaryColor,
+    mergeThemePresets(
+      [androidTheme],
+      [{ ...androidTheme, primaryColor: '#112233' }],
+    )[0].primaryColor,
   ).toBe('#112233');
 });
 
 test('captures and applies the active side of appearance preferences', () => {
-  const night = themePresetFromPreferences('Night', defaultAppPreferences, true),
-    applied = applyThemePreset(defaultAppPreferences, { ...night, primaryColor: '#123456' });
+  const night = themePresetFromPreferences(
+      'Night',
+      defaultAppPreferences,
+      true,
+    ),
+    applied = applyThemePreset(defaultAppPreferences, {
+      ...night,
+      primaryColor: '#123456',
+    });
   expect(night.isNightTheme).toBe(true);
   expect(applied.themeMode).toBe('dark');
   expect(applied.nightPrimary).toBe('#123456');
   expect(applied.dayPrimary).toBe(defaultAppPreferences.dayPrimary);
+});
+
+test('a new collection includes the four source presets', () => {
+  expect(loadThemePresets().map(theme => theme.themeName)).toEqual([
+    '默认',
+    '典雅蓝',
+    '黑白',
+    'A屏黑',
+  ]);
 });

@@ -1,0 +1,6 @@
+
+Test Suites: 6 passed, 6 total
+Tests:       50 passed, 50 total
+Snapshots:   0 total
+Time:        0.888 s, estimated 1 s
+Ran all test suites matching batchSource|chapterMigration|onlineLibrary.

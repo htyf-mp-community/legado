@@ -1,0 +1,14 @@
+src/data/library.ts 53ms
+src/hooks/useLibrary.ts 2ms
+src/hooks/useBookGroups.ts 2ms
+src/hooks/useBookVisit.ts 5ms
+src/data/bookshelf.ts 24ms
+src/core/bookshelfGroups.ts 10ms
+src/core/bookKinds.ts 2ms
+src/core/legacyJson.ts 3ms
+src/core/bookshelfRefresh.ts 12ms
+src/core/bulkBookCache.ts 8ms (unchanged)
+src/components/BookGroupSheets.tsx 36ms
+src/components/BookshelfView.tsx 30ms
+src/components/InTreeSheet.tsx 6ms (unchanged)
+src/bookshelfMessages.ts 3ms

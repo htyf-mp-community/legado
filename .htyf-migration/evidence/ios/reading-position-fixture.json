@@ -1,0 +1,50 @@
+{
+  "source": {
+    "bookSourceUrl": "http://127.0.0.1:18203",
+    "bookSourceName": "iOS 旧版续读验收源",
+    "customOrder": -120,
+    "enabled": true,
+    "enabledExplore": false,
+    "bookSourceType": 0,
+    "ruleBookInfo": {
+      "name": "$.name",
+      "author": "$.author",
+      "intro": "$.intro",
+      "tocUrl": "$.toc"
+    },
+    "ruleToc": {
+      "chapterList": "$[*]",
+      "chapterName": "$.title",
+      "chapterUrl": "$.url",
+      "isVolume": "$.isVolume"
+    },
+    "ruleContent": {
+      "content": "$.content"
+    }
+  },
+  "nativeBook": {
+    "bookUrl": "http://127.0.0.1:18203/book",
+    "origin": "http://127.0.0.1:18203",
+    "originName": "iOS 旧版续读验收源",
+    "name": "iOS旧版续读验收",
+    "author": "续读验收作者",
+    "intro": "原版备份简介",
+    "customIntro": "续读私人简介",
+    "customTag": "resume-private",
+    "durChapterIndex": 2,
+    "durChapterTitle": "第三章 原位置",
+    "durChapterUrl": "http://127.0.0.1:18203/chapter/3",
+    "durChapterPos": 2889,
+    "totalChapterNum": 4,
+    "latestChapterTitle": "第四章 结束",
+    "canUpdate": false,
+    "type": 0,
+    "durChapterTime": 1700000000011
+  },
+  "expected": {
+    "loadedChapterIndex": 3,
+    "position": 2889,
+    "needle": "续读标记020",
+    "paragraphs": 60
+  }
+}

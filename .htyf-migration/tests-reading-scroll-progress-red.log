@@ -1,0 +1,202 @@
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      57 |   const props = base();
+      58 |   act(() => {
+    > 59 |     tree = create(<ReaderPositionBridge {...props} />);
+         |                  ^
+      60 |   });
+      61 |   expect(props.setPageIndex).toHaveBeenCalledWith(1);
+      62 |   expect(props.commit).not.toHaveBeenCalled();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:59:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:58:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      77 |   const props = base();
+      78 |   act(() => {
+    > 79 |     tree = create(<ReaderPositionBridge {...props} />);
+         |                  ^
+      80 |   });
+      81 |   const setPageIndex = jest.fn();
+      82 |   act(() =>
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:79:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:78:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      107 |     });
+      108 |   act(() => {
+    > 109 |     tree = create(<ReaderPositionBridge ref={ref} {...props} />);
+          |                  ^
+      110 |   });
+      111 |   act(() => {
+      112 |     ref.current!.onExtent(1000);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:109:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:108:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      146 |     });
+      147 |   act(() => {
+    > 148 |     tree = create(<ReaderPositionBridge key="old" ref={ref} {...props} />);
+          |                  ^
+      149 |   });
+      150 |   act(() => {
+      151 |     ref.current!.onExtent(1000);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:148:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:147:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      179 |   const props = base();
+      180 |   act(() => {
+    > 181 |     tree = create(<ReaderPositionBridge {...props} />);
+          |                  ^
+      182 |   });
+      183 |   act(() => tree!.update(<ReaderPositionBridge {...props} pageIndex={1} />));
+      184 |   const setPageIndex = jest.fn();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:181:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:180:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      202 |   });
+      203 |   act(() => {
+    > 204 |     tree = create(<ReaderPositionBridge {...props} />);
+          |                  ^
+      205 |   });
+      206 |   act(() =>
+      207 |     tree!.update(
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:204:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:203:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      243 |   });
+      244 |   act(() => {
+    > 245 |     tree = create(<ReaderPositionBridge key="c" {...props} />);
+          |                  ^
+      246 |   });
+      247 |   act(() =>
+      248 |     tree!.update(<ReaderPositionBridge key="c" {...props} pageIndex={1} />),
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:245:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:244:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      271 |   const props = base();
+      272 |   act(() => {
+    > 273 |     tree = create(<ReaderPositionBridge {...props} />);
+          |                  ^
+      274 |   });
+      275 |   act(() => tree!.update(<ReaderPositionBridge {...props} pageIndex={1} />));
+      276 |   const navigate = jest.fn();
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:273:18
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:272:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      293 | test('scroll restore reports the matching page and an accessible page seek uses the measured native lines', () => {
+      294 |   const ref=createRef<ReaderPositionHandle>(), props=base({mode:'scroll',contentTop:0});
+    > 295 |   act(()=>{tree=create(<ReaderPositionBridge {...props} ref={ref} />);});
+          |                       ^
+      296 |   expect(props.setPageIndex).toHaveBeenLastCalledWith(1);
+      297 |   act(()=>{ref.current!.onExtent(1000);ref.current!.onViewport(100);ref.current!.onParagraphLayout(0,0);ref.current!.onTextLayout(0,[{text:'abcd',y:0,height:20},{text:'efgh',y:20,height:20},{text:'ij',y:40,height:20}]);});
+      298 |   expect(props.scrollTo).toHaveBeenLastCalledWith(20);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:295:23
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:295:6)
+
+  console.error
+    react-test-renderer is deprecated. See https://react.dev/warnings/react-test-renderer
+
+      308 | test('scroll page coordinates keep special-break offsets in the canonical page text', () => {
+      309 |   const ref=createRef<ReaderPositionHandle>(), props=base({mode:'scroll',text:'abc\n\ndef',pageText:'abc\n[newpage]\ndef',honorSpecialPageBreaks:true,book:{...book,readingPosition:{chapterId:'c',position:6}},ranges:[{text:'abc',start:0,end:3},{text:'def',start:14,end:17}],contentTop:0});
+    > 310 |   act(()=>{tree=create(<ReaderPositionBridge {...props} ref={ref} />);});
+          |                       ^
+      311 |   expect(props.setPageIndex).toHaveBeenLastCalledWith(1);
+      312 |   act(()=>{ref.current!.onExtent(1000);ref.current!.onViewport(100);ref.current!.onParagraphLayout(1,60);ref.current!.onTextLayout(1,[{text:'def',y:0,height:20}]);});
+      313 |   expect(props.scrollTo).toHaveBeenLastCalledWith(60);
+
+      at process.env.NODE_ENV.exports.create (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:17337:17)
+      at __tests__/readerPositionBridge.test.tsx:310:23
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/readerPositionBridge.test.tsx:310:6)
+
+FAIL __tests__/readerPositionBridge.test.tsx
+  ● scroll restore reports the matching page and an accessible page seek uses the measured native lines
+
+    expect(jest.fn()).toHaveBeenLastCalledWith(...expected)
+
+    Expected: 1
+
+    Number of calls: 0
+
+      294 |   const ref=createRef<ReaderPositionHandle>(), props=base({mode:'scroll',contentTop:0});
+      295 |   act(()=>{tree=create(<ReaderPositionBridge {...props} ref={ref} />);});
+    > 296 |   expect(props.setPageIndex).toHaveBeenLastCalledWith(1);
+          |                              ^
+      297 |   act(()=>{ref.current!.onExtent(1000);ref.current!.onViewport(100);ref.current!.onParagraphLayout(0,0);ref.current!.onTextLayout(0,[{text:'abcd',y:0,height:20},{text:'efgh',y:20,height:20},{text:'ij',y:40,height:20}]);});
+      298 |   expect(props.scrollTo).toHaveBeenLastCalledWith(20);
+      299 |   act(()=>ref.current!.onScroll(20));
+
+      at Object.toHaveBeenLastCalledWith (__tests__/readerPositionBridge.test.tsx:296:30)
+
+  ● scroll page coordinates keep special-break offsets in the canonical page text
+
+    expect(jest.fn()).toHaveBeenLastCalledWith(...expected)
+
+    Expected: 1
+
+    Number of calls: 0
+
+      309 |   const ref=createRef<ReaderPositionHandle>(), props=base({mode:'scroll',text:'abc\n\ndef',pageText:'abc\n[newpage]\ndef',honorSpecialPageBreaks:true,book:{...book,readingPosition:{chapterId:'c',position:6}},ranges:[{text:'abc',start:0,end:3},{text:'def',start:14,end:17}],contentTop:0});
+      310 |   act(()=>{tree=create(<ReaderPositionBridge {...props} ref={ref} />);});
+    > 311 |   expect(props.setPageIndex).toHaveBeenLastCalledWith(1);
+          |                              ^
+      312 |   act(()=>{ref.current!.onExtent(1000);ref.current!.onViewport(100);ref.current!.onParagraphLayout(1,60);ref.current!.onTextLayout(1,[{text:'def',y:0,height:20}]);});
+      313 |   expect(props.scrollTo).toHaveBeenLastCalledWith(60);
+      314 | });
+
+      at Object.toHaveBeenLastCalledWith (__tests__/readerPositionBridge.test.tsx:311:30)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 8 passed, 10 total
+Snapshots:   0 total
+Time:        0.673 s, estimated 1 s
+Ran all test suites matching __tests__/readerPositionBridge.test.tsx.

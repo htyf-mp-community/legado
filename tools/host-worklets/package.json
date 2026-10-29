@@ -1,0 +1,6 @@
+{
+  "name": "react-native-worklets",
+  "version": "0.13.0",
+  "private": true,
+  "description": "Vendored official Babel compiler only; not a native runtime dependency"
+}

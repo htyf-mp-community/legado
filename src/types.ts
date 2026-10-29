@@ -17,6 +17,24 @@ export type Book = {
   name: string;
   author: string;
   intro: string;
+  customIntro?: string;
+  customTag?: string;
+  wordCount?: string;
+  kind?: string;
+  latestChapterTitle?: string;
+  pendingCatalog?: boolean;
+  pendingReadingPosition?: {
+    chapterIndex: number;
+    chapterTitle: string;
+    totalChapters: number;
+    position: number;
+    titleVisible: boolean;
+  };
+  readingPosition?: {
+    chapterId: string;
+    position: number;
+    titleVisible?: boolean;
+  };
   chapterTitle: string;
   content: string;
   chapters?: LocalChapter[];
@@ -25,6 +43,7 @@ export type Book = {
   progress: number;
   updatedAt: number;
   latestChapterTime?: number;
+  lastCheckCount?: number;
   durChapterTime?: number;
   order?: number;
   canUpdate?: boolean;
@@ -33,7 +52,12 @@ export type Book = {
   bookUrl?: string;
   tocUrl?: string;
   coverUrl?: string;
+  customCoverUrl?: string;
+  persistedCoverUrl?: string;
   sourceType?: number;
+  nativeType?: number;
+  updateError?: boolean;
+  notShelf?: boolean;
   localUri?: string;
   epubAssetRoot?: string;
   charset?: string;
@@ -60,6 +84,9 @@ export type BookGroup = {
   order: number;
   show: boolean;
   enableRefresh: boolean;
+  onlyUpdateRead?: boolean;
+  bookSort?: number;
+  cover?: string;
 };
 export type RootTab = 'bookshelf' | 'explore' | 'rss' | 'mine';
 export type BookSource = {

@@ -1,0 +1,6 @@
+
+Test Suites: 2 passed, 2 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        0.875 s, estimated 1 s
+Ran all test suites matching __tests__/legacyBackup.test.ts|__tests__/bookCatalogue.test.ts.

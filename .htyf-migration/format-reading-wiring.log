@@ -1,0 +1,5 @@
+src/components/ReaderPositionBridge.tsx 74ms (unchanged)
+src/components/ReaderRichContent.tsx 47ms
+src/components/RuleHighlightedText.tsx 10ms
+src/index.tsx 415ms
+__tests__/readerPositionBridge.test.tsx 10ms

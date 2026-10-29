@@ -1,0 +1,5 @@
+src/core/remoteBackupArchive.ts 101ms
+src/core/automaticBackup.ts 13ms
+src/core/legacyBackupArchive.ts 43ms
+src/core/backupArchive.ts 21ms
+src/screens/BackupRestore.tsx 175ms

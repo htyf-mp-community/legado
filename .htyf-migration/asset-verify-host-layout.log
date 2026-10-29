@@ -1,0 +1,8 @@
+[
+  {
+    "target": "src/components/BookshelfContent.tsx",
+    "before": "3448f5674c581980c670a4469dc7b63484fbd81c3ddace069ffb9d37b8d11e2c",
+    "after": "a8874a54fd6d8ca8861219eb31fed25b4b33bca5b81bdd46f523c7f5a387ce1e",
+    "reason": "Host layout/scroll event snapshot fix; source gradient geometry unchanged"
+  }
+]

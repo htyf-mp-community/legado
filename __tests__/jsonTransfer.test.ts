@@ -3,6 +3,7 @@ jest.mock('@react-native-documents/picker', () => ({
 }));
 jest.mock('@dr.pogodin/react-native-fs', () => ({
   TemporaryDirectoryPath: '/tmp',
+  mkdir: jest.fn().mockResolvedValue(undefined),
   writeFile: jest.fn(),
   unlink: jest.fn(),
 }));
@@ -26,11 +27,11 @@ beforeEach(() => {
 
 test('writes JSON, opens the document saver and removes its temporary file', async () => {
   save.mockResolvedValue([{ uri: 'content://saved', error: null }]);
-  await expect(saveJsonDocument('[{"name":"A"}]', 'bookSource.json')).resolves.toEqual(
-    expect.objectContaining({ uri: 'content://saved' }),
-  );
+  await expect(
+    saveJsonDocument('[{"name":"A"}]', 'bookSource.json'),
+  ).resolves.toEqual(expect.objectContaining({ uri: 'content://saved' }));
   expect(write).toHaveBeenCalledWith(
-    expect.stringMatching(/^\/tmp\/\d+-bookSource\.json$/),
+    expect.stringMatching(/^\/tmp\/json-export-[^/]+\/bookSource\.json$/),
     '[{"name":"A"}]',
     'utf8',
   );
@@ -54,4 +55,14 @@ test('shares exported JSON through React Native system share', async () => {
   share.mockResolvedValue({ action: 'sharedAction' });
   await shareJsonText('{}', 'Book sources');
   expect(share).toHaveBeenCalledWith({ message: '{}', title: 'Book sources' });
+});
+test('iOS source URI retains the requested Unicode file name while escaping URL fragments and spaces', async () => {
+  save.mockResolvedValue([{ uri: 'file:///saved/rules.json', error: null }]);
+  await saveJsonDocument('{}', '书源 #1.json');
+  const path = write.mock.calls[0][0],
+    uri = save.mock.calls[0][0].sourceUris[0];
+  expect(path.endsWith('/书源 #1.json')).toBe(true);
+  expect(uri).not.toContain(' ');
+  expect(uri).not.toContain('#');
+  expect(decodeURIComponent(uri.slice(7))).toBe(path);
 });

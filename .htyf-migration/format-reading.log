@@ -1,0 +1,3 @@
+src/components/ReaderPositionBridge.tsx 95ms
+__tests__/readerPositionBridge.test.tsx 38ms
+src/index.tsx 362ms

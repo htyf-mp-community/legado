@@ -40,6 +40,8 @@ export function normalizeAutoTask(
   if (!normalizeAutoTaskScript(script))
     throw new Error(`${name} 的任务脚本为空`);
   const optional = (key: string) => text(value[key]) || undefined;
+  const runState = (key: string) =>
+    typeof value[key] === 'string' ? value[key] : undefined;
   return {
     id: text(value.id) || id(),
     name,
@@ -58,9 +60,9 @@ export function normalizeAutoTask(
       ? Number(value.customOrder)
       : fallbackOrder,
     lastRunAt: Number.isFinite(value.lastRunAt) ? Number(value.lastRunAt) : 0,
-    lastResult: optional('lastResult'),
-    lastError: optional('lastError'),
-    lastLog: optional('lastLog'),
+    lastResult: runState('lastResult'),
+    lastError: runState('lastError'),
+    lastLog: runState('lastLog'),
   };
 }
 export function normalizeAutoTaskScript(script: string) {
@@ -86,15 +88,38 @@ export function parseAutoTasks(input: string): AutoTaskRule[] {
   });
 }
 export function loadAutoTasks(): AutoTaskRule[] {
-  const raw = appStorage.getString(KEY);
-  if (!raw) return [];
   try {
+    return loadAutoTasksStrict();
+  } catch {
+    return [];
+  }
+}
+export function loadAutoTasksStrict(): AutoTaskRule[] {
+  const raw = appStorage.getString(KEY);
+  if (raw === undefined) return [];
+  try {
+    const stored: unknown = JSON.parse(raw);
+    if (Array.isArray(stored) && stored.length === 0) return [];
     return parseAutoTasks(raw).sort(
       (a, b) => a.customOrder - b.customOrder || a.name.localeCompare(b.name),
     );
   } catch {
-    return [];
+    throw new Error('定时任务数据无法读取，原始数据已保留');
   }
+}
+/** All updates read/transform/write synchronously, including results completing after an import or edit. */
+export function updateAutoTasks(
+  transform: (current: AutoTaskRule[]) => AutoTaskRule[],
+) {
+  const next = transform(loadAutoTasksStrict());
+  saveAutoTasks(next);
+  return next;
+}
+export function subscribeAutoTasks(changed: () => void) {
+  const subscription = appStorage.addOnValueChangedListener(key => {
+    if (key === KEY || key === SERVICE_KEY) changed();
+  });
+  return () => subscription.remove();
 }
 export function saveAutoTasks(tasks: AutoTaskRule[]) {
   appStorage.set(KEY, JSON.stringify(tasks));
@@ -111,18 +136,24 @@ export function mergeAutoTasks(
   incoming: AutoTaskRule[],
 ) {
   const map = new Map(current.map(task => [task.id, task])),
-    nextOrder = Math.max(-1, ...current.map(task => task.customOrder)) + 1;
-  incoming.forEach((task, index) => {
-    const old = map.get(task.id);
+    localById = new Map(map),
+    imported = new Set<string>();
+  let nextOrder = Math.max(-1, ...current.map(task => task.customOrder)) + 1;
+  incoming.forEach(task => {
+    const old = localById.get(task.id),
+      state = old ?? task,
+      order =
+        old?.customOrder ??
+        (imported.has(task.id) ? map.get(task.id)!.customOrder : nextOrder++);
     map.set(task.id, {
-      ...old,
       ...task,
-      customOrder: old?.customOrder ?? nextOrder + index,
-      lastRunAt: old?.lastRunAt ?? task.lastRunAt,
-      lastResult: old?.lastResult ?? task.lastResult,
-      lastError: old?.lastError ?? task.lastError,
-      lastLog: old?.lastLog ?? task.lastLog,
+      customOrder: order,
+      lastRunAt: state.lastRunAt,
+      lastResult: state.lastResult,
+      lastError: state.lastError,
+      lastLog: state.lastLog,
     });
+    imported.add(task.id);
   });
   return [...map.values()].sort(
     (a, b) => a.customOrder - b.customOrder || a.name.localeCompare(b.name),

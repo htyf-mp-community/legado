@@ -8,6 +8,7 @@ import {
   View,
   type StyleProp,
   type TextStyle,
+  type TextProps,
 } from 'react-native';
 import WebView from 'react-native-webview';
 import {
@@ -42,6 +43,7 @@ export function ReaderRichContent({
   onHighlightRule,
   imageStyle = 'default',
   specialHtmlPageHeight,
+  onTextLayout,
 }: {
   text: string;
   rules: HighlightRule[];
@@ -56,11 +58,13 @@ export function ReaderRichContent({
   onHighlightRule: (value: { ruleId: number; text: string }) => void;
   imageStyle?: 'default' | 'full' | 'text' | 'single';
   specialHtmlPageHeight?: number;
+  onTextLayout?: TextProps['onTextLayout'];
 }) {
   const { colors } = useAppTheme();
+  const segments = readerContentSegments(text);
   return (
     <View>
-      {readerContentSegments(text).map((segment, index) =>
+      {segments.map((segment, index) =>
         segment.type === 'image' ? (
           <ReaderInlineImage
             key={`${segment.image.src}:${index}`}
@@ -106,6 +110,7 @@ export function ReaderRichContent({
             selectable={selectable}
             highlightActionTrigger={highlightActionTrigger}
             onHighlightRule={onHighlightRule}
+            onTextLayout={segments.length === 1 ? onTextLayout : undefined}
           />
         ) : null,
       )}
@@ -128,8 +133,7 @@ function ReaderInlineHtml({
     [contentHeight, setContentHeight] = useState(44),
     flattened = StyleSheet.flatten(textStyle) ?? {},
     color = typeof flattened.color === 'string' ? flattened.color : colors.text,
-    fontSize =
-      typeof flattened.fontSize === 'number' ? flattened.fontSize : 16,
+    fontSize = typeof flattened.fontSize === 'number' ? flattened.fontSize : 16,
     lineHeight =
       typeof flattened.lineHeight === 'number'
         ? flattened.lineHeight

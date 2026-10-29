@@ -1,0 +1,9 @@
+Book-list fixture ready: http://127.0.0.1:18198
+GET /source
+GET /source
+GET /books.json
+GET /search
+GET /book
+GET /toc
+GET /chapter/1
+GET /chapter/2

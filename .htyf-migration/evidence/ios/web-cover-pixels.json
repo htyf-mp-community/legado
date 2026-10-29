@@ -1,0 +1,110 @@
+[
+  {
+    "name": "custom-red",
+    "width": 84,
+    "height": 112,
+    "colors": 1,
+    "pixel": [
+      211,
+      43,
+      55,
+      255
+    ]
+  },
+  {
+    "name": "source-blue",
+    "width": 84,
+    "height": 112,
+    "colors": 1,
+    "pixel": [
+      24,
+      91,
+      190,
+      255
+    ]
+  },
+  {
+    "name": "wide",
+    "width": 84,
+    "height": 112,
+    "colors": 1,
+    "pixel": [
+      24,
+      91,
+      190,
+      255
+    ]
+  },
+  {
+    "name": "tall",
+    "width": 84,
+    "height": 112,
+    "colors": 1,
+    "pixel": [
+      24,
+      91,
+      190,
+      255
+    ]
+  },
+  {
+    "name": "option-green",
+    "width": 84,
+    "height": 112,
+    "colors": 1,
+    "pixel": [
+      22,
+      150,
+      70,
+      255
+    ]
+  },
+  {
+    "name": "default-control",
+    "width": 84,
+    "height": 112,
+    "colors": 1402,
+    "pixel": [
+      71,
+      71,
+      71,
+      255
+    ]
+  },
+  {
+    "name": "invalid",
+    "width": 84,
+    "height": 112,
+    "colors": 1402,
+    "pixel": [
+      71,
+      71,
+      71,
+      255
+    ]
+  },
+  {
+    "name": "slow",
+    "width": 84,
+    "height": 112,
+    "colors": 1402,
+    "pixel": [
+      71,
+      71,
+      71,
+      255
+    ]
+  },
+  {
+    "name": "too-large",
+    "width": 84,
+    "height": 112,
+    "colors": 1402,
+    "pixel": [
+      71,
+      71,
+      71,
+      255
+    ]
+  }
+]

@@ -1,13 +1,85 @@
-jest.mock('@react-native-documents/picker',()=>({pick:jest.fn(),keepLocalCopy:jest.fn(),saveDocuments:jest.fn(),types:{json:'application/json',plainText:'text/plain'}}));
-jest.mock('@dr.pogodin/react-native-fs',()=>({TemporaryDirectoryPath:'/tmp',readFile:jest.fn(),writeFile:jest.fn(),unlink:jest.fn()}));
-jest.mock('react-native-mmkv',()=>({createMMKV:()=>({getString:jest.fn(),set:jest.fn()})}));
-import { fetchAutoTaskJson, pickAutoTaskJson, saveAutoTaskJson } from '../src/core/autoTaskTransfer';
+jest.mock('react-native', () => ({ Share: { share: jest.fn() } }));
+jest.mock('@react-native-documents/picker', () => ({
+  pick: jest.fn(),
+  keepLocalCopy: jest.fn(),
+  saveDocuments: jest.fn(),
+  types: { json: 'application/json', plainText: 'text/plain' },
+}));
+jest.mock('@dr.pogodin/react-native-fs', () => ({
+  TemporaryDirectoryPath: '/tmp',
+  mkdir: jest.fn().mockResolvedValue(undefined),
+  readFile: jest.fn(),
+  writeFile: jest.fn(),
+  unlink: jest.fn(),
+}));
+jest.mock('react-native-mmkv', () => ({
+  createMMKV: () => ({ getString: jest.fn(), set: jest.fn() }),
+}));
+import {
+  fetchAutoTaskJson,
+  pickAutoTaskJson,
+  saveAutoTaskJson,
+} from '../src/core/autoTaskTransfer';
 import { normalizeAutoTask } from '../src/data/autoTasks';
-const pickerMocks=jest.requireMock('@react-native-documents/picker') as {pick:jest.Mock;keepLocalCopy:jest.Mock;saveDocuments:jest.Mock};
-const fileMocks=jest.requireMock('@dr.pogodin/react-native-fs') as {readFile:jest.Mock;writeFile:jest.Mock;unlink:jest.Mock};
-const json=JSON.stringify([{id:'a',name:'Task',cron:'*/5 * * * *',script:'{"type":"log","message":"ok"}'}]);
-beforeEach(()=>{jest.clearAllMocks();fileMocks.unlink.mockResolvedValue(undefined);fileMocks.writeFile.mockResolvedValue(undefined)});
-test('imports task JSON from an online URL',async()=>{const fetcher=jest.fn(async()=>({ok:true,status:200,text:async()=>json})) as unknown as typeof fetch;await expect(fetchAutoTaskJson('https://example.test/tasks',fetcher)).resolves.toHaveLength(1);expect(fetcher).toHaveBeenCalled()});
-test('rejects unsafe online import schemes',async()=>{await expect(fetchAutoTaskJson('file:///tasks.json')).rejects.toThrow('HTTP or HTTPS')});
-test('imports a picked document through a temporary local copy',async()=>{pickerMocks.pick.mockResolvedValue([{uri:'content://tasks',name:'tasks.json'}]);pickerMocks.keepLocalCopy.mockResolvedValue([{status:'success',localUri:'file:///tmp/tasks.json'}]);fileMocks.readFile.mockResolvedValue(json);await expect(pickAutoTaskJson()).resolves.toHaveLength(1);expect(fileMocks.unlink).toHaveBeenCalledWith('/tmp/tasks.json')});
-test('exports task JSON and cleans the temporary file',async()=>{pickerMocks.saveDocuments.mockResolvedValue([{uri:'content://export',error:null}]);await saveAutoTaskJson([normalizeAutoTask(JSON.parse(json)[0])]);expect(fileMocks.writeFile).toHaveBeenCalledWith(expect.stringContaining('exportAutoTask-'),expect.stringContaining('Task'),'utf8');expect(fileMocks.unlink).toHaveBeenCalled()});
+const pickerMocks = jest.requireMock('@react-native-documents/picker') as {
+  pick: jest.Mock;
+  keepLocalCopy: jest.Mock;
+  saveDocuments: jest.Mock;
+};
+const fileMocks = jest.requireMock('@dr.pogodin/react-native-fs') as {
+  readFile: jest.Mock;
+  writeFile: jest.Mock;
+  unlink: jest.Mock;
+};
+const json = JSON.stringify([
+  {
+    id: 'a',
+    name: 'Task',
+    cron: '*/5 * * * *',
+    script: '{"type":"log","message":"ok"}',
+  },
+]);
+beforeEach(() => {
+  jest.clearAllMocks();
+  fileMocks.unlink.mockResolvedValue(undefined);
+  fileMocks.writeFile.mockResolvedValue(undefined);
+});
+test('imports task JSON from an online URL', async () => {
+  const fetcher = jest.fn(async () => ({
+    ok: true,
+    status: 200,
+    text: async () => json,
+  })) as unknown as typeof fetch;
+  await expect(
+    fetchAutoTaskJson('https://example.test/tasks', fetcher),
+  ).resolves.toHaveLength(1);
+  expect(fetcher).toHaveBeenCalled();
+});
+test('rejects unsafe online import schemes', async () => {
+  await expect(fetchAutoTaskJson('file:///tasks.json')).rejects.toThrow(
+    'HTTP or HTTPS',
+  );
+});
+test('imports a picked document through a temporary local copy', async () => {
+  pickerMocks.pick.mockResolvedValue([
+    { uri: 'content://tasks', name: 'tasks.json' },
+  ]);
+  pickerMocks.keepLocalCopy.mockResolvedValue([
+    { status: 'success', localUri: 'file:///tmp/tasks.json' },
+  ]);
+  fileMocks.readFile.mockResolvedValue(json);
+  await expect(pickAutoTaskJson()).resolves.toHaveLength(1);
+  expect(fileMocks.unlink).toHaveBeenCalledWith('/tmp/tasks.json');
+});
+test('exports task JSON and cleans the temporary file', async () => {
+  pickerMocks.saveDocuments.mockResolvedValue([
+    { uri: 'content://export', error: null },
+  ]);
+  await saveAutoTaskJson([normalizeAutoTask(JSON.parse(json)[0])]);
+  expect(fileMocks.writeFile).toHaveBeenCalledWith(
+    expect.stringMatching(/\/exportAutoTask\.json$/),
+    expect.stringContaining('Task'),
+    'utf8',
+  );
+  expect(fileMocks.unlink).toHaveBeenCalled();
+});

@@ -33,8 +33,12 @@ import {
 export function GeneralSettings({
   back,
   changed,
+  openMore,
+  openServices,
 }: {
   back: () => void;
+  openMore: () => void;
+  openServices: () => void;
   changed: (value: GeneralPreferences) => void;
 }) {
   const { colors, t } = useAppTheme();
@@ -419,6 +423,8 @@ export function GeneralSettings({
         >
           {t('nativeSettingsOmitted')}
         </Text>
+        <Pressable accessibilityRole="button" style={s.choice} onPress={openServices}><Text style={{ color: colors.text }}>{t('mineServiceSettings')}</Text></Pressable>
+        <Pressable accessibilityRole="button" style={s.choice} onPress={openMore}><Text style={{ color: colors.text }}>{t('mineMoreSettings')}</Text></Pressable>
       </ScrollView>
       <InTreeSheet
         visible={confirmCache}

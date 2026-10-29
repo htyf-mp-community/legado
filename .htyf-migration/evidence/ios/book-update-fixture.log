@@ -1,0 +1,5 @@
+Book-list/update-task fixture ready: http://127.0.0.1:18198
+2026-10-28T10:38:49.525Z GET /toc chapters=2
+2026-10-28T10:39:00.089Z GET /toc chapters=2
+2026-10-28T10:39:03.073Z POST /__fixture__/advance chapters=3
+2026-10-28T10:40:00.198Z GET /toc chapters=3

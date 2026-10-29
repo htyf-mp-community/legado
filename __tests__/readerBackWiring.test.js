@@ -6,7 +6,7 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
 test('reader registers a focused hardware-back handler with menu state', () => {
   const reader = read('index.tsx');
-  expect(reader).toContain("BackHandler.addEventListener(\n      'hardwareBackPress'");
+  expect(reader).toMatch(/BackHandler\.addEventListener\(\s*'hardwareBackPress'/);
   expect(reader).toContain('shouldBlockReaderHardwareBack(');
   expect(reader).toContain('prefs.disableReturnKey');
   expect(reader).toContain('controls,');

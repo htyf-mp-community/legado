@@ -1,4 +1,5 @@
 import type { Book } from '../types';
+import { normalizeLegacyCover } from './bookCover';
 
 type AndroidBook = Record<string, unknown> & { _htyf?: Book };
 
@@ -16,6 +17,8 @@ export function exportBookshelfJson(books: Book[]) {
       origin: book.origin || 'local',
       originName: book.originName || '',
       coverUrl: book.coverUrl || '',
+      customCoverUrl: book.customCoverUrl,
+      persistedCoverUrl: book.persistedCoverUrl,
       durChapterTitle: book.chapterTitle,
       durChapterIndex: book.currentChapterIndex ?? 0,
       durChapterPos: book.progress,
@@ -69,34 +72,38 @@ export function parseBookshelfJson(raw: string): Book[] {
         ),
       );
     seen.add(id);
-    books.push({
-      ...(embedded ?? {}),
-      id,
-      name,
-      author: text(embedded?.author) || text(value.author),
-      intro: text(embedded?.intro) || text(value.intro),
-      chapterTitle: chapters[currentChapterIndex].title,
-      content: chapters[currentChapterIndex].content,
-      chapters,
-      currentChapterIndex,
-      progress: number(embedded?.progress, number(value.durChapterPos)),
-      updatedAt: number(embedded?.updatedAt, Date.now()),
-      ...(embedded
-        ? {}
-        : {
-            latestChapterTime: number(value.latestChapterTime, Date.now()),
-            durChapterTime: number(value.durChapterTime, Date.now()),
-            order: number(value.order),
-            origin: text(value.origin) || undefined,
-            originName: text(value.originName) || undefined,
-            bookUrl: text(value.bookUrl) || undefined,
-            coverUrl: text(value.coverUrl) || undefined,
-            groupIds: text(value.group)
-              .split(',')
-              .map(item => item.trim())
-              .filter(Boolean),
-          }),
-    });
+    books.push(
+      normalizeLegacyCover({
+        ...(embedded ?? {}),
+        id,
+        name,
+        author: text(embedded?.author) || text(value.author),
+        intro: text(embedded?.intro) || text(value.intro),
+        chapterTitle: chapters[currentChapterIndex].title,
+        content: chapters[currentChapterIndex].content,
+        chapters,
+        currentChapterIndex,
+        progress: number(embedded?.progress, number(value.durChapterPos)),
+        updatedAt: number(embedded?.updatedAt, Date.now()),
+        ...(embedded
+          ? {}
+          : {
+              latestChapterTime: number(value.latestChapterTime, Date.now()),
+              durChapterTime: number(value.durChapterTime, Date.now()),
+              order: number(value.order),
+              origin: text(value.origin) || undefined,
+              originName: text(value.originName) || undefined,
+              bookUrl: text(value.bookUrl) || undefined,
+              coverUrl: text(value.coverUrl) || undefined,
+              customCoverUrl: text(value.customCoverUrl) || undefined,
+              persistedCoverUrl: text(value.persistedCoverUrl) || undefined,
+              groupIds: text(value.group)
+                .split(',')
+                .map(item => item.trim())
+                .filter(Boolean),
+            }),
+      }),
+    );
   }
   if (!books.length && parsed.length)
     throw new Error('bookshelf JSON contains no valid books');

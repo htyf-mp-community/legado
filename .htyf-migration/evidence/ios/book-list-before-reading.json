@@ -1,0 +1,29 @@
+{
+  "id": "remote:http%3A%2F%2F127.0.0.1%3A18198:http%3A%2F%2F127.0.0.1%3A18198%2Fbook",
+  "name": "iOS书单验收",
+  "author": "验收作者",
+  "intro": "这是书源返回的简介。",
+  "chapterTitle": "",
+  "content": "",
+  "chapters": [
+    {
+      "id": "remote:http%3A%2F%2F127.0.0.1%3A18198:http%3A%2F%2F127.0.0.1%3A18198%2Fbook-legacy",
+      "title": "",
+      "content": ""
+    }
+  ],
+  "currentChapterIndex": 0,
+  "progress": 0,
+  "updatedAt": 1793174883391,
+  "origin": "http://127.0.0.1:18198",
+  "originName": "iOS 书单验收源",
+  "bookUrl": "http://127.0.0.1:18198/book",
+  "sourceType": 0,
+  "pendingCatalog": true,
+  "latestChapterTime": 1793174883391,
+  "durChapterTime": 1793174883391,
+  "groupIds": [
+    "1"
+  ],
+  "notShelf": false
+}

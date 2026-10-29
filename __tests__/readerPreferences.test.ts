@@ -5,6 +5,7 @@ import {
   defaultReaderPreferences,
   normalizeReaderPreferences,
   readerPalette,
+  readerPreferencesForAppTheme,
 } from '../src/data/readerPreferences';
 describe('reader preferences', () => {
   test('uses defaults for invalid persisted data', () =>
@@ -129,9 +130,9 @@ describe('reader preferences', () => {
   });
   test('keeps Android hidden-menu return-key blocking opt-in', () => {
     expect(normalizeReaderPreferences({}).disableReturnKey).toBe(false);
-    expect(normalizeReaderPreferences({ disableReturnKey: true })).toMatchObject(
-      { disableReturnKey: true },
-    );
+    expect(
+      normalizeReaderPreferences({ disableReturnKey: true }),
+    ).toMatchObject({ disableReturnKey: true });
   });
   test('keeps Android special-content adaptation enabled by default', () => {
     expect(normalizeReaderPreferences({}).adaptSpecialStyle).toBe(true);
@@ -250,4 +251,27 @@ describe('reader preferences', () => {
       normalizeReaderPreferences({ nightBackground: 'red' }).nightBackground,
     ).toBe('#171a1c');
   });
+});
+
+test('app e-ink mode restores an independent reader profile without mutating the regular one', () => {
+  const regular = normalizeReaderPreferences({
+    theme: 'night',
+    pageAnimation: 'cover',
+    epaperBackground: '#fafafa',
+  });
+  const eink = readerPreferencesForAppTheme(regular, 'eink');
+  expect(eink).toMatchObject({
+    theme: 'epaper',
+    pageAnimation: 'none',
+    epaperBackground: '#fafafa',
+  });
+  expect(readerPalette(eink.theme, eink).background).toBe('#fafafa');
+  expect(readerPreferencesForAppTheme(regular, 'light')).toBe(regular);
+  expect(regular).toMatchObject({ theme: 'night', pageAnimation: 'cover' });
+  expect(
+    readerPreferencesForAppTheme(
+      normalizeReaderPreferences({ ...regular, epaperPageAnimation: 'fade' }),
+      'eink',
+    ).pageAnimation,
+  ).toBe('fade');
 });

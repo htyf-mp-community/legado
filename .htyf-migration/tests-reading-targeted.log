@@ -1,0 +1,6 @@
+
+Test Suites: 5 passed, 5 total
+Tests:       31 passed, 31 total
+Snapshots:   0 total
+Time:        0.886 s, estimated 3 s
+Ran all test suites matching __tests__/readerPositionBridge.test.tsx|__tests__/readerPosition.test.ts|__tests__/bookCatalogue.test.ts|__tests__/legacyBackup.test.ts|__tests__/pagination.test.ts.

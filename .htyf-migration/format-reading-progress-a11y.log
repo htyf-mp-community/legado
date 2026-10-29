@@ -1,0 +1,3 @@
+src/components/ReaderProgressSlider.tsx 42ms
+src/index.tsx 388ms
+__tests__/readerProgressSlider.test.tsx 9ms
