@@ -1,7 +1,0 @@
-src/core/backupMediaPaths.ts 70ms
-src/core/backupMedia.ts 21ms
-src/core/backupArchive.ts 15ms
-src/core/restoreBackupPreview.ts 4ms
-src/core/legacyBackupArchive.ts 19ms
-src/data/backup.ts 18ms
-src/data/backupPreferences.ts 7ms

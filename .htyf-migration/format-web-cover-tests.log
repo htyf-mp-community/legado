@@ -1,6 +1,0 @@
-__tests__/browser.test.ts 81ms
-__tests__/coverThumbnail.test.ts 15ms
-__tests__/webBookCover.test.ts 21ms
-src/core/coverThumbnail.ts 13ms (unchanged)
-src/components/CoverThumbnailRenderer.tsx 12ms (unchanged)
-src/services/webBookCover.ts 12ms (unchanged)

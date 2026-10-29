@@ -1,6 +1,0 @@
-
-Test Suites: 4 passed, 4 total
-Tests:       27 passed, 27 total
-Snapshots:   0 total
-Time:        0.712 s, estimated 2 s
-Ran all test suites matching __tests__/backup.test.ts|__tests__/legacyBackupArchive.test.ts|__tests__/restorePreferences.test.ts|__tests__/restoreBackupPreview.test.ts.

@@ -1,6 +1,0 @@
-
-Test Suites: 2 passed, 2 total
-Tests:       9 passed, 9 total
-Snapshots:   0 total
-Time:        0.769 s, estimated 1 s
-Ran all test suites matching __tests__/readerPosition.test.ts|__tests__/pagination.test.ts.

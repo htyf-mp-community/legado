@@ -1,4 +1,0 @@
-src/core/autoTaskProtocol.ts 73ms
-src/services/autoTaskProtocol.ts 30ms
-__tests__/autoTaskProtocol.test.ts 10ms (unchanged)
-__tests__/autoTaskProtocolMetadata.test.ts 8ms

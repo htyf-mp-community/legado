@@ -1,9 +1,0 @@
-{
-  "stoppedAt": "2026-10-28T11:20:26.801965+00:00",
-  "pid": 4224,
-  "command": "node scripts/cover-persistence-fixture.mjs",
-  "reason": "Intentional fixture shutdown for offline persisted-cover cold-start acceptance",
-  "fixtureStoppedConfirmed": true,
-  "offlineScreenshot": "cover-persisted-offline-cold-start.png",
-  "verifiedAt": "2026-10-28T11:23:09.623813+00:00"
-}

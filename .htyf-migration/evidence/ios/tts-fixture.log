@@ -1,5 +1,0 @@
-HTTP TTS iOS test fixture: http://127.0.0.1:8098/engines
-{"type":"speech","characters":6,"speed":10,"bytes":64490}
-{"type":"speech","characters":18,"speed":10,"bytes":147080}
-{"type":"speech","characters":18,"speed":10,"bytes":147080}
-{"type":"speech","characters":51,"speed":10,"bytes":461510}

@@ -1,5 +1,0 @@
-src/components/ReaderPositionBridge.tsx 105ms
-src/data/remoteBackup.ts 41ms
-src/index.tsx 315ms
-__tests__/readerPositionBridge.test.tsx 9ms
-__tests__/remoteBackup.test.ts 8ms

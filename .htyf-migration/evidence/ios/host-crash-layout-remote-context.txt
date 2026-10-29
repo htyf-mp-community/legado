@@ -1,4 +1,0 @@
-version 0.0.14
-sha256 084aeb7dd073560784a8eeb4bb43475d6e5bba4c3b92f3589ca4867cf0903df6
-plugin_legado_v0_0_14.bundle:8414:3415
-

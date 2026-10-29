@@ -1,2 +1,0 @@
-__tests__/readerProgressSlider.test.tsx(32,19): error TS2454: Variable 'tree' is used before being assigned.
-__tests__/readerProgressSlider.test.tsx(46,18): error TS2454: Variable 'tree' is used before being assigned.

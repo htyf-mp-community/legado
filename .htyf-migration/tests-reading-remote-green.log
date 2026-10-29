@@ -1,6 +1,0 @@
-
-Test Suites: 2 passed, 2 total
-Tests:       13 passed, 13 total
-Snapshots:   0 total
-Time:        0.737 s, estimated 1 s
-Ran all test suites matching __tests__/readerPositionBridge.test.tsx|__tests__/remoteBackup.test.ts.

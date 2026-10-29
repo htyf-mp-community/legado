@@ -1,7 +1,0 @@
-HTTP/1.1 200 OK
-x-content-type-options: nosniff
-cache-control: private, no-store
-content-type: image/png
-content-length: 14128
-date: Wed, 28 Oct 2026 14:26:19 GMT
-
