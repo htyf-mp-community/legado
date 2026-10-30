@@ -11,7 +11,7 @@ test('reader consumes a stable two-finger hold and restores replacement state', 
   expect(reader).toContain('600,');
   expect(reader).toContain('shouldCancelTwoFingerPreview(');
   expect(reader).toContain('setReplacePreviewActive(false)');
-  expect(reader).toContain('previewReplacementRules(');
+  expect(reader).toContain('readerReplacementPolicy(');
 });
 
 test('reader settings expose the persisted preview preference', () => {

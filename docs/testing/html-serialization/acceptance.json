@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-29",
+  "scope": "native collection html/all extraction and serialization; full goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "reference": {
+    "sources": {
+      "AnalyzeByJSoup.kt": "d4e87034a0e7db3ab94148b45ec8e0aa257e222924723cfb2adda41e20a97cd8",
+      "RuleAnalyzer.kt": "74ab0152bce9d5e014cc69d9c6974cbb093d8353200f1452066f7d05102265a7"
+    },
+    "jsoupVersion": "1.16.2",
+    "xpathVersion": "2.5.3",
+    "jsoupJarSha256": "a73a1eb5d02b51490547c46485e30f4f14e68af3624840b57abe8c4580a00b83",
+    "xpathJarSha256": "1bcd0643910663a6eb0e506803011b9145b5192b8905b1522ab07d0702ce394a",
+    "caseCount": 109
+  },
+  "nativeFixtureMatches": "pass",
+  "realResponseComparison": {
+    "nativeItems": 1,
+    "targetItems": 1,
+    "nativeChars": 9281,
+    "targetChars": 9281,
+    "nativeSha256": "d6fdf81c855eafdcc3e859849c09383830788af17b3d23de63ffa6e84ac526ba",
+    "targetSha256": "d6fdf81c855eafdcc3e859849c09383830788af17b3d23de63ffa6e84ac526ba",
+    "equal": true,
+    "url": "https://www.vikbook.com/?id=642932592530&display=fulltext&p=3",
+    "inputBytes": 59052,
+    "inputSha256": "74740b4bf27281d22339b6dbe4aa8f22a8c0d6e5c114f136768f9f17767bf9f7",
+    "rule": ".calibre@html",
+    "hashEncoding": "SHA-256 of UTF-8 JSON.stringify(resultStringArray)",
+    "snapshotStored": "temporary directory only"
+  },
+  "ios": {
+    "temporaryRealSource": {
+      "base": "📂阅读书屋",
+      "searchCount": 1,
+      "info": "pass",
+      "tocCount": 2,
+      "selectedOriginalChapterIndexes": [
+        2,
+        3
+      ],
+      "contentChars": 6934,
+      "contentRuleUnchanged": true,
+      "allFourStages": "pass",
+      "screenshot": "source-debug.png"
+    },
+    "originalSource": {
+      "tocCount": 105,
+      "rulesUnchanged": true,
+      "screenshot": "real-source.png"
+    },
+    "temporarySourceRemoved": true,
+    "libraryBookAdded": false,
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "59b85376ad5ddfb4ecc832453e933411415194c2f86344d37bcb28cb50546175"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "cfcaefd8c9223d11c7f4f6fc9df2d4a1db286e4f69c5a0c728d73f0ab18fa95b"
+      }
+    },
+    "coldResume": {
+      "result": "pass",
+      "book": "西游记-吴承恩",
+      "chapter": "第二回 悟彻菩提真妙理断魔归本合元神第4页",
+      "page": 2,
+      "pages": 24,
+      "screenshot": "cold-resume.png",
+      "launchBundleId": "org.reactjs.native.example.apps",
+      "repackLocation": "127.0.0.1:8097"
+    },
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "finalScreen": "书架"
+  },
+  "verification": {
+    "suites": 198,
+    "tests": 975,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "existingDependencyPinsUnchanged": true,
+    "newPureJavascriptDependencies": {
+      "parse5": "7.3.0",
+      "parse5-htmlparser2-tree-adapter": "7.1.0"
+    },
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass"
+  },
+  "package": {
+    "version": "0.0.32",
+    "bytes": 1679446,
+    "sha256": "f8ea8577ca9224c5ec5822e87010add5325f2893ba13fb93bcd6c59e57a37e10",
+    "zipIntegrity": "pass",
+    "productionInputCount": 316,
+    "productionInputSha256": "76e73aa3cdc9c9250e6d5d7eb7ed571e55f3d550e74e2ea3406a63e06b29e340",
+    "licensesRetained": [
+      "Jsoup MIT",
+      "parse5 MIT",
+      "parse5 adapter MIT",
+      "entities BSD"
+    ],
+    "fixtureDataEmbedded": false,
+    "qrPixelPayloadMatchesConfig": true,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "remainingGaps": [
+    "Complete explicit CSS and mixed-rule grammar",
+    "Complete HTML5/XML parser/declaration/namespace edge matrix",
+    "Full native HtmlFormatter/ContentProcessor paragraph and reader position/visual matrix",
+    "General JavaScript sandbox and remaining migration inventory",
+    "Actual HTYF-host/device acceptance"
+  ],
+  "remoteAvailability": {
+    "checkedAt": "2026-10-29T06:46:21.716409+00:00",
+    "localVersion": "0.0.32",
+    "config": {
+      "url": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/app.json",
+      "status": 200,
+      "version": "0.0.27"
+    },
+    "package": {
+      "url": "https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/dist.dgz",
+      "status": 200
+    }
+  }
+}

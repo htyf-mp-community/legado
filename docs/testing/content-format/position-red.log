@@ -1,0 +1,23 @@
+FAIL __tests__/readerPositionBridge.test.tsx
+  ● scroll restore uses measured paragraph lines across "\n" separators
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: 110
+
+    Number of calls: 0
+
+      123 |     ]);
+      124 |   });
+    > 125 |   expect(props.scrollTo).toHaveBeenCalledWith(110);
+          |                          ^
+      126 |   act(() => ref.current!.onScroll(110));
+      127 |   act(() => jest.runOnlyPendingTimers());
+      128 |   expect(props.commit).not.toHaveBeenCalled();
+
+      at toHaveBeenCalledWith (__tests__/readerPositionBridge.test.tsx:125:26)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 10 passed, 11 total
+Snapshots:   0 total
+Time:        1.294 s, estimated 2 s

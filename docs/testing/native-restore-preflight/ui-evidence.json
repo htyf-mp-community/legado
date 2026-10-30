@@ -1,0 +1,38 @@
+[
+  {
+    "stage": "runtime",
+    "message": "备份或恢复源变量前，请先设置非空的本地密码。",
+    "confirmationAbsent": true
+  },
+  {
+    "stage": "clean",
+    "confirmationPresent": true,
+    "recognized": [
+      "bookSource.json"
+    ],
+    "confirmed": false
+  },
+  {
+    "stage": "cookies",
+    "message": "备份或恢复持久 Cookie 前，请先设置非空的本地密码。",
+    "confirmationAbsent": true
+  },
+  {
+    "stage": "services",
+    "web": false,
+    "mcp": false,
+    "tasks": false
+  },
+  {
+    "stage": "cold-start",
+    "pid": 18302,
+    "books": 10,
+    "inReading": 9
+  },
+  {
+    "stage": "cold-services",
+    "web": false,
+    "mcp": false,
+    "tasks": false
+  }
+]

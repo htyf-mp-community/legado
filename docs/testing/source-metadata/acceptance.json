@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-29",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "source": {
+    "name": "📂阅读书屋",
+    "url": "https://www.vikbook.com/",
+    "collectionUrl": "https://www.yckceo.com/yuedu/shuyuans/json/id/1321.json",
+    "originalRulesUnmodified": true
+  },
+  "preview": {
+    "book": "西游记-吴承恩",
+    "introTitle": "西游记",
+    "tagsExpanded": true,
+    "unexpandedTemplateMarkers": false,
+    "tocItems": 105,
+    "authorSelectorCurrentSiteMismatch": true,
+    "descriptionSelectorCurrentSiteMismatch": true,
+    "bookReadded": false
+  },
+  "preservation": {
+    "bookCount": 9,
+    "sourceCount": 8,
+    "books": {
+      "unchanged": true,
+      "beforeSha256": "adc1453570e7472da210d703235d4645a57de2216d572054e031fa5ac9baa206",
+      "afterSha256": "adc1453570e7472da210d703235d4645a57de2216d572054e031fa5ac9baa206"
+    },
+    "sources": {
+      "unchanged": true,
+      "beforeSha256": "cfcaefd8c9223d11c7f4f6fc9df2d4a1db286e4f69c5a0c728d73f0ab18fa95b",
+      "afterSha256": "cfcaefd8c9223d11c7f4f6fc9df2d4a1db286e4f69c5a0c728d73f0ab18fa95b"
+    }
+  },
+  "coldResume": {
+    "result": "pass",
+    "chapter": "第二回",
+    "page": "2/24",
+    "screenshot": "cold-resume.png",
+    "debugBundlePort": 8097,
+    "productionHostAcceptance": "pending"
+  },
+  "servicesAtEnd": {
+    "web": false,
+    "mcp": false,
+    "scheduledTasks": false
+  },
+  "verification": {
+    "suites": 195,
+    "tests": 935,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "runtimeDependencyPinsUnchanged": true,
+    "diffCheck": "pass"
+  },
+  "package": {
+    "version": "0.0.29",
+    "bytes": 1612459,
+    "sha256": "f86025db45ad3868ded5d82497a9ac489215c5532217c9f1af80ef1a405eca42",
+    "zipIntegrity": "pass",
+    "productionInputCount": 308,
+    "productionInputSha256": "3209ee220eb0e516c1191a44e83b28c08201654ef9af12cbc81a4d45423096bd",
+    "sourceDataEmbedded": false,
+    "qrPixelPayloadMatchesConfig": true,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "remainingGaps": [
+    "Arbitrary JavaScript sandbox execution",
+    "Full legacy index range/step semantics",
+    "Original source author/description selectors outdated on the current site",
+    "Actual HTYF host/device acceptance of the production archive"
+  ]
+}

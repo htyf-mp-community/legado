@@ -19,6 +19,7 @@ import {
 } from './backupMedia';
 import { localMediaPath } from './backupMediaPaths';
 import type { BackupPreview } from './restoreBackupPreview';
+import { loadLocalPassword } from '../data/localPassword';
 const stamp = () => new Date().toISOString().slice(0, 10);
 const token = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const remove = async (path: string) => {
@@ -73,7 +74,7 @@ export async function saveBackupArchive(raw = createBackup()) {
 /** Takes ownership of the local archive; extracted media remains staged until explicit restore/cancel. */
 export async function inspectLocalBackupArchive(
   archive: string,
-  password = '',
+  password = loadLocalPassword(),
 ): Promise<BackupPreview> {
   const id = token(),
     destination = `${CachesDirectoryPath}/htyf-backup-${id}`,

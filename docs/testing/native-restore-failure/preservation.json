@@ -1,0 +1,31 @@
+{
+  "method": "normal UI ZIP exports only; no MMKV file access",
+  "all27EntriesRestoredExactly": true,
+  "entryCount": 27,
+  "core": {
+    "library.v1": {
+      "count": 10,
+      "sha256": "3b3054fdd31010b8dfe8a0fc0c34e6daa81b41644a2d904be958e4b9fdf79fc9",
+      "equal": true
+    },
+    "sources.v1": {
+      "count": 9,
+      "sha256": "62024f2d131cb9066cd022683ed6103c8b5c591d9049e47821225f2f9b0a0eb1",
+      "equal": true
+    },
+    "replace.rules.v1": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    "reading.records.v1": {
+      "count": 16,
+      "sha256": "62dc02b1c851356c693bc366cccf903881b4c6c8adadb80758605e6024f2aef2",
+      "equal": true
+    }
+  },
+  "temporarySourceCustomOrderRestored": 9999,
+  "remoteCounterRestoredMs": 1000,
+  "noNewEntries": true,
+  "priorTemporaryDataCleanupStillPending": true
+}

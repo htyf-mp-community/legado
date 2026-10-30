@@ -1,0 +1,51 @@
+{
+  "source": "📂阅读书屋",
+  "chapterIndex": 3,
+  "input": "Previously cached real chapter; no fresh network fetch",
+  "sourceSha256": "3130fbf6bf4cbcba1ec6e0d8994f9fb7621334779897c80c2eca3c1302e547b0",
+  "rows": [
+    {
+      "randomTape": [
+        0
+      ],
+      "randomCalls": 23,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7247,
+      "sha256": "ae1baa7df38cc95f016627a5c7c2cefc5e8cee30acc5b28544c064d2f3cd5079",
+      "equal": true
+    },
+    {
+      "randomTape": [
+        0.5
+      ],
+      "randomCalls": 36,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7231,
+      "sha256": "2e7df2b78ea10dd1d6bca627803c60c58edf0a08d571cec2b7a19e41b1af90ba",
+      "equal": true
+    },
+    {
+      "randomTape": [
+        0.999999
+      ],
+      "randomCalls": 41,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7226,
+      "sha256": "52efbf4af9449c8544da450fbda9476b00ec7f9710193d2800c97921f6197eb8",
+      "equal": true
+    },
+    {
+      "randomTape": [
+        0.1,
+        0.9,
+        0.3,
+        0.7
+      ],
+      "randomCalls": 29,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7237,
+      "sha256": "1e15ef8f4a78d8699de6a4d5c57c999cfcf7ad5dc04c4db89e39e445b9dc8e65",
+      "equal": true
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-29",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "sourceCollection": {
+    "url": "https://www.yckceo.com/yuedu/shuyuans/json/id/1321.json",
+    "count": 836,
+    "bytes": 9302369,
+    "sha256": "761f4a91086a40a0c22bb50702fe7152ee3854ca55286292e26101a4e2ca7390"
+  },
+  "imported": {
+    "index": 97,
+    "name": "📂阅读书屋",
+    "url": "https://www.vikbook.com/",
+    "originalRulesUnmodified": true,
+    "sourceCountBefore": 7,
+    "sourceCountAfter": 8,
+    "unrelatedSourcesPreserved": true
+  },
+  "book": {
+    "name": "西游记-吴承恩",
+    "url": "https://www.vikbook.com/?id=642932592530",
+    "tocUrl": "https://www.vikbook.com/?id=642932592530&display=menu",
+    "tocItems": 105,
+    "chapterIndex": 3,
+    "readingPosition": {
+      "chapterId": "https://www.vikbook.com/?id=642932592530&display=fulltext&p=4",
+      "position": 366,
+      "titleVisible": true
+    },
+    "firstChapterChars": 6991,
+    "secondChapterChars": 7152,
+    "coldResume": "pass: 第二回, 第2/24页, see cold-resume.png"
+  },
+  "preserved": {
+    "originalBookCount": 8,
+    "originalFullRecordsEqual": true,
+    "totalBookCount": 9
+  },
+  "verification": {
+    "suites": 195,
+    "tests": 926,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "runtimeDependencyPinsUnchanged": true,
+    "diffCheck": "pass"
+  },
+  "package": {
+    "version": "0.0.28",
+    "bytes": 1611597,
+    "sha256": "ac3ea4b95c46c41f41eb7d4ebc0a127ab19a42b54944da7236a5fa0336a98d92",
+    "zipIntegrity": "pass",
+    "productionInputCount": 308,
+    "productionInputSha256": "a68050c86efc7a498237eb6c4eba497d9ebe246d7c27a79a762eb00bfa2b8c1c",
+    "sourceDataEmbedded": false,
+    "published": false,
+    "realHostAcceptance": "pending",
+    "qrPixelPayloadMatchesConfig": true
+  },
+  "remaining": [
+    "作者/简介模板未完整解析",
+    "单页进度条无障碍百分比显示",
+    "其余835条源尚未验收",
+    "全应用1:1迁移未完成"
+  ],
+  "finalServices": {
+    "8097": true,
+    "1122": false,
+    "1236": false
+  }
+}

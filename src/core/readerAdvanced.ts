@@ -1,25 +1,13 @@
 import type { Book } from '../types';
+import { processChapterTitle } from './chapterTitle';
 
 export function reverseContentLines(content: string) {
   return content.split(/\r?\n/).reverse().join('\n');
 }
 
-const comparable = (value: string) =>
-  value.replace(/[\s\u3000:：第章节卷篇部]/g, '').toLowerCase();
-
-export function removeDuplicateChapterTitle(content: string, title: string) {
-  const lines = content.split(/\r?\n/),
-    first = lines.findIndex(line => line.trim());
-  if (
-    first >= 0 &&
-    comparable(lines[first]) &&
-    comparable(lines[first]) === comparable(title)
-  ) {
-    lines.splice(first, 1);
-    while (lines[0] !== undefined && !lines[0].trim()) lines.shift();
-    return lines.join('\n');
-  }
-  return content;
+/** Remove only the native exact title line, including its optional book prefix. */
+export function removeDuplicateChapterTitle(content: string, title: string, bookName = '') {
+  return processChapterTitle(content, { title, bookName }).content;
 }
 
 export function simulatedChapterCount(

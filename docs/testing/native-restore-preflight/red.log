@@ -1,0 +1,80 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/nativeRestorePreflight.test.ts
+  ● wrong encrypted-cookie password rejects the whole native preview before a valid source can be restored
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"importedFiles": ["bookSource.json"], "payload": {"createdAt": 1793303966568, "entries": {"sources.v1": {"type": "string", "value": "[{\"bookSourceUrl\":\"https://fixture.invalid\",\"bookSourceName\":\"source\",\"bookSourceType\":0,\"customOrder\":0,\"enabled\":true,\"enabledExplore\":true}]"}}, "format": "legado-htyf-backup", "storageId": "io.legado.htyf.application-storage", "version": 1}, "warnings": ["未导入加密数据（cookies.json：旧版备份密码错误或加密数据已损坏）"]}
+
+      43 |     'cookies.json': encrypt('[{"url":"fixture.invalid","cookie":"sid=fixture"}]'),
+      44 |   });
+    > 45 |   await expect(inspectLegacyBackupDirectory('/stage', 'wrong-password')).rejects.toThrow();
+         |         ^
+      46 |   expect(mockValues.size).toBe(0);
+      47 | });
+      48 |
+
+      at expect (node_modules/@jest/expect/node_modules/expect/build/index.js:2116:15)
+      at Object.expect (__tests__/nativeRestorePreflight.test.ts:45:9)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+  ● plain source-variable data still requires the nonblank native local password before other data
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"importedFiles": ["bookSource.json", "runtimeSourceCache.json"], "payload": {"createdAt": 1793303966574, "entries": {"legacy.runtime-source-cache.v1": {"type": "string", "value": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":0}]"}, "sources.v1": {"type": "string", "value": "[{\"bookSourceUrl\":\"https://fixture.invalid\",\"bookSourceName\":\"source\",\"bookSourceType\":0,\"customOrder\":0,\"enabled\":true,\"enabledExplore\":true}]"}}, "format": "legado-htyf-backup", "storageId": "io.legado.htyf.application-storage", "version": 1}, "warnings": []}
+
+      52 |     'runtimeSourceCache.json': '[{"key":"v_fixture","value":"fixture","deadline":0}]',
+      53 |   });
+    > 54 |   await expect(inspectLegacyBackupDirectory('/stage', '')).rejects.toThrow('源变量');
+         |         ^
+      55 |   expect(mockValues.size).toBe(0);
+      56 | });
+      57 |
+
+      at expect (node_modules/@jest/expect/node_modules/expect/build/index.js:2116:15)
+      at Object.expect (__tests__/nativeRestorePreflight.test.ts:54:9)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+  ● invalid strict sensitive rows reject rather than being filtered or converted into import warnings
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"importedFiles": ["cookies.json"], "payload": {"createdAt": 1793303966575, "entries": {}, "format": "legado-htyf-backup", "storageId": "io.legado.htyf.application-storage", "version": 1}, "warnings": ["bookSource.json: 书源列表为空"]}
+
+      65 |   ]) {
+      66 |     archive({ 'bookSource.json': '[]', [name]: encrypt(raw) });
+    > 67 |     await expect(inspectLegacyBackupDirectory('/stage', 'fixture-password')).rejects.toThrow();
+         |           ^
+      68 |   }
+      69 | });
+      70 |
+
+      at expect (node_modules/@jest/expect/node_modules/expect/build/index.js:2116:15)
+      at Object.expect (__tests__/nativeRestorePreflight.test.ts:67:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.631 s
+Ran all test suites matching __tests__/nativeRestorePreflight.test.ts.

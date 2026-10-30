@@ -74,3 +74,10 @@ test('disabled progress cannot change through a screen-reader action', () => {
   expect(seek).not.toHaveBeenCalled();
   act(() => tree.unmount());
 });
+
+test('single-page progress supplies explicit text instead of a zero-range percentage', () => {
+  let tree!: ReturnType<typeof create>;
+  act(() => { tree = create(<ReaderProgressSlider value={0} max={0} step={1} label="页码" disabled onSeek={jest.fn()} minimumTrackTintColor="#000" maximumTrackTintColor="#888" />); });
+  expect(tree.root.findByType('View' as never).props.accessibilityValue).toMatchObject({ text: '0%' });
+  act(() => tree.unmount());
+});

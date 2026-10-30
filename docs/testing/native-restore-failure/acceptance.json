@@ -1,0 +1,63 @@
+{
+  "version": "0.0.46",
+  "overallParityComplete": false,
+  "iosOnly": true,
+  "androidAppBuilt": false,
+  "device": {
+    "name": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "model": "iPhone 17 Pro",
+    "ios": "26.5",
+    "reactNative": "0.86.2",
+    "storage": "io.legado.htyf.application-storage"
+  },
+  "tests": {
+    "suites": 219,
+    "tests": 1105,
+    "passed": true,
+    "typecheck": "pass",
+    "changedFileLint": "pass",
+    "nativeSequences": 84,
+    "nativeFailures": 72,
+    "successfulControls": 12
+  },
+  "normalNativeZipPreview": true,
+  "neutralErrorTitle": "恢复备份出错",
+  "committedBeforeFailure": {
+    "sourceCustomOrder": 1234,
+    "remoteReadTimeMs": 2000,
+    "display": "13秒"
+  },
+  "laterBadAndValidRecordsNotInserted": true,
+  "laterServersCategoryNotReached": true,
+  "other25EntriesUnchanged": true,
+  "committedDurationSurvivesColdStart": true,
+  "partialColdStartPid": 49341,
+  "restoredValues": {
+    "sourceCustomOrder": 9999,
+    "remoteReadTimeMs": 1000,
+    "display": "12秒"
+  },
+  "all27EntriesRestoredExactly": true,
+  "repeatFailureInputForToastCapture": true,
+  "htyfAtomicContractPreservedByRegression": true,
+  "nativeMediaOrderAndMutexByRegression": true,
+  "finalColdStartPid": 54078,
+  "services": {
+    "repack8097": "listening",
+    "fixture18201": "stopped",
+    "web1122": "off",
+    "mcp1236": "off",
+    "automaticTasks": "off"
+  },
+  "priorCleanupPendingUserConfirmation": true,
+  "noDeletionRetry": true,
+  "generatedCachedExportZipsRetained": 3,
+  "published": false,
+  "physicalHostAccepted": false,
+  "limits": [
+    "Finite JVM/DAO loop profile with in-memory row storage; no Room/Android execution",
+    "Full crypto preflight, fatal restore logging, schema/batch failures, keyboard clear failures, media per-file faults, XML/configuration, cancellation/process/repeated storage faults and large imports remain open",
+    "Full accessibility/layout/gesture/physical-host matrices and prior cleanup remain open"
+  ]
+}

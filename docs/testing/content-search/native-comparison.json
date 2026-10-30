@@ -1,0 +1,50 @@
+{
+  "reference": "Unchanged SearchContentViewModel searchChapter/searchPosition/getResultAndQueryIndex, getContent and BookChapter.getDisplayTitle methods",
+  "sources": {
+    "search": {
+      "path": "app/src/main/java/io/legado/app/ui/book/searchContent/SearchContentViewModel.kt",
+      "sha256": "dbd8d93f9316dd26be466ae496fce47a7ac9f1aa8484247736a4d11e50917bb9"
+    },
+    "result": {
+      "path": "app/src/main/java/io/legado/app/ui/book/searchContent/SearchResult.kt",
+      "sha256": "a03339bf799772079f10d8cd4da465aaa6ba5a8fda9e587893f5b66df735b8d9"
+    },
+    "processor": {
+      "path": "app/src/main/java/io/legado/app/help/book/ContentProcessor.kt",
+      "sha256": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666"
+    },
+    "chapter": {
+      "path": "app/src/main/java/io/legado/app/data/entities/BookChapter.kt",
+      "sha256": "270974eef0f026143327534963ff06fa0a4621c0ecbf95b5fd9fc57665c99434"
+    },
+    "patterns": {
+      "path": "app/src/main/java/io/legado/app/constant/AppPattern.kt",
+      "sha256": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa"
+    },
+    "strings": {
+      "path": "app/src/main/java/io/legado/app/utils/StringExtensions.kt",
+      "sha256": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51"
+    },
+    "contentHelp": {
+      "path": "app/src/main/java/io/legado/app/help/book/ContentHelp.kt",
+      "sha256": "3130fbf6bf4cbcba1ec6e0d8994f9fb7621334779897c80c2eca3c1302e547b0"
+    },
+    "converter": {
+      "path": "app/src/main/java/io/legado/app/utils/ChineseUtils.kt",
+      "sha256": "f346a544d0ec88d5537b08a1b27850de267aedeb7c1b5996826e4650da5c7a5d"
+    }
+  },
+  "getContentSha256": "4bdddcd65758dbd0a6d5243c527a3beedbc32436d455dc84d8b5b60061a3dd30",
+  "searchMethodsSha256": "929a1dbc42ca99c03878fc27b8e549db224c031fe2c632c04dac373ce5c4749b",
+  "displayTitleMethodSha256": "be487bc9915a9606b635bdcc76da5ea777540a2b391466eeac1532ff6d0fd409",
+  "cases": 1738,
+  "results": 3934,
+  "allEqual": true,
+  "platformAdaptations": [
+    "Existing reader-native boundary stubs, same synchronous JVM Matcher replacement loop",
+    "nr lookup represented by supplied keepTitle flag; keys covered separately",
+    "DB/cache supplies the given raw content, empty cache returns null",
+    "Coroutine context stub executes synchronously without cancellation",
+    "Temporary Math.random fixed to 0.5"
+  ]
+}

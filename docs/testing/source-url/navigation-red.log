@@ -1,0 +1,37 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/sourceUrlRuntime.test.ts
+
+FAIL __tests__/sourceUrlRuntime.test.ts
+  ● detail, TOC and chapter navigation preserve literal legacy search-token words
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      67 |     const book = await loadBookInfo(s, { name: '书', author: '', origin: s.bookSourceUrl, originName: '源', bookUrl: `${s.bookSourceUrl}/book?literal=searchKey` });
+      68 |     const chapters = await loadChapters(s, book); await loadChapterPayload(s, chapters[0]);
+    > 69 |     expect(urls).toHaveLength(3); expect(urls.every(url => url.includes('literal=searchKey'))).toBe(true);
+         |                                                                                                ^
+      70 |   } finally { globalThis.fetch = previous; }
+      71 | });
+      72 |
+
+      at Object.toBe (__tests__/sourceUrlRuntime.test.ts:69:96)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        1.151 s, estimated 2 s
+Ran all test suites matching __tests__/sourceUrlRuntime.test.ts.

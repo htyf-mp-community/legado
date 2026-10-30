@@ -1,0 +1,18 @@
+{
+  "version": "0.0.40",
+  "bytes": 2223834,
+  "sha256": "2e2025d261df2fc9b7208da87654b81a2792bde266d3686dac3fa01ebd1dc3f8",
+  "bundle": "plugin_legado_v0_0_40.bundle",
+  "bundleSha256": "c8b6c9f218e02c0d74faad5a6b9c25d21d473b2b5f24bb2dc6a851cbca896812",
+  "productionInputCount": 332,
+  "productionInputSha256": "8256c763a7d4b9df370e4601b6e366945dddb310c6bd313af6213d3e04954611",
+  "zipTest": "pass",
+  "zipEntries": [
+    "app.json",
+    "assets/",
+    "manifest.json",
+    "plugin_legado_v0_0_40.bundle",
+    "qrcode.png"
+  ],
+  "published": false
+}

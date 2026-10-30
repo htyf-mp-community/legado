@@ -1,0 +1,43 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/readRecords.test.ts
+
+FAIL __tests__/readRecords.test.ts
+  ● native display groups identical names across devices before author filtering
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+        "bookName": "同名",
+    -   "displayAuthor": "乙、甲",
+        "lastRead": 20,
+    -   "readTime": 3000,
+    +   "readTime": 2000,
+      }
+
+      83 |   const visible = selectReadRecords(loadReadRecords(), '乙', 'duration');
+      84 |   expect(visible).toHaveLength(1);
+    > 85 |   expect(visible[0]).toMatchObject({ bookName: '同名', readTime: 3000, lastRead: 20, displayAuthor: '乙、甲' });
+         |                      ^
+      86 |   expect(selectReadRecords(loadReadRecords(), '%', 'name')).toHaveLength(2);
+      87 | });
+      88 |
+
+      at Object.toMatchObject (__tests__/readRecords.test.ts:85:22)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 passed, 5 total
+Snapshots:   0 total
+Time:        0.507 s, estimated 1 s
+Ran all test suites matching __tests__/readRecords.test.ts.

@@ -1,0 +1,459 @@
+FAIL __tests__/legacySelectorIndex.test.ts
+  ● matches native index order and bounds: tag.i.4:1:-1:1
+
+    Unknown pseudo-class :1
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at compilePseudoSelector (node_modules/css-select/lib/pseudo-selectors/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/pseudo-selectors/index.ts:73:11)
+      at compileGeneralSelector (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/general.ts:58:41)
+      at rules.reduce._a (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:160:41)
+          at Array.reduce (<anonymous>)
+      at compileRules (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:156:18)
+      at node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:138:20
+          at Array.map (<anonymous>)
+      at compileToken (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:116:10)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:37:12)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i!0:2:-1
+
+    Unknown pseudo-class :2
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at compilePseudoSelector (node_modules/css-select/lib/pseudo-selectors/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/pseudo-selectors/index.ts:73:11)
+      at compileGeneralSelector (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/general.ts:58:41)
+      at rules.reduce._a (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:160:41)
+          at Array.reduce (<anonymous>)
+      at compileRules (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:156:18)
+      at node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:138:20
+          at Array.map (<anonymous>)
+      at compileToken (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:116:10)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:37:12)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[1:3]
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+      Array [
+        "1",
+        "2",
+    -   "3",
+      ]
+
+      27 |
+      28 | test.each(cases)('matches native index order and bounds: %s', (selector, expected) => {
+    > 29 |   expect(sourceRuleTexts(page, `${selector}@text`)).toEqual(expected);
+         |                                                     ^
+      30 |   expect(sourceRuleValues(page, selector).map(node => sourceRuleText(node, 'text'))).toEqual(expected);
+      31 | });
+      32 |
+
+      at toEqual (__tests__/legacySelectorIndex.test.ts:29:53)
+
+  ● matches native index order and bounds: tag.i[0:-1:2]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[-1:0:2]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[4,1:3,1,-1]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[!1:3,-1]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[0:-1:-2]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[0:-1:-6]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[0:-1:0]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[5:0:0]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[2:5:99]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[:2]
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 5
+    + Received  + 1
+
+    - Array [
+    -   "0",
+    -   "1",
+    -   "2",
+    - ]
+    + Array []
+
+      27 |
+      28 | test.each(cases)('matches native index order and bounds: %s', (selector, expected) => {
+    > 29 |   expect(sourceRuleTexts(page, `${selector}@text`)).toEqual(expected);
+         |                                                     ^
+      30 |   expect(sourceRuleValues(page, selector).map(node => sourceRuleText(node, 'text'))).toEqual(expected);
+      31 | });
+      32 |
+
+      at toEqual (__tests__/legacySelectorIndex.test.ts:29:53)
+
+  ● matches native index order and bounds: tag.i[3:]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[:]
+
+    Expected name, found :]
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at getName (node_modules/css-what/lib/commonjs/parse.js:95:19)
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:241:30)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[-99:2]
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+      Array [
+        "0",
+        "1",
+    -   "2",
+      ]
+
+      27 |
+      28 | test.each(cases)('matches native index order and bounds: %s', (selector, expected) => {
+    > 29 |   expect(sourceRuleTexts(page, `${selector}@text`)).toEqual(expected);
+         |                                                     ^
+      30 |   expect(sourceRuleValues(page, selector).map(node => sourceRuleText(node, 'text'))).toEqual(expected);
+      31 | });
+      32 |
+
+      at toEqual (__tests__/legacySelectorIndex.test.ts:29:53)
+
+  ● matches native index order and bounds: tag.i[ 4, 1 : 3 : 2, -1 ]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● matches native index order and bounds: tag.i[99,-99,2,2]
+
+    Attribute selector didn't terminate
+
+      776 |     });
+      777 |   }
+    > 778 |   return selectAll(normalizeSelector(selector), context);
+          |                   ^
+      779 | }
+      780 |
+      781 | function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+
+      at parseSelector (node_modules/css-what/lib/commonjs/parse.js:309:27)
+      at parse (node_modules/css-what/lib/commonjs/parse.js:83:20)
+      at compileUnsafe (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/compile.ts:36:55)
+      at select (node_modules/css-select/lib/https:/raw.githubusercontent.com/fb55/css-select/93caad96c807da1d48f08166ef14cf26916b9364/src/index.ts:86:34)
+      at selectLegacyNodes (src/core/sourceRule.ts:778:19)
+      at selectLegacyNodes (src/core/sourceRule.ts:908:11)
+      at _loop2 (src/core/sourceRule.ts:898:41)
+      at htmlValues (src/core/sourceRule.ts:1183:12)
+      at sourceRuleValues (src/core/sourceRule.ts:1227:10)
+      at __tests__/legacySelectorIndex.test.ts:29:25
+
+  ● applies root and children indexes to each selected parent
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 6
+    + Received  + 1
+
+    - Array [
+    -   "C",
+    -   "A",
+    -   "F",
+    -   "D",
+    - ]
+    + Array []
+
+      33 | test('applies root and children indexes to each selected parent', () => {
+      34 |   const groups = '<main><div><b>A</b><b>B</b><b>C</b></div><div><b>D</b><b>E</b><b>F</b></div></main>';
+    > 35 |   expect(sourceRuleTexts(groups, 'tag.div@[2,0]@text')).toEqual(['C', 'A', 'F', 'D']);
+         |                                                         ^
+      36 |   expect(sourceRuleTexts(groups, 'tag.div@children[!1]@text')).toEqual(['A', 'C', 'D', 'F']);
+      37 |   expect(sourceRuleTexts(groups, 'tag.div@.1@text')).toEqual(['B', 'E']);
+      38 | });
+
+      at Object.toEqual (__tests__/legacySelectorIndex.test.ts:35:57)
+
+Test Suites: 1 failed, 1 total
+Tests:       19 failed, 4 passed, 23 total
+Snapshots:   0 total
+Time:        0.573 s
+Ran all test suites matching __tests__/legacySelectorIndex.test.ts.

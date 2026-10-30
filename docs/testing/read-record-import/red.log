@@ -1,0 +1,62 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/readRecordImport.test.ts
+
+FAIL __tests__/readRecordImport.test.ts
+  ● native list parsing rejects a null item instead of silently restoring only its neighbours
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Array [
+    +   "readRecord.json",
+        "bookSource.json",
+      ]
+
+      18 |   expect(row.error).toBe('JsonSyntaxException');
+      19 |   const result = convert(row.raw);
+    > 20 |   expect(result.importedFiles).toEqual(['bookSource.json']);
+         |                                ^
+      21 |   expect(result.payload.entries['reading.records.v1']).toBeUndefined();
+      22 |   expect(result.warnings).toEqual([expect.stringContaining('readRecord.json')]);
+      23 | });
+
+      at Object.toEqual (__tests__/readRecordImport.test.ts:20:32)
+
+  ● native Long parse failure rejects the whole read-record file, without zeroing a fractional counter
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Array [
+    +   "readRecord.json",
+        "bookSource.json",
+      ]
+
+      27 |   expect(row.error).toBe('JsonSyntaxException');
+      28 |   const result = convert(row.raw);
+    > 29 |   expect(result.importedFiles).toEqual(['bookSource.json']);
+         |                                ^
+      30 |   expect(result.payload.entries['reading.records.v1']).toBeUndefined();
+      31 | });
+      32 |
+
+      at Object.toEqual (__tests__/readRecordImport.test.ts:29:32)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        0.591 s
+Ran all test suites matching __tests__/readRecordImport.test.ts.

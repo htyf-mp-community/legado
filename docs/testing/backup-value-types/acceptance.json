@@ -1,0 +1,50 @@
+{
+  "version": "0.0.43",
+  "fullGoalComplete": false,
+  "device": {
+    "name": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "ios": "26.5",
+    "reactNative": "0.86.2",
+    "storageId": "io.legado.htyf.application-storage",
+    "finalColdStartPid": 54843
+  },
+  "normalUi": {
+    "zipExport": true,
+    "webDavDownloadPreviewAndConfirmedRestore": true,
+    "actualExportSubsetRestoredAfterChangingAllThreeValues": true,
+    "allExportedValueTypesAndValuesMatch": true,
+    "requestGetStages": {
+      "typed-values": 2,
+      "changed-values": 1,
+      "restore-exported-values": 1,
+      "restore-original-values": 1
+    }
+  },
+  "preservation": {
+    "all26ExistingEntriesEqual": true,
+    "books": 9,
+    "sources": 8,
+    "replaceRules": 0,
+    "readingRecords": 12,
+    "legacyNumericEmptyStringsKept": true
+  },
+  "cleanup": {
+    "temporaryThreePreferencesRestored": true,
+    "verifiedGeneratedCacheZipsRemoved": 6,
+    "fixturePort18201Stopped": true
+  },
+  "coldStart": {
+    "versionAndNamespaceCorrect": true,
+    "shelfBooks": 9,
+    "inProgress": 8,
+    "originalContinuationRetained": true,
+    "webOff": true,
+    "mcpOff": true,
+    "tasksOff": true
+  },
+  "unknownKeyIndexDeviceMatrix": "pending; recreated-adapter and failure regression tests pass",
+  "physicalHostArchiveLoading": "pending",
+  "published": false,
+  "androidBuildOrDeviceWork": false
+}

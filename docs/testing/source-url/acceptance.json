@@ -1,0 +1,97 @@
+{
+  "platform": "Dedicated Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "androidBuildOrDeviceWork": false,
+  "scope": "In-app SourceDebug on actual iOS runtime, then cold-start About/services/bookshelf verification",
+  "fixture": {
+    "origin": "http://127.0.0.1:18212",
+    "normalSourceImport": true,
+    "get": {
+      "query": "iOS 地址验收",
+      "intentional404Count": 2,
+      "retryStatus": 200,
+      "relativeInfoTocChapter": true,
+      "literalSearchKeyPreserved": true,
+      "searchCount": 1,
+      "tocCount": 2,
+      "contentCharacters": 182
+    },
+    "post": {
+      "query": "iOS 表单验收",
+      "charsetOption": "GBK",
+      "body": "q=iOS+%B1%ED%B5%A5%D1%E9%CA%D5&literal=%2520&raw=%2B",
+      "contentType": "application/x-www-form-urlencoded; charset=UTF-8",
+      "nativeBodyEqual": true,
+      "responseCharset": "UTF-8",
+      "responseChineseCorrect": true,
+      "searchCount": 1,
+      "tocCount": 2,
+      "contentCharacters": 182
+    },
+    "normalSearchAddReadAccepted": false,
+    "secondChapterCurrencyAccepted": false,
+    "imageRenderingAccepted": false,
+    "temporaryBooksAdded": false,
+    "temporarySourcesRemovedThroughUi": true,
+    "fixtureStopped": true
+  },
+  "realSource": {
+    "input": "https://www.yckceo.com/yuedu/shuyuans/json/id/1321.json",
+    "name": "📂阅读书屋",
+    "origin": "https://www.vikbook.com/",
+    "retained": true,
+    "freshNetworkDebug": true,
+    "query": "西游记",
+    "searchCount": 1,
+    "title": "西游记-吴承恩",
+    "author": "未知作者",
+    "tocCount": 105,
+    "contentCharacters": 119,
+    "contentKind": "First front-matter entry; not a fresh full-novel-chapter reader acceptance",
+    "screenshot": "real-source-debug.png"
+  },
+  "automaticReview": {
+    "rejectedAction": "Enable both persistent Web and MCP services",
+    "reason": "Expands local network access; simultaneous services were not explicitly authorized",
+    "retried": false,
+    "safeAlternative": "Existing in-app SourceDebug and normal local ZIP backup export",
+    "verificationCompletedThroughAlternative": true
+  },
+  "dataPreservation": {
+    "record": "preservation.json",
+    "method": "Normal in-app ZIP export compared to baseline; no direct MMKV access",
+    "books": 9,
+    "sources": 8,
+    "rules": 0,
+    "fullRecordsEqual": true,
+    "onlyGeneratedTemporaryBackupCleaned": true
+  },
+  "aboutAfterColdStart": {
+    "version": "0.0.41",
+    "storage": "io.legado.htyf.application-storage",
+    "reactNative": "0.86.2",
+    "pid": 66630
+  },
+  "finalShelf": {
+    "books": 9,
+    "continueBook": "西游记-吴承恩",
+    "web": false,
+    "mcp": false,
+    "tasks": false,
+    "screenshot": "final-shelf.png"
+  },
+  "screenshots": [
+    "get-debug.png",
+    "post-debug.png",
+    "real-source-debug.png",
+    "final-shelf.png"
+  ],
+  "limits": [
+    "No Android or physical HTYF-host acceptance",
+    "Headerless HTML meta/ICU charset detection remains pending",
+    "Complete Java charset, protocol handler and custom body/header/wire matrices remain pending",
+    "Other URL consumers, full source scripts, rich layout/selection and visual/gesture matrices remain pending"
+  ],
+  "published": false,
+  "fullGoalComplete": false
+}

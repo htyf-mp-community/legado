@@ -1,0 +1,60 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent __tests__/readerNativeContent.test.ts __tests__/readerProgressSlider.test.tsx
+
+FAIL __tests__/readerNativeContent.test.ts
+  ● conversion and replacement see raw HTML/image content before render encoding
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "图片.png"
+    Received string:    "外部头发
+    {{HTYF_HTML:%7B%22html%22%3A%22%3Cb%3E%E9%A0%AD%E9%AB%AE%3C%2Fb%3E%22%2C%22baseUrl%22%3A%22https%3A%2F%2Fx.test%2Fchapter%22%2C%22sourceFormatted%22%3Atrue%7D}}
+    {{HTYF_IMAGE:%7B%22src%22%3A%22https%3A%2F%2Fx.test%2F%E9%A0%AD%E9%AB%AE.png%22%7D}}"
+
+       8 |   const converted = prepareReaderText(cached, '第一章', false, 1);
+       9 |   const rules = parseReplaceRules('[{"pattern":"头发.png","replacement":"图片.png","isRegex":false}]');
+    > 10 |   expect(applyReplaceRules(converted, rules, 'content', { name: '书', origin: '源' })).toContain('图片.png');
+         |                                                                                      ^
+      11 | });
+      12 |
+
+      at Object.toContain (__tests__/readerNativeContent.test.ts:10:86)
+
+FAIL __tests__/readerProgressSlider.test.tsx
+  ● single-page progress supplies explicit text instead of a zero-range percentage
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 3
+
+      Object {
+    -   "text": "0%",
+    +   "max": 0,
+    +   "min": 0,
+    +   "now": 0,
+      }
+
+      79 |   let tree!: ReturnType<typeof create>;
+      80 |   act(() => { tree = create(<ReaderProgressSlider value={0} max={0} step={1} label="页码" disabled onSeek={jest.fn()} minimumTrackTintColor="#000" maximumTrackTintColor="#888" />); });
+    > 81 |   expect(tree.root.findByType('View' as never).props.accessibilityValue).toMatchObject({ text: '0%' });
+         |                                                                          ^
+      82 |   act(() => tree.unmount());
+      83 | });
+      84 |
+
+      at Object.toMatchObject (__tests__/readerProgressSlider.test.tsx:81:74)
+
+Test Suites: 2 failed, 2 total
+Tests:       2 failed, 2 passed, 4 total
+Snapshots:   0 total
+Time:        0.843 s, estimated 1 s

@@ -1,0 +1,48 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/backup.test.ts
+
+FAIL __tests__/backup.test.ts
+  ● backs up the existing native false preference as boolean despite a successful empty-string getter
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+    @@ -1,9 +1,9 @@
+      Object {
+        "bookshelf.manage.delete-original.v1": Object {
+    -     "type": "boolean",
+    -     "value": false,
+    +     "type": "string",
+    +     "value": "",
+        },
+        "empty": Object {
+          "type": "string",
+          "value": "",
+        },
+
+      480 |     ? '' : getString(key);
+      481 |   const raw = createBackup(source.storage);
+    > 482 |   expect(parseBackup(raw).entries).toEqual({
+          |                                    ^
+      483 |     'bookshelf.manage.delete-original.v1': { type: 'boolean', value: false },
+      484 |     empty: { type: 'string', value: '' },
+      485 |     jsonFalse: { type: 'string', value: 'false' },
+
+      at Object.toEqual (__tests__/backup.test.ts:482:36)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 19 passed, 20 total
+Snapshots:   0 total
+Time:        0.755 s, estimated 1 s
+Ran all test suites matching __tests__/backup.test.ts.

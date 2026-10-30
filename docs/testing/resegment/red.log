@@ -1,0 +1,37 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/resegmentParity.test.ts
+
+FAIL __tests__/resegmentParity.test.ts
+  ● does not discard a later paragraph merely because it equals the chapter title
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 1
+    + Received  + 0
+
+      正文。
+    - 第一章
+
+       8 |
+       9 | test('does not discard a later paragraph merely because it equals the chapter title', () => {
+    > 10 |   expect(reSegmentText('正文。\n第一章', '第一章')).toBe('正文。\n第一章');
+         |                                            ^
+      11 | });
+      12 |
+
+      at Object.toBe (__tests__/resegmentParity.test.ts:10:44)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 passed, 2 total
+Snapshots:   0 total
+Time:        0.472 s
+Ran all test suites matching __tests__/resegmentParity.test.ts.

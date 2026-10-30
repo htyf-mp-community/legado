@@ -1,0 +1,68 @@
+{
+  "version": "0.0.44",
+  "overallParityComplete": false,
+  "device": {
+    "name": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "model": "iPhone 17 Pro",
+    "ios": "26.5",
+    "reactNative": "0.86.2",
+    "storage": "io.legado.htyf.application-storage"
+  },
+  "iosOnly": true,
+  "androidAppBuilt": false,
+  "tests": {
+    "suites": 217,
+    "tests": 1085,
+    "passed": true,
+    "typecheck": "pass",
+    "changedFileLint": "pass",
+    "nativeFiniteCases": 4717
+  },
+  "normalUiNativeZipImport": true,
+  "authorAggregateSeconds": 6,
+  "wildcardGroupCounts": {
+    "percent": 4,
+    "twoUnderscores": 3
+  },
+  "sortPersistedAcrossColdStart": true,
+  "recordDisabledPersistedAcrossColdStart": true,
+  "recordEnabledFinal": true,
+  "sortFinal": "name",
+  "totalBeforeGroupDeletion": "1小时39分钟38秒",
+  "totalAfterPageRecreation": "1小时39分钟32秒",
+  "clearAllCancelled": true,
+  "allThreeGroupRowsDeleted": true,
+  "directReaderByTitleWithoutBookId": true,
+  "recordingCounterProof": "recording-values.json",
+  "originalDataPreserved": true,
+  "cleanupComplete": false,
+  "cleanup": {
+    "status": "awaiting_user_confirmation",
+    "automaticApprovalRejections": 2,
+    "reason": "In-app deletion requires explicit action-time user confirmation even for verified reimportable fixture data.",
+    "pendingRecordGroups": [
+      "iOS 记录对照验收",
+      "iOS 记录空作者验收",
+      "iOS 记录计时验收"
+    ],
+    "pendingBook": "iOS 记录计时验收",
+    "pendingSource": "iOS 阅读记录验收（临时）",
+    "generatedCachedExportsRetained": 4
+  },
+  "finalShelf": {
+    "books": 10,
+    "reading": 9,
+    "continuation": "iOS 记录计时验收"
+  },
+  "services": {
+    "repack8097": "listening",
+    "fixture18201": "stopped",
+    "web1122": "off",
+    "mcp1236": "off",
+    "automaticTasks": "off"
+  },
+  "finalColdStartPid": 50334,
+  "published": false,
+  "physicalHtyfHostAccepted": false
+}

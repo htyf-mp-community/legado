@@ -1,0 +1,29 @@
+{
+  "originalRecordsUnchanged": true,
+  "removedRuleIds": [
+    99203901,
+    99203902,
+    99203903,
+    99203904
+  ],
+  "removedFixtureOrigin": "http://127.0.0.1:18210",
+  "originalRealSourceAndBookRetained": true,
+  "books": {
+    "count": 9,
+    "beforeSha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f",
+    "afterSha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f",
+    "equal": true
+  },
+  "sources": {
+    "count": 8,
+    "beforeSha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68",
+    "afterSha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68",
+    "equal": true
+  },
+  "rules": {
+    "count": 0,
+    "beforeSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "afterSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "equal": true
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "productionInputCount": 349,
+  "productionInputSha256": "08a5645838ffd39ed2d7d8018f1aa3c91cdd35eb7bcfdf79824d0c27d0006dbe",
+  "productionInputsUnchanged": true,
+  "archiveMatchesPackage": true,
+  "beforeEqualsPrevious045FinalExport": true,
+  "all27EntriesRestoredExactly": true,
+  "normalUiExportsOnly": true,
+  "noMmkvFileAccess": true,
+  "dependencyHashesUnchanged": true,
+  "nativeProjectsUnchanged": true,
+  "sourceRepositoryStatusUnchanged": true,
+  "removedMigrationDirectoryStillAbsent": true,
+  "privateExportsExcludedFromRepo": true,
+  "generatedCachedExportZipsRetained": 3,
+  "priorCleanupPending": true,
+  "allNewReportLinksExist": true
+}

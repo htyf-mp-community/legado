@@ -15,10 +15,17 @@ describe('book content search', () => {
       match: '天地',
     });
   });
-  test('is case insensitive and supports limits', () =>
+  test('uses native case-sensitive literal search', () =>
     expect(
-      searchChapters([{ id: 'x', title: 'x', content: 'Aa aa AA' }], 'aa', 2),
-    ).toHaveLength(2));
+      searchChapters([{ id: 'x', title: 'x', content: 'Aa aa AA' }], 'aa'),
+    ).toHaveLength(1));
+  test('does not truncate a book at 100 results', () => {
+    expect(searchChapters([{ id: 'x', title: 'x', content: '甲'.repeat(125) }], '甲')).toHaveLength(125);
+  });
+  test('uses the native 20-unit excerpt without inserted ellipses', () => {
+    const text = '前'.repeat(35) + '甲' + '后'.repeat(35);
+    expect(searchChapters([{ id: 'x', title: 'x', content: text }], '甲')[0].excerpt).toBe('前'.repeat(20) + '甲' + '后'.repeat(20));
+  });
   test('returns no results for blank query', () =>
     expect(searchChapters(chapters, '   ')).toEqual([]));
 });

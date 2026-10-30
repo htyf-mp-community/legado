@@ -1,4 +1,5 @@
 import { appStorage } from './storage';
+import type { ChineseConverterType } from '../core/chineseConversion';
 const KEY = 'reader.preferences.v1';
 export type ReaderTheme = 'paper' | 'green' | 'night' | 'epaper';
 export type ReaderMode = 'scroll' | 'page';
@@ -18,6 +19,7 @@ export type ReaderImageClickMode =
   | 'double';
 export type HighlightActionTrigger = 'click' | 'longPress' | 'off';
 export type ReaderPreferences = {
+  chineseConverterType: ChineseConverterType;
   fontSize: number;
   lineHeight: number;
   theme: ReaderTheme;
@@ -78,6 +80,7 @@ export type ReaderPreferences = {
   footerRightTemplate: string;
 };
 export const defaultReaderPreferences: ReaderPreferences = {
+  chineseConverterType: 0,
   fontSize: 19,
   lineHeight: 34,
   theme: 'paper',
@@ -153,6 +156,7 @@ export function normalizeReaderPreferences(
     mode = value?.mode,
     orientation = value?.orientation;
   return {
+    chineseConverterType: value?.chineseConverterType === 1 || value?.chineseConverterType === 2 ? value.chineseConverterType : 0,
     fontSize: clamp(Number.isFinite(font) ? font : 19, 14, 36),
     lineHeight: clamp(Number.isFinite(line) ? line : 34, 22, 60),
     theme:

@@ -1,0 +1,86 @@
+{
+  "platform": "Dedicated Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "androidBuildOrDeviceWork": false,
+  "fixture": {
+    "origin": "http://127.0.0.1:18211",
+    "normalApiImport": true,
+    "uiSearchDetailAddRead": true,
+    "cachedChapterIndexesBeforeSearch": [
+      0,
+      1,
+      2
+    ],
+    "uncachedLastChapterIndex": 5,
+    "noLastChapterRequests": true
+  },
+  "checks": {
+    "inputDoesNotAutoSearch": true,
+    "literalAbcCount": 1,
+    "literal125HitsRetained": 125,
+    "optionsDoNotAutoSearch": true,
+    "caseInsensitiveRegexCount": 3,
+    "locationQueryCount": 4,
+    "unCachedTitleQueryCount": 0,
+    "convertedReplaceDisabledCount": 0,
+    "convertedReplaceEnabledCount": 3,
+    "returnRestoresResultSet": true,
+    "navigationQueryCountVisible": true
+  },
+  "positions": {
+    "firstChapterFirstOccurrence": 2621,
+    "firstChapterSecondOccurrence": 5092,
+    "nextChapterFirstOccurrence": 21,
+    "nextChapterIndex": 1,
+    "currentReaderTextOrdinalRefind": true
+  },
+  "screenshots": [
+    "regex.png",
+    "position-second.png",
+    "navigation.png",
+    "converted-replaced.png",
+    "final-shelf.png"
+  ],
+  "preferencesRestored": {
+    "chineseConverterType": 0,
+    "adaptSpecialStyle": "unchanged true",
+    "fontSize": 19,
+    "lineHeight": 34
+  },
+  "searchHistoryRestored": [
+    "西游记"
+  ],
+  "processSearchOptionsResetByColdStart": true,
+  "aboutAfterColdStart": {
+    "version": "0.0.40",
+    "storage": "io.legado.htyf.application-storage",
+    "reactNative": "0.86.2",
+    "pid": 65938
+  },
+  "temporaryRecordsRemoved": true,
+  "webMcpTasksOff": true,
+  "limits": [
+    "No Android or physical-host acceptance",
+    "Rich HTML snippet rendering, selected-text highlighting and complete image/layout positions remain pending",
+    "Native search-result list scroll restoration remains pending",
+    "Java/ICU regex and bounded interruption remain incomplete"
+  ],
+  "newCounterexample": {
+    "status": "pending",
+    "kind": "Unescaped spaces in online search URL",
+    "query": "iOS 搜索验收",
+    "requestPath": "/http://127.0.0.1:18211/search",
+    "controlQuery": "验收",
+    "controlResult": "search/detail/toc/content pass",
+    "productionCodeChangedForThisIssue": false
+  },
+  "finalColdStartPid": 77423,
+  "finalShelf": {
+    "books": 9,
+    "continueBook": "西游记-吴承恩",
+    "web": false,
+    "mcp": false,
+    "tasks": false,
+    "screenshot": "final-shelf.png"
+  }
+}

@@ -13,7 +13,7 @@ import {
   exportFileBaseName,
   type BookExportPreferences,
 } from '../data/exportPreferences';
-import { applyReplaceRules, loadReplaceRules } from '../data/replaceRules';
+import { applyReplaceRules, loadReplaceRules, replacementContextForBook } from '../data/replaceRules';
 import { loadWebDavConfig } from '../data/remoteBackup';
 import { loadSources } from '../data/sources';
 import type { Book } from '../types';
@@ -127,7 +127,7 @@ export async function saveBulkBookExport(
           : [],
       prepare = (book: Book): Book => {
         if (!rules.length) return book;
-        const context = { name: book.name, origin: book.origin ?? '' },
+        const context = replacementContextForBook(book),
           replace = (value: string, target: 'title' | 'content') =>
             applyReplaceRules(value, rules, target, context);
         return {

@@ -1,0 +1,47 @@
+{
+  "method": "normal UI ZIP exports; generated ZIP artifacts only; no MMKV file access",
+  "cleanupStatus": "awaiting explicit user confirmation after automatic approval rejection",
+  "core": {
+    "library.v1": {
+      "originalCount": 9,
+      "currentCount": 10,
+      "originalSubsetEqual": true,
+      "originalSha256": "63202baf440e2546f114c90f947d3a4a5522cdb16f37f1bdd8460009941ca06f"
+    },
+    "sources.v1": {
+      "originalCount": 8,
+      "currentCount": 9,
+      "originalSubsetEqual": true,
+      "originalSha256": "75b3791a91dfd69876de922ed1a388e7fadef6d1586c3debb1c4bcc5573072d9"
+    },
+    "replace.rules.v1": {
+      "originalCount": 0,
+      "currentCount": 0,
+      "originalSubsetEqual": true,
+      "originalSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "reading.records.v1": {
+      "originalCount": 12,
+      "currentCount": 16,
+      "originalSubsetEqual": true,
+      "originalSha256": "bd4f236f24a65433aaa0a3054c61de9b498435e0445bc76199cae0cd1c0613bb"
+    }
+  },
+  "otherOriginalEntriesEqual": true,
+  "originalEntryCount": 26,
+  "currentEntryCount": 27,
+  "newEntries": {
+    "reading.record-enabled.v1": {
+      "type": "string",
+      "value": "true"
+    }
+  },
+  "realSource1321Retained": true,
+  "remainingTemporaryRecordGroups": [
+    "iOS 记录对照验收",
+    "iOS 记录空作者验收",
+    "iOS 记录计时验收"
+  ],
+  "temporaryBook": "iOS 记录计时验收",
+  "temporarySource": "iOS 阅读记录验收（临时）"
+}

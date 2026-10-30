@@ -1,0 +1,57 @@
+{
+  "reference": "Unchanged NetworkUtils.getAbsoluteURL overloads, predicates and AnalyzeUrl.encodeParams/appendEncoded with pinned Hutool codec",
+  "sources": {
+    "network": {
+      "path": "app/src/main/java/io/legado/app/utils/NetworkUtils.kt",
+      "sha256": "6d0a69c1408ba10223afef06181d96421d2542d0fd7e36e8b5a8213ba3f64d48"
+    },
+    "strings": {
+      "path": "app/src/main/java/io/legado/app/utils/StringExtensions.kt",
+      "sha256": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51"
+    },
+    "patterns": {
+      "path": "app/src/main/java/io/legado/app/constant/AppPattern.kt",
+      "sha256": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa"
+    },
+    "analyze": {
+      "path": "app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeUrl.kt",
+      "sha256": "f523dbaed6fbf03bf005e3ed7692669e9d0bde033a1f80711e823dd5680411d4"
+    },
+    "encoder": {
+      "path": "app/src/main/java/io/legado/app/utils/EncoderUtils.kt",
+      "sha256": "7f0b671208ee55205f70a0b6c4b165237f473cc88d74f0c1c619d6f27260d61b"
+    },
+    "help/http/OkHttpUtils.kt": {
+      "path": "app/src/main/java/io/legado/app/help/http/OkHttpUtils.kt",
+      "sha256": "cba1feb22468363d8b95f22779cb6ab538ae80c64e898fc7fde995b2e699376d"
+    },
+    "utils/EncodingDetect.kt": {
+      "path": "app/src/main/java/io/legado/app/utils/EncodingDetect.kt",
+      "sha256": "b5ed529ce2a288f8d527b3778b892e63eff1e03f2b7c3b54a62e417047832ea1"
+    },
+    "utils/Utf8BomUtils.kt": {
+      "path": "app/src/main/java/io/legado/app/utils/Utf8BomUtils.kt",
+      "sha256": "8884cbb57c7e760856b666c9e6d3bd9a9ad6d41dedac0a0a103ceb304fb7b60f"
+    },
+    "model/analyzeRule/AnalyzeRule.kt": {
+      "path": "app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeRule.kt",
+      "sha256": "1253f78ce41b2218d0a75cecd8157dc97c375b30fbd241f7951eec2d1ec105e8"
+    }
+  },
+  "methodsSha256": "f604cb82de2969c8f7f516b590f95da003ecff9ccdb294fecc1d69f18cb15da1",
+  "hutool": {
+    "version": "5.8.22",
+    "sha256": "93912196a719b4c88c7f3b3e2cf0f490932d46f349061d5776ea22b4287a0fa3"
+  },
+  "platformAdaptations": [
+    "JVM java.net.URL; Android URL-handler differences remain a separate boundary",
+    "AppLog and debug-print are no-op; no network request or Android build"
+  ],
+  "counts": {
+    "absolute": 1798,
+    "resource": 1798,
+    "params": 3100
+  },
+  "totalCases": 6696,
+  "allEqual": true
+}

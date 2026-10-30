@@ -1,0 +1,17 @@
+Chinese conversion data and matching algorithm attribution
+
+quick-chinese-transfer / quick-transfer-core 0.2.17
+https://github.com/liuyueyi/quick-chinese-transfer
+Commit: 810e881ce722e7919ad00f283551e897bf7aad77
+Authors named in the upstream source: luhuiguo, YiHui / liuyueyi.
+Upstream declares The Apache Software License, Version 2.0 in its root pom.xml.
+The upstream project identifies HanLP and luhuiguo/chinese-utils as its origins.
+
+This distribution extracts tc/s2t.txt and tc/t2s.txt without content changes
+into src/data/chineseConversionData.json. It ports the bounded longest-prefix
+matching and character fallback of BasicDictionary/Trie into TypeScript.
+Legado's own T2S exclusion list is applied with the source's maxLen semantics.
+These adaptations were made for the HTYF migration on 2026-10-29.
+
+The complete Apache License 2.0 accompanies this notice in
+docs/licenses/quick-transfer-Apache-2.0.txt and the production bundle banner.

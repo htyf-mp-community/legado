@@ -1,0 +1,29 @@
+{
+  "method": "normal UI ZIP export; generated artifacts only; no direct MMKV file access",
+  "allExistingEntriesEqual": true,
+  "entryCount": 26,
+  "core": {
+    "library.v1": {
+      "count": 9,
+      "sha256": "63202baf440e2546f114c90f947d3a4a5522cdb16f37f1bdd8460009941ca06f",
+      "equal": true
+    },
+    "sources.v1": {
+      "count": 8,
+      "sha256": "75b3791a91dfd69876de922ed1a388e7fadef6d1586c3debb1c4bcc5573072d9",
+      "equal": true
+    },
+    "replace.rules.v1": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    "reading.records.v1": {
+      "count": 12,
+      "sha256": "bd4f236f24a65433aaa0a3054c61de9b498435e0445bc76199cae0cd1c0613bb",
+      "equal": true
+    }
+  },
+  "testPreferencesRestoredToOriginalEntries": true,
+  "legacyEmptyNumericStringsPreserved": true
+}

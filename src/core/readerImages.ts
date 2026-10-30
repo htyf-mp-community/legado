@@ -1,6 +1,7 @@
+import { resolveNativeResourceUrl } from './nativeSourceUrl';
 export type ReaderImage = { src: string; click?: string };
 export type ReaderLink = { text: string; url: string };
-export type ReaderHtml = { html: string; baseUrl: string };
+export type ReaderHtml = { html: string; baseUrl: string; sourceFormatted?: boolean };
 const IMAGE_PREFIX = '{{HTYF_IMAGE:',
   LINK_PREFIX = '{{HTYF_LINK:',
   RUBY_PREFIX = '{{HTYF_RUBY:',
@@ -11,11 +12,9 @@ const IMAGE_PREFIX = '{{HTYF_IMAGE:',
 const attribute = (html: string, name: string) =>
   html.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1] ?? '';
 const absolute = (value: string, baseUrl: string) => {
-  try {
-    return new URL(value, baseUrl || undefined).toString();
-  } catch {
-    return value;
-  }
+  const resolved = resolveNativeResourceUrl(value, baseUrl);
+  // Extracted EPUB assets keep the iOS/RN filesystem URI contract.
+  return resolved.replace(/^file:\/(?!\/)/i, 'file:///');
 };
 export const readerImageMarker = (image: ReaderImage) =>
   `${IMAGE_PREFIX}${encodeURIComponent(JSON.stringify(image))}${SUFFIX}`;
@@ -50,13 +49,21 @@ const decodeEntities = (value: string) => {
 };
 
 export function readerHtmlToText(value: string, baseUrl = '') {
+  // Ignore native serializer indentation before creating semantic markers;
+  // usehtml payloads retain their original formatting and marker boundaries.
+  const formatted = value
+    .split(/(<usehtml>[\s\S]*?<\/usehtml>)/gi)
+    .map(part => /^<usehtml>/i.test(part) ? part : part
+      .replace(/[ \t\r\n]*(<\/?(?:div|p|hr|article|dd|dl)\b[^>]*>)[ \t\r\n]*/gi, '$1')
+      .replace(/[ \t\r\n]*(<br\s*\/?\s*>)[ \t\r\n]*/gi, '$1'))
+    .join('');
   const image = (tag: string, click = '') => {
     const src = attribute(tag, 'data-src') || attribute(tag, 'src');
     return src
       ? `\n${readerImageMarker({ src: absolute(decodeEntities(src), baseUrl), click: click ? absolute(decodeEntities(click), baseUrl) : undefined })}\n`
       : '';
   };
-  return decodeEntities(value)
+  return decodeEntities(formatted)
     .replace(
       /<usehtml>([\s\S]*?)<\/usehtml>/gi,
       (_all, html: string) =>
@@ -110,41 +117,18 @@ export function readerHtmlToText(value: string, baseUrl = '') {
     .trim();
 }
 
-export function applyReaderSpecialStylePreference(
-  value: string,
-  enabled: boolean,
-) {
-  if (enabled) return value;
-  return value.replace(/\{\{HTYF_HTML:([^}]+)\}\}/g, (marker, payload) => {
-    try {
-      const decoded = JSON.parse(decodeURIComponent(payload)) as ReaderHtml;
-      return readerHtmlToText(decoded.html, decoded.baseUrl);
-    } catch {
-      return marker;
+/**
+ * Adapt already formatted online content to atomic reader segments. Ordinary
+ * text is left verbatim: entities have already been decoded once by the source
+ * formatter, so a decoded <b> literal must not be parsed/deleted a second time.
+ */
+export function formattedSourceToReaderContent(value: string, baseUrl = '') {
+  return value.split(/(<usehtml>[\s\S]*?<\/usehtml>)/g).map(part => {
+    if (part.startsWith('<usehtml>') && part.endsWith('</usehtml>')) {
+      return `\n${readerHtmlMarker({ html: part.slice(9, -10), baseUrl, sourceFormatted: true })}\n`;
     }
-  });
-}
-
-export function protectReaderHtmlMarkers(value: string) {
-  const entries = new Map<string, string>();
-  const text = value.replace(/\{\{HTYF_HTML:[^}]+\}\}/g, marker => {
-    let suffix = 0,
-      placeholder = `HTYF特殊格式占位${entries.size}。`;
-    while (value.includes(placeholder) || entries.has(placeholder))
-      placeholder = `HTYF特殊格式占位${entries.size}-${++suffix}。`;
-    entries.set(placeholder, marker);
-    return placeholder;
-  });
-  return {
-    text,
-    restore: (replaced: string) => {
-      let result = replaced;
-      entries.forEach((marker, placeholder) => {
-        result = result.split(placeholder).join(marker);
-      });
-      return result;
-    },
-  };
+    return part.replace(/<img src="([\s\S]*?)">/g, (_tag, src: string) => readerImageMarker({ src }));
+  }).join('');
 }
 
 export function applyReaderTagPreferences(
@@ -179,7 +163,7 @@ export function applyReaderTagPreferences(
       }
     })
     .replace(/\n{3,}/g, '\n\n')
-    .trim();
+    .replace(/^[\x00-\x20\u3000]+|[\x00-\x20\u3000]+$/g, '');
 }
 
 export type ReaderContentSegment =

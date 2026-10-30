@@ -1,3 +1,4 @@
+import { parseNativeReadRecords } from '../core/readRecordImport';
 import { parseLegacyJson } from '../core/legacyJson';
 import { isLocalBook, sourceTypeFromLegacyBookType } from '../core/bookKinds';
 import type {
@@ -26,6 +27,10 @@ import {
 import { legacyReaderInfoTemplate } from '../core/readerInfoTemplate';
 import { coverImageUri, normalizeLegacyCover } from '../core/bookCover';
 import { localMediaPath } from '../core/backupMediaPaths';
+import {
+  parseNativeCookieBackup,
+  parseNativeRuntimeSourceCacheBackup,
+} from '../core/nativeBackupSensitive';
 
 type Entry = { type: 'string'; value: string };
 type ObjectValue = Record<string, unknown>;
@@ -51,9 +56,9 @@ const entry = (value: unknown): Entry => ({
 const stableId = (value: string, fallback: string) => value.trim() || fallback;
 function cookies(raw: string): Record<string, Entry> {
   const result: Record<string, Entry> = {};
-  for (const value of array(raw, 'cookies.json')) {
-    const source = text(value.url),
-      header = text(value.cookie),
+  for (const value of parseNativeCookieBackup(raw)) {
+    const source = value.url,
+      header = value.cookie,
       pairs: Record<string, string> = {};
     for (const pair of header.split(';')) {
       const separator = pair.indexOf('=');
@@ -421,6 +426,9 @@ export function convertLegacyBackup(
     );
   if (files['highlight.json'])
     add('highlight.json', 'annotations.highlights.v1', highlights);
+  add('readRecord.json', 'reading.records.v1', raw =>
+    parseNativeReadRecords(raw),
+  );
   add('bookSource.json', 'sources.v1', raw => parseBookSources(raw));
   add('rssSources.json', 'rss.sources.v1', raw => parseRssSources(raw));
   add('rssStar.json', 'rss.articles.v1', rssStars);
@@ -438,9 +446,22 @@ export function convertLegacyBackup(
   );
   add('autoTask.json', 'auto.tasks.v1', raw => parseAutoTasks(raw));
   add('httpTTS.json', HTTP_TTS_KEY, raw => parseHttpTts(raw));
-  add('runtimeSourceCache.json', 'legacy.runtime-source-cache.v1', raw =>
-    array(raw, 'runtimeSourceCache.json'),
-  );
+  if (files['runtimeSourceCache.json'] !== undefined) {
+    try {
+      const caches = parseNativeRuntimeSourceCacheBackup(
+        files['runtimeSourceCache.json'],
+      );
+      // Restore.kt only calls the cache DAO for a nonempty list; an empty native file
+      // must not create a new empty storage row or replace local-only cached values.
+      if (caches.length)
+        entries['legacy.runtime-source-cache.v1'] = entry(caches);
+      importedFiles.push('runtimeSourceCache.json');
+    } catch (error) {
+      warnings.push(
+        `runtimeSourceCache.json: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
   add('servers.json', 'legacy.servers.v1', raw => array(raw, 'servers.json'));
   if (files['cookies.json']) {
     try {

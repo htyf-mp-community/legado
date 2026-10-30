@@ -14,12 +14,3 @@ export function shouldCancelTwoFingerPreview(
     })
   );
 }
-
-export function previewReplacementRules<T>(
-  configured: T[],
-  available: T[],
-  active: boolean,
-) {
-  if (!active) return configured;
-  return configured.length ? [] : available;
-}

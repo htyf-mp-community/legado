@@ -1,0 +1,73 @@
+FAIL __tests__/onlineContentFormatting.test.ts
+  ● online chapter native formatting › matches native formatKeepImg then HTML4 unescape for <div>A</div><div>B</div>
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 3
+    + Received  + 1
+
+    - 　　　　A
+    - 　　B
+    - 　　
+    + AB
+
+      34 |     ));
+      35 |     try {
+    > 36 |       expect((await loadChapterPayload(source, chapter)).content).toBe(reference.value);
+         |                                                                   ^
+      37 |     } finally {
+      38 |       mock.mockRestore();
+      39 |     }
+
+      at toBe (__tests__/onlineContentFormatting.test.ts:36:67)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● online chapter native formatting › matches native formatKeepImg then HTML4 unescape for A<p>B</p>C
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 3
+    + Received  + 2
+
+    - A
+    + AB
+    - 　　B
+    - 　　C
+    + C
+
+      34 |     ));
+      35 |     try {
+    > 36 |       expect((await loadChapterPayload(source, chapter)).content).toBe(reference.value);
+         |                                                                   ^
+      37 |     } finally {
+      38 |       mock.mockRestore();
+      39 |     }
+
+      at toBe (__tests__/onlineContentFormatting.test.ts:36:67)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● online chapter native formatting › matches native formatKeepImg then HTML4 unescape for &lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "<b>literal</b> &lt;b&gt; &amp;"
+    Received: "literal  &"
+
+      34 |     ));
+      35 |     try {
+    > 36 |       expect((await loadChapterPayload(source, chapter)).content).toBe(reference.value);
+         |                                                                   ^
+      37 |     } finally {
+      38 |       mock.mockRestore();
+      39 |     }
+
+      at toBe (__tests__/onlineContentFormatting.test.ts:36:67)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.456 s, estimated 1 s

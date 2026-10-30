@@ -1,0 +1,19 @@
+{
+  "method": "normal UI ZIP exports only",
+  "entryCount": 27,
+  "changedKeys": [
+    "reading.records.v1",
+    "sources.v1"
+  ],
+  "earlierSourceCustomOrder": {
+    "before": 9999,
+    "afterFailure": 1234
+  },
+  "firstRemoteCounter": {
+    "before": 1000,
+    "afterFailure": 2000
+  },
+  "invalidAndLaterRowsAbsent": true,
+  "laterServersCategoryNotReached": true,
+  "allOther25EntriesEqual": true
+}

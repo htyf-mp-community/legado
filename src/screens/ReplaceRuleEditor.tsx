@@ -11,7 +11,7 @@ import {
 import jssdk from '@htyf-mp/js-sdk';
 import { PageHeader } from '../components/PageHeader';
 import {
-  applyReplaceRules,
+  runReplaceRules,
   loadReplaceRules,
   mergeReplaceRules,
   normalizeReplaceRule,
@@ -68,13 +68,13 @@ export function ReplaceRuleEditor({
     }
   };
   const result = rule.pattern
-    ? applyReplaceRules(
+    ? runReplaceRules(
         preview,
-        [{ ...rule, isEnabled: true, scopeContent: true }],
+        [{ ...rule, isEnabled: true, scopeContent: true, scope: undefined, excludeScope: undefined }],
         'content',
         { name: '', origin: '' },
       )
-    : preview;
+    : { value: preview, issues: [] };
   return (
     <View style={[s.flex, { backgroundColor: colors.background }]}>
       <PageHeader
@@ -161,7 +161,7 @@ export function ReplaceRuleEditor({
         />
         <Text style={[s.label, { color: colors.text }]}>{t('replacementResult')}</Text>
         <Text selectable style={[s.preview, { backgroundColor: colors.surface, color: colors.text }]}>
-          {result}
+          {result.issues.length ? result.issues.map(issue => `${t('replaceRuleFailed', { name: issue.rule.name })}: ${issue.message}`).join('\n') : result.value}
         </Text>
       </ScrollView>
     </View>

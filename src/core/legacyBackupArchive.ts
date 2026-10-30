@@ -15,6 +15,9 @@ import {
   type LegacyBackupPreview,
 } from '../data/legacyBackup';
 import { decryptLegacyBackupText } from './legacyBackupCrypto';
+import { preflightNativeBackupFiles } from './nativeBackupPreflight';
+import { trimSourceWhitespace } from './nativeSourceUrl';
+import { loadLocalPassword } from '../data/localPassword';
 import {
   loadRestoreIgnore,
   type RestoreIgnore,
@@ -90,10 +93,11 @@ export async function discardLegacyMedia(plan: LegacyMediaPlan) {
   } catch {}
 }
 
+/** Own an imported archive copy; fatal preflight errors clean extraction without changing application data. */
 export async function inspectLegacyBackupArchive(
   uri: string,
   fileName = 'backup.zip',
-  password = '',
+  password = loadLocalPassword(),
   ignore: Partial<RestoreIgnore> = loadRestoreIgnore(),
 ): Promise<LegacyArchivePreview> {
   const copies = await keepLocalCopy({
@@ -126,9 +130,14 @@ export async function inspectLegacyBackupArchive(
   }
 }
 
+/**
+ * Inspect extracted native files using the local password unless explicitly overridden.
+ * Sensitive-file preflight is fatal and precedes conversion; media stays staged until confirm.
+ * The archive owner must remove `destination` if inspection throws.
+ */
 export async function inspectLegacyBackupDirectory(
   destination: string,
-  password = '',
+  password = loadLocalPassword(),
   token = `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   ignore: Partial<RestoreIgnore> = loadRestoreIgnore(),
 ): Promise<LegacyArchivePreview> {
@@ -163,12 +172,14 @@ export async function inspectLegacyBackupDirectory(
       continue;
     }
     if (item.name.toLowerCase().endsWith('.json')) {
-      const raw = await readFile(item.path, 'utf8'),
-        encrypted =
-          ['cookies.json', 'runtimeSourceCache.json', 'servers.json'].includes(
-            item.name,
-          ) && !/^[\s]*[\[{]/.test(raw);
-      if (encrypted) {
+      const raw = await readFile(item.path, 'utf8');
+      const trimmed = trimSourceWhitespace(raw);
+      // Server decrypt failures are source runCatching warnings. Cookies and runtime
+      // caches instead have a fatal, ordered preflight before ordinary conversions.
+      if (
+        item.name === 'servers.json' &&
+        !(trimmed.startsWith('[') && trimmed.endsWith(']'))
+      ) {
         try {
           files[item.name] = decryptLegacyBackupText(raw, password);
         } catch (error) {
@@ -179,13 +190,18 @@ export async function inspectLegacyBackupDirectory(
       } else files[item.name] = raw;
     }
   }
-  const preview: LegacyArchivePreview = convertLegacyBackup(files, Date.now(), {
-    coverRoot: `${targetDirectory}/covers`,
-    coverFiles,
-    existingCoverFiles: await currentCoverFiles(),
-    bgRoot: `${targetDirectory}/bg`,
-    bgFiles,
-  });
+  const decoded = preflightNativeBackupFiles(files, password, ignore);
+  const preview: LegacyArchivePreview = convertLegacyBackup(
+    decoded,
+    Date.now(),
+    {
+      coverRoot: `${targetDirectory}/covers`,
+      coverFiles,
+      existingCoverFiles: await currentCoverFiles(),
+      bgRoot: `${targetDirectory}/bg`,
+      bgFiles,
+    },
+  );
   const databases = blocked.filter(item => database.test(item)),
     encrypted = blocked.filter(item => !database.test(item));
   if (databases.length)

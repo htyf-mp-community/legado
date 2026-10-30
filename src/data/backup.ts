@@ -22,14 +22,18 @@ import {
   validateBackupMedia,
   type BackupMediaIndex,
 } from '../core/backupMediaPaths';
+import {
+  readStorageEntries,
+  writeStorageEntries,
+  validateStorageEntryType,
+  STORAGE_VALUE_TYPES_KEY,
+  type StorageEntry,
+} from './storageValues';
 
 const FORMAT = 'legado-htyf-backup';
 const VERSION = 1;
 
-export type BackupValue =
-  | { type: 'string'; value: string }
-  | { type: 'number'; value: number }
-  | { type: 'boolean'; value: boolean };
+export type BackupValue = StorageEntry;
 
 export type BackupPayload = {
   format: typeof FORMAT;
@@ -44,41 +48,34 @@ export type BackupPayload = {
   };
 };
 
-type BackupStorage = Pick<
+/** Typed storage seam for backup restore; callers must provide the application's isolated namespace. */
+export type BackupStorage = Pick<
   MMKV,
   'getAllKeys' | 'getString' | 'getNumber' | 'getBoolean' | 'set' | 'clearAll'
 >;
 
-function readEntries(
-  storage: BackupStorage,
-  filter: (key: string) => boolean = () => true,
-): Record<string, BackupValue> {
-  const entries: Record<string, BackupValue> = {};
-  for (const key of storage.getAllKeys()) {
-    if (!filter(key)) continue;
-    const stringValue = storage.getString(key);
-    if (stringValue !== undefined) {
-      entries[key] = { type: 'string', value: stringValue };
-      continue;
-    }
-    const numberValue = storage.getNumber(key);
-    if (numberValue !== undefined) {
-      entries[key] = { type: 'number', value: numberValue };
-      continue;
-    }
-    const booleanValue = storage.getBoolean(key);
-    if (booleanValue !== undefined)
-      entries[key] = { type: 'boolean', value: booleanValue };
-  }
-  return entries;
-}
-
-function writeEntries(
-  storage: BackupStorage,
-  entries: Record<string, BackupValue>,
+/**
+ * Commit one prepared restore unit, rolling back only this unit if a storage write throws.
+ * Snapshot logical types and the exact private type index. Native restore invokes this per
+ * source transaction; an earlier successful unit is therefore retained on a later failure.
+ */
+export function commitRestoreEntries(
+  changes: Record<string, BackupValue>,
+  storage: BackupStorage = appStorage,
 ) {
-  for (const [key, entry] of Object.entries(entries))
-    storage.set(key, entry.value);
+  if (!Object.keys(changes).length) return;
+  const previous = readStorageEntries(storage);
+  const previousTypeIndex = storage.getString(STORAGE_VALUE_TYPES_KEY);
+  try {
+    writeStorageEntries(storage, changes);
+  } catch (error) {
+    storage.clearAll();
+    for (const [key, entry] of Object.entries(previous))
+      storage.set(key, entry.value);
+    if (previousTypeIndex !== undefined)
+      storage.set(STORAGE_VALUE_TYPES_KEY, previousTypeIndex);
+    throw error;
+  }
 }
 
 function validateEntries(entries: Record<string, BackupValue>) {
@@ -90,6 +87,7 @@ function validateEntries(entries: Record<string, BackupValue>) {
       (entry.type === 'number' && Number.isFinite(entry.value)) ||
       (entry.type === 'boolean' && typeof entry.value === 'boolean');
     if (!valid) throw new Error(`备份条目 ${key} 的类型无效`);
+    validateStorageEntryType(key);
   }
 }
 
@@ -98,7 +96,7 @@ export function createBackup(
   password = loadLocalPassword(),
 ): string {
   const preferences = loadBackupPreferences();
-  const encrypted = readEntries(
+  const encrypted = readStorageEntries(
     storage,
     key =>
       ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)) &&
@@ -109,7 +107,7 @@ export function createBackup(
     version: VERSION,
     createdAt: Date.now(),
     storageId: APP_STORAGE_ID,
-    entries: readEntries(
+    entries: readStorageEntries(
       storage,
       key =>
         !SENSITIVE_STORAGE_KEYS.has(key) &&
@@ -187,19 +185,42 @@ export function restoreBackup(
       if (!ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)))
         throw new Error('敏感备份包含不允许的条目');
   }
-  const previous = readEntries(storage);
+  const previous = readStorageEntries(storage);
   const incoming = Object.fromEntries(
     Object.entries({ ...payload.entries, ...encryptedEntries }).filter(
       ([key]) => !SENSITIVE_STORAGE_KEYS.has(key),
     ),
   );
-  const changes = prepareRestoreEntries(previous, incoming, ignore);
-  try {
-    writeEntries(storage, changes);
-  } catch (error) {
-    storage.clearAll();
-    writeEntries(storage, previous);
-    throw error;
-  }
+  // The host exposes no Android ID. A private, per-install restore identity keeps other
+  // devices' counters separate without exporting or overwriting device identity.
+  const recordDeviceKey = 'reading.record-device.v1';
+  const previousRecordDevice = storage.getString(recordDeviceKey);
+  const ownRecordDevice =
+    previousRecordDevice ||
+    `htyf-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const changes = prepareRestoreEntries(
+    previous,
+    incoming,
+    ignore,
+    ownRecordDevice,
+  );
+  const recordEntry = incoming['reading.records.v1'];
+  const hasReadRecordRows =
+    recordEntry?.type === 'string' &&
+    (JSON.parse(recordEntry.value) as unknown[]).length > 0;
+  commitRestoreEntries(
+    {
+      ...(hasReadRecordRows && !previousRecordDevice
+        ? {
+            [recordDeviceKey]: {
+              type: 'string' as const,
+              value: ownRecordDevice,
+            },
+          }
+        : {}),
+      ...changes,
+    },
+    storage,
+  );
   return payload;
 }

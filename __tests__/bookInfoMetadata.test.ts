@@ -2,7 +2,7 @@ jest.mock('../src/data/storage', () => ({
   appStorage: { getString: jest.fn(), set: jest.fn() },
 }));
 jest.mock('../src/core/sourceRequest', () => ({
-  buildSourceRequest: jest.fn(),
+  buildSourcePageRequest: jest.fn(),
   executeSourceRequest: async () => ({
     url: 'https://source.test/book',
     data: {

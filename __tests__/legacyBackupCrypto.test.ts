@@ -1,11 +1,20 @@
-jest.mock('react-native-quick-crypto', () => ({
-  createHash: () => ({ update: () => undefined, digest: () => '0123456789abcdef0123456789abcdef' }),
-  createDecipheriv: (algorithm: string, key: string, iv: Uint8Array) => {
-    if (algorithm !== 'aes-128-ecb' || key !== '0123456789abcdef' || iv.length !== 0) throw new Error('envelope mismatch');
-    return { setAutoPadding: () => undefined, update: (value: string, input: string, output: string) => value === 'YmFzZTY0' && input === 'base64' && output === 'utf8' ? '解密' : '', final: () => '成功' };
-  },
-}));
+jest.mock('react-native-quick-crypto', () => require('node:crypto'));
 import { decryptLegacyBackupText } from '../src/core/legacyBackupCrypto';
+import native from './fixtures/nativeRestorePreflight.native.json';
 
-test('matches Legado BackupAES MD5-key AES-128-ECB envelope', () => expect(decryptLegacyBackupText('YmFzZTY0', '密码')).toBe('解密成功'));
-test('requires a password before decrypting', () => expect(() => decryptLegacyBackupText('x', '')).toThrow('需要密码'));
+test('decrypts native BackupAES output with MD5 hex key bytes, including an empty server password', () => {
+  for (const password of ['', 'fixture-password', ' 密码 ']) {
+    const row = native.envelopes.find(
+      value => value.password === password && value.plaintext === '[]',
+    )!;
+    expect(decryptLegacyBackupText(row.encoded, password)).toBe('[]');
+  }
+});
+test('reports wrong passwords without ciphertext or password text', () => {
+  const row = native.envelopes.find(
+    value => value.password === 'fixture-password' && value.plaintext === '[]',
+  )!;
+  expect(() => decryptLegacyBackupText(row.encoded, 'wrong-password')).toThrow(
+    '旧版备份密码错误或加密数据已损坏',
+  );
+});

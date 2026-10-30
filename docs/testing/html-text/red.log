@@ -1,0 +1,110 @@
+FAIL __tests__/htmlTextExtraction.test.ts
+  ● separates block and br text while excluding script/style data
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "甲 乙 丙 尾 末"
+    Received: "甲乙丙尾bad().ad{}末"
+
+      3 | test('separates block and br text while excluding script/style data', () => {
+      4 |   const page = '<div id="x"><p>甲</p><p>乙<br>丙</p>尾<script>bad()</script><style>.ad{}</style>末</div>';
+    > 5 |   expect(sourceRuleText(page, '#x@text')).toBe('甲 乙 丙 尾 末');
+        |                                           ^
+      6 |   expect(sourceRuleTexts(page, 'script@text')).toEqual([]);
+      7 |   expect(sourceRuleTexts(page, 'style@text')).toEqual([]);
+      8 | });
+
+      at Object.toBe (__tests__/htmlTextExtraction.test.ts:5:43)
+
+  ● joins direct text nodes with native newline boundaries
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 3
+    + Received  + 3
+
+    - A
+    - B C
+    - D
+    + A B
+    +  C 
+    +  D
+
+      10 | test('joins direct text nodes with native newline boundaries', () => {
+      11 |   const page = '<p id="x">A <b>skip</b>  B\n C <i>skip</i>\n D</p>';
+    > 12 |   expect(sourceRuleText(page, '#x@textNodes')).toBe('A\nB C\nD');
+         |                                                ^
+      13 |   expect(sourceRuleText(page, '#x@ownText')).toBe('A B C D');
+      14 | });
+      15 |
+
+      at Object.toBe (__tests__/htmlTextExtraction.test.ts:12:48)
+
+  ● retains preformatted whitespace and native Unicode normalization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 1
+    + Received  + 2
+
+    - A B
+    + A 
+    +  B
+
+      16 | test('retains preformatted whitespace and native Unicode normalization', () => {
+      17 |   expect(sourceRuleText('<pre id="x">\n A \n B </pre>', '#x@text')).toBe('A \n B');
+    > 18 |   expect(sourceRuleText('<pre id="x">\n A \n B </pre>', '#x@textNodes')).toBe('A B');
+         |                                                                          ^
+      19 |   expect(sourceRuleText('<div id="x">\u2003A\u200bB\u00adC\u200dD\u2003</div>', '#x@text')).toBe('\u2003ABC\u200dD\u2003');
+      20 | });
+      21 |
+
+      at Object.toBe (__tests__/htmlTextExtraction.test.ts:18:74)
+
+  ● deduplicates nonblank raw attributes without deduplicating text
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 3
+
+      Array [
+        "/a",
+    +   "/a",
+    +   " 	",
+        "/b",
+    +   " ",
+      ]
+
+      22 | test('deduplicates nonblank raw attributes without deduplicating text', () => {
+      23 |   const page = '<a href="/a">same</a><a href="/a">same</a><a href=" \t">same</a><a href="/b">same</a><a href="\u2003">same</a>';
+    > 24 |   expect(sourceRuleTexts(page, 'a@href')).toEqual(['/a', '/b']);
+         |                                           ^
+      25 |   expect(sourceRuleTexts(page, 'a@text')).toEqual(['same', 'same', 'same', 'same', 'same']);
+      26 |   expect(sourceRuleTexts(page, 'a@href##/a|/b##same')).toEqual(['same', 'same']);
+      27 | });
+
+      at Object.toEqual (__tests__/htmlTextExtraction.test.ts:24:43)
+
+  ● preserves extraction of nodes and root-level own text
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "headmid tail"
+    Received: "headmidtail"
+
+      29 | test('preserves extraction of nodes and root-level own text', () => {
+      30 |   const node = sourceRuleValues('<p>head<b>skip</b>mid<br>tail</p>', 'p')[0];
+    > 31 |   expect(sourceRuleText(node, 'ownText')).toBe('headmid tail');
+         |                                           ^
+      32 |   expect(sourceRuleText(node, 'textNodes')).toBe('head\nmid\ntail');
+      33 | });
+      34 |
+
+      at Object.toBe (__tests__/htmlTextExtraction.test.ts:31:43)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 5 total
+Snapshots:   0 total
+Time:        0.512 s
+Ran all test suites matching __tests__/htmlTextExtraction.test.ts.

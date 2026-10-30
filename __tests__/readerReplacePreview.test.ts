@@ -1,5 +1,4 @@
 import {
-  previewReplacementRules,
   shouldCancelTwoFingerPreview,
 } from '../src/core/readerReplacePreview';
 
@@ -28,10 +27,4 @@ describe('two-finger replacement preview', () => {
     expect(shouldCancelTwoFingerPreview(starts, [starts[0]])).toBe(true);
   });
 
-  test('temporarily removes configured rules or restores available rules', () => {
-    const available = ['a', 'b'];
-    expect(previewReplacementRules(['a'], available, false)).toEqual(['a']);
-    expect(previewReplacementRules(['a'], available, true)).toEqual([]);
-    expect(previewReplacementRules([], available, true)).toEqual(available);
-  });
 });

@@ -1,6 +1,7 @@
 import {
   estimatePageCapacity,
   paginateText,
+  paginateTextRanges,
   stripSpecialPageBreaks,
 } from '../src/core/pagination';
 
@@ -15,6 +16,11 @@ test('paginates without losing or duplicating text', () => {
   const pages = paginateText(input, 8);
   expect(pages.length).toBeGreaterThan(1);
   expect(pages.join('').replace(/\n/g, '')).toBe(input.replace(/\n/g, ''));
+});
+
+test('keeps configured paragraph indentation on the first page and in its UTF-16 range', () => {
+  const text = '　　第一段\n　　第二段';
+  expect(paginateTextRanges(text, 100)).toEqual([{ text, start: 0, end: text.length }]);
 });
 
 test('handles empty text and invalid capacity safely', () => {

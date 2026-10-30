@@ -1,0 +1,34 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/chineseConversion.test.ts
+
+FAIL __tests__/chineseConversion.test.ts
+  ● retains the source Chinese conversion mode instead of discarding the setting
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: undefined
+
+      4 |
+      5 | test('retains the source Chinese conversion mode instead of discarding the setting', () => {
+    > 6 |   expect(normalizeReaderPreferences({ chineseConverterType: 2 }).chineseConverterType).toBe(2);
+        |                                                                                        ^
+      7 | });
+      8 |
+
+      at Object.toBe (__tests__/chineseConversion.test.ts:6:88)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.524 s
+Ran all test suites matching __tests__/chineseConversion.test.ts.

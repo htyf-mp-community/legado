@@ -1,0 +1,75 @@
+{
+  "version": "0.0.47",
+  "overallParityComplete": false,
+  "iosOnly": true,
+  "androidBuilt": false,
+  "tests": {
+    "suites": 220,
+    "tests": 1118,
+    "passed": true,
+    "typecheck": "pass",
+    "changedFileLint": "pass"
+  },
+  "finiteReference": {
+    "strictParserCases": 349,
+    "envelopeCases": 336,
+    "allMatched": true
+  },
+  "nativeSensitivePreflight": "fatal before ordinary conversion or storage",
+  "passwordSource": "current local password unless legacy preview explicitly overrides it",
+  "ignorePolicy": "skip ignored sensitive files before reading or decrypting",
+  "emptyNativeLists": "no persistent rows materialized",
+  "ordinaryHtyfAtomicContract": "unchanged and covered by existing regression suite",
+  "ios": {
+    "device": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "coldStartPid": 96732,
+    "currentSourceColdStartShelf": "10 books / 9 in reading",
+    "sensitiveRestoreInteraction": {
+      "noPasswordCookies": "blocked before confirmation",
+      "noPasswordPlaintextRuntime": "blocked before confirmation",
+      "ordinarySourceOnly": "confirmation present; cancelled",
+      "correctPasswordDecrypt": "pending",
+      "ignoreSwitchUi": "pending"
+    },
+    "uiBlocker": "Transient CUA native-pipe/ScreenCaptureKit failures recovered; all input stayed in CUA on pinned Legado window.",
+    "newNormalZipExport": "fresh before/after exports; all 27 typed entries exactly equal; before equals .46 final",
+    "finalColdStartPid": 18302,
+    "currentSourceVersionUi": "0.0.47"
+  },
+  "services": {
+    "repack8097": {
+      "pid": 92620,
+      "state": "listening",
+      "previousPid35753": "confirmed absent before restart"
+    },
+    "fixtureServer": "stopped; process exit 130",
+    "webMcpTasks": "all off in UI, including after final cold start",
+    "webMcpFixturePorts": "no listeners on 1122 / 1236 / 18201 at final read-only check; UI settings not rechecked"
+  },
+  "priorCleanup": "pending explicit confirmation; no deletion retry",
+  "published": false,
+  "physicalHostAccepted": false,
+  "limits": [
+    "No Android/Room runtime; JVM strict parsers/BackupAES plus Node crypto are finite reference evidence",
+    "QuickCrypto encrypted-file restoration in the actual iOS/HTYF runtime still requires UI acceptance",
+    "CookieStore subdomain/session/merge and runtime-variable consumers remain open",
+    "Original configuration/XML, all native entity/DAO constraints, error logging, cancellation/process/storage failures, extreme/deep/large inputs and complete crypto/charset profiles remain open",
+    "Full accessibility/layout/gesture and physical-host matrices remain open"
+  ],
+  "package": {
+    "version": "0.0.47",
+    "bytes": 2605186,
+    "sha256": "f34192f02267085c17afadce7b74caca7f2adef8627304c13a6242bc37566af7",
+    "bundleSha256": "a625dbe0c6c989895d08f715a800f27b816eccdaae516f4a50dabc996309f144",
+    "bundle": "plugin_legado_v0_0_47.bundle",
+    "productionInputCount": 351,
+    "productionInputSha256": "295ce77ccfde9e5d3858b30d6ec5d0bc27dca5747f37660a052d3835d57c8b3c",
+    "zipTest": "pass",
+    "licensesRetained": true,
+    "testFixtureStringsAbsent": true,
+    "published": false
+  },
+  "generatedExportZipsRetained": 0,
+  "normalUiExportEntriesExactlyUnchanged": 27
+}

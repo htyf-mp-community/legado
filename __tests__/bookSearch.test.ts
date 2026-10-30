@@ -170,3 +170,24 @@ test('merges same-name/author books across sources and ranks Android match bucke
   ]);
   expect(grouped[0].origins.map(item => item.origin)).toEqual(['a', 'b']);
 });
+
+test('read indicators decode the native multi-author field and keep exact author identity', () => {
+  const records = [
+    {
+      deviceId: 'remote',
+      bookName: 'Same',
+      author: '\u001eauthors:["甲","乙"]',
+      readTime: 1,
+      lastRead: 2,
+    },
+  ];
+  expect(searchBookIndicator(book('Same', '乙'), [], records, true)).toBe(
+    'read',
+  );
+  expect(searchBookIndicator(book('Same', '甲'), [], records, true)).toBe(
+    'read',
+  );
+  expect(searchBookIndicator(book('Same', '丙'), [], records, true)).toBe(
+    'none',
+  );
+});

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { PageHeader } from '../components/PageHeader';
+import { ChineseConverter } from '../components/ChineseConverter';
 import {
   defaultReaderPreferences,
   loadReaderPreferences,
@@ -62,6 +63,7 @@ export function ReaderSettings({ back }: { back: () => void }) {
         >
           {t('typography')}
         </Text>
+        <ChineseConverter value={preferences.chineseConverterType} change={chineseConverterType => change({ chineseConverterType })} />
         <Stepper
           label={t('fontSize')}
           value={preferences.fontSize}

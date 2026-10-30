@@ -1,0 +1,30 @@
+{
+  "version": "0.0.47",
+  "productionInputCount": 351,
+  "productionInputSha256": "295ce77ccfde9e5d3858b30d6ec5d0bc27dca5747f37660a052d3835d57c8b3c",
+  "productionInputsUnchanged": true,
+  "archiveMatchesPackage": true,
+  "tests": {
+    "suites": 220,
+    "tests": 1118,
+    "passed": true
+  },
+  "typecheck": "pass",
+  "changedFileLint": "pass",
+  "dependencyHashesUnchanged": true,
+  "nativeProjectsUnchanged": true,
+  "sourceRepositoryStatusUnchanged": true,
+  "removedMigrationDirectoryStillAbsent": true,
+  "noNewMmkvFileAccess": true,
+  "noUiDataMutation": "No restore was confirmed; only normal exports and source previews/failures were exercised",
+  "iosColdStartSmoke": "shelf rendered",
+  "iosSensitiveRestoreInteraction": "password preflight rejection and ordinary preview pass; correct-password/ignore-switch matrices pending",
+  "freshExportComparison": "27 typed entries exactly equal before/after; before equals .46 final",
+  "priorCleanupPending": true,
+  "newReportLinksExist": true,
+  "published": false,
+  "overallParityComplete": false,
+  "finalColdStartPid": 18302,
+  "uiConnection": "recovered after transient failures",
+  "services": "fixture stopped; Web/MCP/tasks off including after cold start"
+}

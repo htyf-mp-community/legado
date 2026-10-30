@@ -54,6 +54,7 @@ test('switches source while preserving identity, groups and matching progress', 
     chapterTitle: '第二章',
     currentChapterIndex: 1,
     progress: 0.5,
+    keepDuplicateTitleKeys: ['00001-1234567890abcdef.nr'],
   };
   const switched = switchLibraryBookSource(
     current,
@@ -70,6 +71,7 @@ test('switches source while preserving identity, groups and matching progress', 
     currentChapterIndex: 1,
     chapterTitle: '第二章',
     progress: 0.5,
+    keepDuplicateTitleKeys: ['00001-1234567890abcdef.nr'],
   });
 });
 

@@ -98,11 +98,11 @@ test('reflows from the character anchor rather than multiplying by an estimated 
   expect(setPageIndex).toHaveBeenCalledWith(2);
   expect(props.commit).not.toHaveBeenCalled();
 });
-test('scroll restore waits for measured lines and ignores early/programmatic scroll events', () => {
+test.each(['\n', '\n\n'])('scroll restore uses measured paragraph lines across %j separators', separator => {
   const ref = createRef<ReaderPositionHandle>(),
     props = base({
       mode: 'scroll',
-      text: 'abcdef\n\nghijkl',
+      text: `abcdef${separator}ghijkl`,
       book: { ...book, readingPosition: { chapterId: 'c', position: 12 } },
     });
   act(() => {

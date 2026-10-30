@@ -1,0 +1,40 @@
+{
+  "bookSourceGroup": "通常书源 📂,快速书源 ⚡",
+  "bookSourceName": "📂阅读书屋",
+  "bookSourceType": 0,
+  "bookSourceUrl": "https://www.vikbook.com/",
+  "customButton": false,
+  "customOrder": 99,
+  "enabled": true,
+  "enabledCookieJar": true,
+  "enabledExplore": false,
+  "eventListener": false,
+  "header": "{'User-Agent':'Mozilla/5.0 (Linux; Android 14; V2304A; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/123.0.6312.118 Mobile Safari/537.36',\n\"Referer\":\"https://www.vikbook.com/\"}",
+  "lastUpdateTime": 1787213048593,
+  "respondTime": 23133,
+  "ruleBookInfo": {
+    "author": ".author@a@text",
+    "coverUrl": "img.3@src",
+    "intro": "&nbsp;\n📖 书名：{{@@h1@text}}\n👤 作者：{{@@.author@a@text}}\n🔖 标签：{{@@#tags@.tag@text##\\n}}  🏷 简介：{{@@.description@text}}",
+    "name": "h1@text",
+    "tocUrl": "text.在线阅读@href"
+  },
+  "ruleContent": {
+    "content": ".calibre@html",
+    "replaceRegex": "##华章网站.*|电子邮件.*|联系电话.*|联系地址.*|邮政编码.*|.*专属 VPN.*|.*版权所有.*|客服.+：.*|.*微博.*|.*网址：.*|.*图文信息.*|.*电子化阅读中的各种.*|.*在线电子.*|http.+.com.*|.*格式包括.*|.*默认书库.*|"
+  },
+  "ruleExplore": {},
+  "ruleSearch": {
+    "bookList": "#page@div[itemscope]",
+    "bookUrl": "a.0@href",
+    "coverUrl": "a.0@href##(\\d+)##https://www.vikbook.com/contents/$1/cover.jpeg###",
+    "name": "a.0@text"
+  },
+  "ruleToc": {
+    "chapterList": "#content@.page",
+    "chapterName": "a@text",
+    "chapterUrl": "a@href"
+  },
+  "searchUrl": "https://www.vikbook.com/search.php?s={{key}}&p={{page}}",
+  "weight": 0
+}

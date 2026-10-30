@@ -111,7 +111,8 @@ export default (env = {}) => {
           extractComments: false,
           terserOptions: {
             format: {
-              comments: false,
+              // Keep the MIT notice for the source-compatible Jsoup text port.
+              comments: /@license Jsoup/,
             },
           },
         }),
@@ -119,6 +120,15 @@ export default (env = {}) => {
       chunkIds: 'named', // 便于调试
     },
     plugins: [
+      // Preserve bundled parser/conversion licenses after minification, before
+      // Repack code signing / manifest consumers inspect the final assets.
+      new webpack.BannerPlugin({
+        banner: ['jsoup-MIT.txt', 'parse5-MIT.txt', 'parse5-adapter-MIT.txt', 'parse5-entities-BSD.txt', 'quick-transfer-NOTICE.txt', 'quick-transfer-Apache-2.0.txt', 'source-charset-NOTICE.txt', 'icu-Unicode.txt']
+          .map(name => fse.readFileSync(path.join(__dirname, 'docs/licenses', name), 'utf8'))
+          .join('\n\n'),
+        entryOnly: true,
+        stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+      }),
       // 注入全局常量（appid、版本、构建时间）
       new webpack.DefinePlugin({
         __APP_DEFINE_APPID__: `"${appid}"`,

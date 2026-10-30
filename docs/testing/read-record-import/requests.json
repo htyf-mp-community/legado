@@ -1,0 +1,167 @@
+{
+  "requests": [
+    {
+      "time": "2026-10-29T18:48:11.235Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 201
+    },
+    {
+      "time": "2026-10-29T18:48:11.274Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 207
+    },
+    {
+      "time": "2026-10-29T18:48:11.304Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "null-item",
+      "status": 200,
+      "sha256": "de798371ee66089ba8815df795051f79bd3906a31e88c4eeac00034cff7946b9"
+    },
+    {
+      "time": "2026-10-29T18:48:41.971Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "fraction",
+      "status": 201
+    },
+    {
+      "time": "2026-10-29T18:48:41.994Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "fraction",
+      "status": 207
+    },
+    {
+      "time": "2026-10-29T18:48:41.999Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "fraction",
+      "status": 200,
+      "sha256": "e215f5177a0fbbed2c877f72ecc8973b524b46b228b3e272c73d2d74ed5ff281"
+    },
+    {
+      "time": "2026-10-29T18:49:05.803Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "null-author",
+      "status": 201
+    },
+    {
+      "time": "2026-10-29T18:49:05.822Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "null-author",
+      "status": 207
+    },
+    {
+      "time": "2026-10-29T18:49:05.833Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "null-author",
+      "status": 200,
+      "sha256": "24ded71b16967cd19e6728f255bff95534fe30a777adb6c24ed8ae518285d275"
+    },
+    {
+      "time": "2026-10-29T18:51:19.507Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "valid-duplicate",
+      "status": 201
+    },
+    {
+      "time": "2026-10-29T18:51:19.524Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "valid-duplicate",
+      "status": 207
+    },
+    {
+      "time": "2026-10-29T18:51:19.540Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "valid-duplicate",
+      "status": 200,
+      "sha256": "96f8d8926e3ab9881e1491d45ed28b1c482ac941b6b6ac06eac1e5b7784f9fbe"
+    },
+    {
+      "time": "2026-10-29T19:00:24.604Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 201,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:00:24.627Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 207,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:00:24.657Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "null-item",
+      "status": 200,
+      "sha256": "de798371ee66089ba8815df795051f79bd3906a31e88c4eeac00034cff7946b9",
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:00.016Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 201,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:00.038Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "null-item",
+      "status": 207,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:00.048Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "null-item",
+      "status": 200,
+      "sha256": "de798371ee66089ba8815df795051f79bd3906a31e88c4eeac00034cff7946b9",
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:45.884Z",
+      "method": "MKCOL",
+      "path": "/legado/",
+      "stage": "fraction",
+      "status": 201,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:45.904Z",
+      "method": "PROPFIND",
+      "path": "/legado/",
+      "stage": "fraction",
+      "status": 207,
+      "repeatForVisibleScreenshot": true
+    },
+    {
+      "time": "2026-10-29T19:03:45.914Z",
+      "method": "GET",
+      "path": "/legado/backup-htyf.zip",
+      "stage": "fraction",
+      "status": 200,
+      "sha256": "e215f5177a0fbbed2c877f72ecc8973b524b46b228b3e272c73d2d74ed5ff281",
+      "repeatForVisibleScreenshot": true
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import { parseLegacyJson } from './legacyJson';
+import { mergeReadRecordRows, normalizeReadRecord } from './readRecord';
 import { isLocalBook } from './bookKinds';
 import type { BackupValue } from '../data/backup';
 import type { RestoreIgnore } from '../data/restorePreferences';
@@ -20,7 +22,6 @@ const identities: Record<string, string> = {
   'http.tts.engines.v1': 'id',
   'legacy.runtime-source-cache.v1': 'key',
   'legacy.servers.v1': 'id',
-  'reading.records.v1': 'bookId',
 };
 const replaceLists = new Set([
   'keyboard-assists.v1',
@@ -32,7 +33,9 @@ const object = (value: unknown): value is Row =>
 function decode(entry: BackupValue, key: string): unknown {
   if (entry.type !== 'string') throw new Error(`备份条目 ${key} 应为 JSON`);
   try {
-    return JSON.parse(entry.value);
+    return key === 'reading.records.v1'
+      ? parseLegacyJson(entry.value)
+      : JSON.parse(entry.value);
   } catch {
     throw new Error(`备份条目 ${key} 不是有效的 JSON`);
   }
@@ -54,14 +57,12 @@ const identity = (row: Row, field: string, key: string) => {
   return String(value);
 };
 
-/** Native restore upserts tables; absent categories and device-only rows survive. Compute everything before writing. */
-export function prepareRestoreEntries(
+/** Resolve native book URLs against existing target IDs once, so later restore phases keep annotation ownership. */
+export function restoreBookIdentities(
   previous: Entries,
   incoming: Entries,
-  ignore: Partial<RestoreIgnore> = {},
-): Entries {
-  const result: Entries = {},
-    bookIds = new Map<string, string>();
+): Map<string, string> {
+  const bookIds = new Map<string, string>();
   const currentBooks =
     incoming['library.v1'] && previous['library.v1']
       ? rows(previous['library.v1'], 'library.v1')
@@ -78,9 +79,31 @@ export function prepareRestoreEntries(
           identity(match, 'id', 'library.v1'),
         );
     }
+  return bookIds;
+}
+
+/** Compute an upsert without writing. Optional book IDs carry ownership across ordered native phases. */
+export function prepareRestoreEntries(
+  previous: Entries,
+  incoming: Entries,
+  ignore: Partial<RestoreIgnore> = {},
+  ownReadRecordDeviceId?: string,
+  nativeBookIds?: ReadonlyMap<string, string>,
+): Entries {
+  const result: Entries = {},
+    bookIds = new Map([
+      ...(nativeBookIds ?? []),
+      ...restoreBookIdentities(previous, incoming),
+    ]);
+  const currentBooks =
+    incoming['library.v1'] && previous['library.v1']
+      ? rows(previous['library.v1'], 'library.v1')
+      : [];
   for (const [key, entry] of Object.entries(incoming)) {
     if (
       key === 'backup.restore-ignore.v1' ||
+      key === 'reading.record-sort.v1' ||
+      key === 'reading.record-device.v1' ||
       (ignore.ignoreCookies && key.startsWith('source-cookie.')) ||
       (ignore.ignoreSourceVariables &&
         key === 'legacy.runtime-source-cache.v1') ||
@@ -95,6 +118,33 @@ export function prepareRestoreEntries(
       (ignore.bookshelfLayout && key === 'bookshelf.layout.v1')
     )
       continue;
+    if (key === 'reading.records.v1') {
+      const parsed = (entryRows: Row[], incomingRows = false) =>
+        entryRows.map(row => {
+          // Gson preserves explicit null String fields. Native DAO/Room insertion fails;
+          // do not turn unknown authors into empty strings or silently drop the row.
+          if (
+            incomingRows &&
+            ['deviceId', 'bookName', 'author'].some(
+              field => row[field] === null,
+            )
+          )
+            throw new Error(`备份条目 ${key} 的设备、书名和作者不能为 null`);
+          const normalized = normalizeReadRecord(row);
+          if (!normalized) throw new Error(`备份条目 ${key} 缺少书名`);
+          return normalized.bookId && bookIds.has(normalized.bookId)
+            ? { ...normalized, bookId: bookIds.get(normalized.bookId) }
+            : normalized;
+        });
+      result[key] = encode(
+        mergeReadRecordRows(
+          previous[key] ? parsed(rows(previous[key], key)) : [],
+          parsed(rows(entry, key), true),
+          ownReadRecordDeviceId,
+        ),
+      );
+      continue;
+    }
     const field = identities[key];
     if (field) {
       const current = previous[key] ? rows(previous[key], key) : [];
@@ -126,16 +176,7 @@ export function prepareRestoreEntries(
             row = { ...row, id: match.id };
           }
         }
-        if (key === 'reading.records.v1' && bookIds.has(String(row.bookId)))
-          row = { ...row, bookId: bookIds.get(String(row.bookId)) };
-        const id = identity(row, field, key),
-          old = values.get(id);
-        if (
-          key === 'reading.records.v1' &&
-          old &&
-          Number(old.readTime) >= Number(row.readTime)
-        )
-          row = { ...old, ...(row.author ? { author: row.author } : {}) };
+        const id = identity(row, field, key);
         values.set(id, row);
       }
       result[key] = encode([...values.values()]);
@@ -176,11 +217,7 @@ export function prepareRestoreEntries(
       result[key] = encode({ ...(local as Row | undefined), ...patch });
     } else result[key] = entry;
   }
-  for (const key of [
-    'annotations.bookmarks.v1',
-    'annotations.highlights.v1',
-    'reading.records.v1',
-  ]) {
+  for (const key of ['annotations.bookmarks.v1', 'annotations.highlights.v1']) {
     if (!result[key] || !incoming[key]) continue;
     const imported = new Set(
       rows(incoming[key], key).map(row => identity(row, identities[key], key)),

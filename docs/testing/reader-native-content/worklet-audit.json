@@ -1,0 +1,10 @@
+{
+  "bundleSha256": "aefb7f2b23762b428ea9135207d7e2dcf97f9947e52fa93e62cb69ef8658c8d4",
+  "compiledArrayClosures": 460,
+  "unexpectedClosureAssignments": 0,
+  "libraryJestHelpers": [
+    "w.__closure={...original.__closure}",
+    "fn.__closure={}"
+  ],
+  "syntaxErrors": 0
+}

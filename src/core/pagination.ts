@@ -76,8 +76,10 @@ function paginatePlainText(
       if (newline > start + size * 0.55) end = newline + 1;
     }
     const raw = text.slice(start, end),
-      value = raw.trim(),
-      leading = raw.length - raw.trimStart().length;
+      // ContentProcessor already trims each paragraph before adding the
+      // configured indent. Page slicing must retain that visible indentation.
+      value = raw.replace(/^[\r\n]+|[\r\n]+$/g, ''),
+      leading = raw.length - raw.replace(/^[\r\n]+/, '').length;
     pages.push({
       text: value,
       start: offset + start + leading,

@@ -1,13 +1,16 @@
 import type { BookChapter, BookSource, SearchBook } from '../types';
 import { SourceRuleError, UnsupportedRuleError } from './errors';
-import { buildSourceRequest, executeSourceRequest } from './sourceRequest';
+import { buildSourceRequest, buildSourcePageRequest, executeSourceRequest } from './sourceRequest';
 import {
   sourceRuleText,
   sourceRuleTexts,
   sourceRuleValues,
 } from './sourceRule';
-import { readerHtmlToText } from './readerImages';
+import { readerHtmlToText, formattedSourceToReaderContent } from './readerImages';
+import { formatSourceChapter, unescapeSourceHtml4 } from './htmlFormatter';
 import { checkCancelled } from './cancellation';
+import { loadReaderPreferences } from '../data/readerPreferences';
+import { resolveNativeResourceUrl } from './nativeSourceUrl';
 const rule = (
   source: BookSource,
   name:
@@ -18,27 +21,18 @@ const rule = (
     | 'ruleContent',
 ) => (source[name] ?? {}) as Record<string, unknown>;
 export const resolveWebBookUrl = (value: string, base: string) => {
-  const target = value.trim();
-  if (/^\/\//.test(target)) {
-    const protocol = base.match(/^([a-z][a-z\d+.-]*:)/i)?.[1] ?? 'https:';
-    return `${protocol}${target}`;
-  }
-  if (/^\/(?!\/)/.test(target)) {
-    const origin = base.match(/^([a-z][a-z\d+.-]*:\/\/[^/]+)/i)?.[1];
-    if (origin) return `${origin}${target}`;
-  }
-  try {
-    return new URL(target, base).toString();
-  } catch {
-    return target;
-  }
+  return resolveNativeResourceUrl(value, base);
 };
 const url = resolveWebBookUrl;
 const optionalUrl = (value: string, base: string) =>
   value ? url(value, base) : undefined;
-const optionalRuleText = (value: unknown, ruleValue: unknown) => {
+const optionalRuleText = (
+  value: unknown,
+  ruleValue: unknown,
+  isUrl = false,
+) => {
   try {
-    return sourceRuleText(value, ruleValue);
+    return sourceRuleText(value, ruleValue, isUrl);
   } catch (error) {
     if (error instanceof UnsupportedRuleError) return '';
     throw error;
@@ -93,7 +87,10 @@ export function parseSearchBooks(
   return items
     .map(item => {
       const name = sourceRuleText(item, r.name),
-        bookUrl = url(sourceRuleText(item, r.bookUrl) || baseUrl, baseUrl);
+        bookUrl = url(
+          sourceRuleText(item, r.bookUrl, true) || baseUrl,
+          baseUrl,
+        );
       const intro = optionalRuleText(item, r.intro);
       return {
         bookUrl,
@@ -103,7 +100,10 @@ export function parseSearchBooks(
         name,
         author: optionalRuleText(item, r.author),
         kind: optionalRuleText(item, r.kind) || undefined,
-        coverUrl: optionalUrl(optionalRuleText(item, r.coverUrl), baseUrl),
+        coverUrl: optionalUrl(
+          optionalRuleText(item, r.coverUrl, true),
+          baseUrl,
+        ),
         intro: intro ? readerHtmlToText(intro, baseUrl) : undefined,
         wordCount: optionalRuleText(item, r.wordCount) || undefined,
         latestChapterTitle: optionalRuleText(item, r.lastChapter) || undefined,
@@ -194,7 +194,7 @@ export async function exploreSource(
 ) {
   if (!source.enabled || !source.enabledExplore) return [];
   const response = await executeSourceRequest(
-    buildSourceRequest(source, entry.url, '', page),
+    buildSourcePageRequest(source, entry.url, page),
   );
   return parseExploreBooks(source, response.data, response.url);
 }
@@ -205,7 +205,7 @@ export async function loadBookInfo(
 ): Promise<SearchBook> {
   checkCancelled(signal);
   const response = await executeSourceRequest(
-    buildSourceRequest(source, book.bookUrl),
+    buildSourcePageRequest(source, book.bookUrl),
     15000,
     signal,
   );
@@ -229,12 +229,14 @@ export async function loadBookInfo(
     wordCount: sourceRuleText(initialized, r.wordCount) || book.wordCount,
     intro: intro ? readerHtmlToText(intro, response.url) : book.intro,
     coverUrl:
-      optionalUrl(sourceRuleText(initialized, r.coverUrl), response.url) ||
-      book.coverUrl,
+      optionalUrl(
+        sourceRuleText(initialized, r.coverUrl, true),
+        response.url,
+      ) || book.coverUrl,
     tocUrl: url(
       resolveBookInfoTocUrl(
         r.tocUrl,
-        optionalRuleText(initialized, r.tocUrl),
+        optionalRuleText(initialized, r.tocUrl, true),
         response.url,
       ) || book.bookUrl,
       response.url,
@@ -257,7 +259,7 @@ export function parseChapters(
         typeof r.chapterUrl === 'string' &&
         (r.chapterUrl.includes('@js:') || r.chapterUrl.includes('<js>'))
           ? ''
-          : sourceRuleText(item, r.chapterUrl);
+          : sourceRuleText(item, r.chapterUrl, true);
       if (
         !chapterUrl &&
         typeof r.chapterUrl === 'string' &&
@@ -303,7 +305,7 @@ export async function loadChapters(
     checkCancelled(signal);
     seenPages.add(pageUrl);
     const response = await executeSourceRequest(
-      buildSourceRequest(source, pageUrl, '', page),
+      buildSourcePageRequest(source, pageUrl, page),
       15000,
       signal,
     );
@@ -318,7 +320,7 @@ export async function loadChapters(
       seenChapters.add(key);
       chapters.push({ ...chapter, index: chapters.length });
     }
-    const next = sourceRuleText(response.data, r.nextTocUrl);
+    const next = sourceRuleText(response.data, r.nextTocUrl, true);
     pageUrl = next ? url(next, response.url) : '';
   }
   return chapters;
@@ -333,6 +335,7 @@ export async function loadChapterPayload(
     contents: string[] = [],
     subContents: string[] = [];
   let pageUrl = chapter.url;
+  let contentBaseUrl = chapter.url;
   for (
     let page = 1;
     page <= 50 && pageUrl && !seenPages.has(pageUrl);
@@ -340,7 +343,7 @@ export async function loadChapterPayload(
   ) {
     seenPages.add(pageUrl);
     const response = await executeSourceRequest(
-        buildSourceRequest(source, pageUrl, '', page),
+        buildSourcePageRequest(source, pageUrl, page),
       ),
       main =
         typeof response.data === 'string' && !String(r.content ?? '').trim()
@@ -351,16 +354,17 @@ export async function loadChapterPayload(
       sub = sourceRuleTexts(response.data, r.subContent)
         .filter(Boolean)
         .join('\n');
+    if (!contents.length) contentBaseUrl = response.url;
     if (main)
       contents.push(
-        source.bookSourceType === 4
+        source.bookSourceType === 1 || source.bookSourceType === 4
           ? main
-          : readerHtmlToText(main, response.url),
+          : formatSourceChapter(main, response.url, (await loadReaderPreferences()).adaptSpecialStyle),
       );
     if (sub) {
       if (/^https?:\/\//i.test(sub.trim())) {
         const subResponse = await executeSourceRequest(
-          buildSourceRequest(source, sub.trim()),
+          buildSourcePageRequest(source, sub.trim()),
         );
         subContents.push(
           typeof subResponse.data === 'string'
@@ -369,34 +373,31 @@ export async function loadChapterPayload(
         );
       } else subContents.push(sub);
     }
-    const next = sourceRuleText(response.data, r.nextContentUrl);
+    const next = sourceRuleText(response.data, r.nextContentUrl, true);
     pageUrl = next ? url(next, response.url) : '';
   }
   if (!contents.length)
     throw new SourceRuleError('正文为空', source.bookSourceName);
-  let content =
-    source.bookSourceType === 4
-      ? contents.join('\n').trim()
-      : contents.join('\n').trim();
+  let content = contents.join('\n');
   const replace = String(r.replaceRegex ?? '').trim();
   if (replace) {
+    content = content.split(/\r\n|\r|\n/).map(line => line.trim()).join('\n');
     if (replace.includes('@js:') || replace.includes('<js>'))
       throw new UnsupportedRuleError(
         'JavaScript 正文替换',
         source.bookSourceName,
       );
-    const parts = replace.split('##'),
-      [pattern, replacement = ''] =
-        parts[0] === '' && parts.length > 1
-          ? [parts.slice(1).join('##'), '']
-          : [parts[0], parts.slice(1).join('##')];
-    try {
-      content = content.replace(new RegExp(pattern, 'g'), replacement);
-    } catch {
-      throw new SourceRuleError('正文替换正则无效', source.bookSourceName);
-    }
+    // Native BookContent runs the complete replacement rule against the
+    // formatted source value, before adapting images/rich HTML for the reader.
+    content = unescapeSourceHtml4(sourceRuleText(content, replace));
   }
-  return { content, subContent: subContents.join('\n').trim() };
+  if (!content.trim()) throw new SourceRuleError('正文为空', source.bookSourceName);
+  return {
+    content: [1, 2, 4].includes(source.bookSourceType)
+      ? content
+      : formattedSourceToReaderContent(content, contentBaseUrl),
+    subContent: subContents.join('\n').trim(),
+  };
 }
 
 export async function loadChapterContent(

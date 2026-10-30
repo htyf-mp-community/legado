@@ -1,0 +1,13 @@
+{
+  "version": "0.0.33",
+  "bytes": 1683134,
+  "sha256": "4bfd7e90a0ca29169ba4dea487a3608e6102a10f0c4e2cbe5686d5f02f956caf",
+  "zipIntegrity": "pass",
+  "productionInputCount": 318,
+  "productionInputSha256": "8cb5ff6bb23b5208c93ecee93aedce488c81e305c9905f4e529c851b2c619db0",
+  "productionInputsUnchanged": true,
+  "licensesRetained": true,
+  "fixtureDataEmbedded": false,
+  "published": false,
+  "realHostAcceptance": "pending"
+}

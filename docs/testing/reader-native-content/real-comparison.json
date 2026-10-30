@@ -1,0 +1,45 @@
+{
+  "freshNetworkFetch": false,
+  "rawContentCommitted": false,
+  "inputUtf16Length": 7152,
+  "cases": 6,
+  "allEqual": true,
+  "outputs": [
+    {
+      "mode": 0,
+      "adapt": false,
+      "utf16Length": 7166,
+      "sha256": "8a1e2de79dfa1f2b6a22b16257aa3d8008480447b5e390ad94a7932001d609bc"
+    },
+    {
+      "mode": 0,
+      "adapt": true,
+      "utf16Length": 7166,
+      "sha256": "8a1e2de79dfa1f2b6a22b16257aa3d8008480447b5e390ad94a7932001d609bc"
+    },
+    {
+      "mode": 1,
+      "adapt": false,
+      "utf16Length": 7167,
+      "sha256": "66bdfce488a2beec4ad314800362d383f843dbc17c2407ac388fb086fa31fdc7"
+    },
+    {
+      "mode": 1,
+      "adapt": true,
+      "utf16Length": 7167,
+      "sha256": "66bdfce488a2beec4ad314800362d383f843dbc17c2407ac388fb086fa31fdc7"
+    },
+    {
+      "mode": 2,
+      "adapt": false,
+      "utf16Length": 7166,
+      "sha256": "db8c5d0783a61c57c8436d01b5758cb9a1d9b47c06332898fc2f602390886e86"
+    },
+    {
+      "mode": 2,
+      "adapt": true,
+      "utf16Length": 7166,
+      "sha256": "db8c5d0783a61c57c8436d01b5758cb9a1d9b47c06332898fc2f602390886e86"
+    }
+  ]
+}

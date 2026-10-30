@@ -1,0 +1,42 @@
+{
+  "jarSha256": "184bc394eca5a87320a1a2eb0b9e0ceb42b1295c21cd17efb4c5e6e73274bce0",
+  "wrapperSha256": "f346a544d0ec88d5537b08a1b27850de267aedeb7c1b5996826e4650da5c7a5d",
+  "cases": [
+    {
+      "chapter": 0,
+      "mode": 0,
+      "expectedBeforeTitleRemovalAndUserRules": "第一章 頭髮與發展\n頭髮與發展。\n鳳梨機車介面規則純文字檔案。\n他說。她說。\n😀甲 乙。",
+      "sha256": "0f28021751f7ffeb12ed405aba20ba91cd9e4b910e2fdedc9877471735531f8b"
+    },
+    {
+      "chapter": 0,
+      "mode": 1,
+      "expectedBeforeTitleRemovalAndUserRules": "第一章 头发与发展\n头发与发展。\n鳳梨機車介面規則純文字檔案。\n他说。她说。\n😀甲 乙。",
+      "sha256": "a09e3696e5a8444a79d07204a69ac54be95627d7a5e8f877c79943bbb8a41b7e"
+    },
+    {
+      "chapter": 0,
+      "mode": 2,
+      "expectedBeforeTitleRemovalAndUserRules": "第一章 頭髮與發展\n頭髮與發展。\n鳳梨機車介面規則純文字檔案。\n他說。她說。\n😀甲 乙。",
+      "sha256": "0f28021751f7ffeb12ed405aba20ba91cd9e4b910e2fdedc9877471735531f8b"
+    },
+    {
+      "chapter": 1,
+      "mode": 0,
+      "expectedBeforeTitleRemovalAndUserRules": "第二章 头发与发展\n这是简体正文，皇后的头发与干燥的面条。\n凤梨机车介面规则纯文字档案。\n“发型与发表。”",
+      "sha256": "85dcb5e0569b515bd5bd591487b03dab3c81dcbd1bb340c16471752d27167df6"
+    },
+    {
+      "chapter": 1,
+      "mode": 1,
+      "expectedBeforeTitleRemovalAndUserRules": "第二章 头发与发展\n这是简体正文，皇后的头发与干燥的面条。\n凤梨机车介面规则纯文字档案。\n“发型与发表。”",
+      "sha256": "85dcb5e0569b515bd5bd591487b03dab3c81dcbd1bb340c16471752d27167df6"
+    },
+    {
+      "chapter": 1,
+      "mode": 2,
+      "expectedBeforeTitleRemovalAndUserRules": "第二章 頭髮與發展\n這是簡體正文，皇后的頭髮與乾燥的麪條。\n鳳梨機車介面規則純文字檔案。\n「髮型與發表。」",
+      "sha256": "e6c731fc7b3688c474e02cf899689db0cbd4acf00d5cd4e48fe45127855d0f12"
+    }
+  ]
+}

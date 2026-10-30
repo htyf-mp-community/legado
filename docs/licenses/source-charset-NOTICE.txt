@@ -1,0 +1,18 @@
+Source charset recognition, response decoding and MediaType parsing
+
+The TypeScript default charset recognizers and sourceCharsetData.json are
+derived from Legado's source-bundled ICU4J recognizers.
+Copyright (C) 2005-2016, International Business Machines Corporation and others.
+Copyright (C) 2016 and later, Unicode, Inc. and others.
+
+The ISO-2022 state logic and frozen converter facts in sourceCharsetDecodeData.json
+use ICU 77.1. The accompanying icu-Unicode.txt contains the Unicode license and
+third-party notices distributed with that version.
+
+Source-pinned OkHttp 5.4.0 MediaType regular expressions and parameter handling:
+Copyright (C) 2013 Square, Inc.
+Licensed under the Apache License, Version 2.0. The complete Apache 2.0 text is
+included in quick-transfer-Apache-2.0.txt in this same directory.
+
+The JVM Charset comparison outputs are test evidence, not the production
+conversion tables. Test-only Java/C++ tools are never linked into the app.

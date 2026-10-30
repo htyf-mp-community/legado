@@ -1,0 +1,89 @@
+{
+  "fullGoal": "1:1还原htyf小程序",
+  "fullGoalComplete": false,
+  "status": "partial-parity",
+  "platform": "ios-only",
+  "nativeCases": 2280,
+  "nativeGetContentMethodSha256": "4bdddcd65758dbd0a6d5243c527a3beedbc32436d455dc84d8b5b60061a3dd30",
+  "sources": {
+    "processor": {
+      "path": "app/src/main/java/io/legado/app/help/book/ContentProcessor.kt",
+      "sha256": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666"
+    },
+    "contentHelp": {
+      "path": "app/src/main/java/io/legado/app/help/book/ContentHelp.kt",
+      "sha256": "3130fbf6bf4cbcba1ec6e0d8994f9fb7621334779897c80c2eca3c1302e547b0"
+    },
+    "converter": {
+      "path": "app/src/main/java/io/legado/app/utils/ChineseUtils.kt",
+      "sha256": "f346a544d0ec88d5537b08a1b27850de267aedeb7c1b5996826e4650da5c7a5d"
+    },
+    "patterns": {
+      "path": "app/src/main/java/io/legado/app/constant/AppPattern.kt",
+      "sha256": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa"
+    },
+    "layout": {
+      "path": "app/src/main/java/io/legado/app/ui/book/read/page/provider/TextChapterLayout.kt",
+      "sha256": "d73fdddb6d9b8216f17d8935a225aa63e2e5f1e1db5c5f1462c384b0b17953bf"
+    }
+  },
+  "platformAdaptations": [
+    "getContent copied unchanged into boundary-stub class",
+    "title-file cache prepopulated: duplicate removal skipped",
+    "Android8 compatibility false for iOS",
+    "timeout regex service replaced by same synchronous Matcher loop; no JS cases",
+    "ContentHelp temporary Math.random fixed to 0.5"
+  ],
+  "controlledCacheCases": 12,
+  "realCachedCases": 6,
+  "tests": {
+    "suites": 207,
+    "tests": 1027,
+    "typecheck": "pass",
+    "lint": "pass"
+  },
+  "ios": {
+    "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "firstPid": 82293,
+    "disabledStyleColdPid": 10731,
+    "restoredStyleColdPid": 47899,
+    "htmlConversionBeforeProtection": "pass",
+    "bodyRulesDoNotEnterProtectedHtml": "pass",
+    "imageRequestBefore": "/chapter/頭髮.png",
+    "imageRequestAfter": "/chapter/图片.png",
+    "disabledCachedHtmlLiteral": "pass",
+    "disabledRefetchCleanedHtml": "pass",
+    "singlePageAxValue": "0%",
+    "finalPreferences": {
+      "chineseConverterType": 0,
+      "adaptSpecialStyle": true
+    },
+    "finalColdStartPid": 70258
+  },
+  "cleanup": {
+    "book": true,
+    "source": true,
+    "ruleIds": [
+      99203901,
+      99203902,
+      99203903,
+      99203904
+    ],
+    "fixturePort": 18210,
+    "resumedFixtureExitCode": 130,
+    "web": false,
+    "mcp": false,
+    "tasks": false
+  },
+  "published": false,
+  "realHostAcceptance": "pending",
+  "pending": [
+    "complete Java/ICU Pattern and bounded Rhino/cancellation/deadlines",
+    "all error/invalidation and original global config/XML branches",
+    "legacy EPUB semantic markers and multi-page redirected bases",
+    "image options/click and rendered layout/pagination/position matrices",
+    "all annotation/search/audio/export consumers",
+    "development warning diagnosis and full visual/gesture/real-host acceptance"
+  ]
+}

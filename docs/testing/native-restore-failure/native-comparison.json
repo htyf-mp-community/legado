@@ -1,0 +1,153 @@
+{
+  "sourceRoot": "/Users/dgz/code/github/legado",
+  "sources": [
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecord.kt",
+      "sha256": "2ea5d212e5e9145f081856ee9923e0db4e0a3dfcf3654e0be997f9e290102161"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecordBook.kt",
+      "sha256": "7c3408125c9cf4fb4b35985728bbb8bd47ba3d4ee2aceabcf463ac4463b7e95e"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecordShow.kt",
+      "sha256": "89ebf2a4f5db939da6f90cb086bd78d8fe967e422a9eae7db7e57000eeca33ae"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/dao/ReadRecordDao.kt",
+      "sha256": "cf2bb39a8751238a0a6c233d5a591a4b2b9cdf32b2119f7797546434a1e5ccd5"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/GsonExtensions.kt",
+      "sha256": "b4fbe868051a2d20c4159059b56d172360ec0981b34d6d75b0ba01b20bf27eba"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+      "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+    }
+  ],
+  "gsonSha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f",
+  "restoreBlock": "it.forEach { readRecord ->\n                //判断是不是本机记录\n                if (readRecord.deviceId != androidId) {\n                    appDb.readRecordDao.insert(readRecord)\n                } else {\n                    val current = appDb.readRecordDao\n                        .getRecord(readRecord.deviceId, readRecord.bookName)\n                    if (current == null || current.readTime < readRecord.readTime) {\n                        appDb.readRecordDao.insert(readRecord)\n                    } else if (readRecord.author.isNotBlank()) {\n                        appDb.readRecordDao.insert(current.copy(author = readRecord.author))\n                    }\n                }\n            }",
+  "boundary": "Unchanged Kotlin/Gson/DAO/restore loop with in-memory row storage; no Room/Android execution. Null String failures occur before insertRaw. Each source restore iteration invokes its own @Transaction DAO.insert call.",
+  "javaVersion": "openjdk version \"17.0.18\" 2026-01-20 LTS",
+  "kotlinTestJars": [
+    {
+      "file": "kotlin-assignment-compiler-plugin-embeddable-2.2.21.jar",
+      "sha256": "26616b8e1b214d62f02d15331caff725c4e8237ce20ad14f5ccce724aa29e7cf"
+    },
+    {
+      "file": "kotlin-build-tools-impl-2.2.21.jar",
+      "sha256": "458b63ef8fc50a0a3180fe688ec1b995745992a05c495dac61e58d1088927a80"
+    },
+    {
+      "file": "kotlin-compiler-embeddable-2.2.21.jar",
+      "sha256": "9588fa696ac5507af764fd5660df6894185e12704ec1bc3f5cb772af4987f295"
+    },
+    {
+      "file": "kotlin-daemon-embeddable-2.2.21.jar",
+      "sha256": "91c0673c22e44b054ae0314d323860ebe1f3aff3f0ebc74fff82c4733dde09be"
+    },
+    {
+      "file": "kotlin-reflect-2.2.21.jar",
+      "sha256": "44380abf37d245ce5c0f294f43512d1c39a59642bfa463922c74e96877cf49f8"
+    },
+    {
+      "file": "kotlin-sam-with-receiver-compiler-plugin-2.2.21.jar",
+      "sha256": "13f2598f77063560e43fbca892df03f295ce5092a15ce37bb58c9671baa78a6b"
+    },
+    {
+      "file": "kotlin-script-runtime-2.2.21.jar",
+      "sha256": "2b1519b427b514d1536c1b425674b03fe914af637924028e9959c6625442df51"
+    },
+    {
+      "file": "kotlin-scripting-common-2.2.21.jar",
+      "sha256": "414ed91c3f5e4492b23cb9537842b4651038e25dad84107939f434c2203f2a92"
+    },
+    {
+      "file": "kotlin-scripting-compiler-embeddable-2.2.21.jar",
+      "sha256": "d934b9d0c246bc09624b7068af58ad57cef11dbe2addbc7b19d250cce42de1c9"
+    },
+    {
+      "file": "kotlin-scripting-compiler-impl-embeddable-2.2.21.jar",
+      "sha256": "788a3060c8e7997f8ae16ba5c0280d05005af0a42029f18cb10c5625b979fac3"
+    },
+    {
+      "file": "kotlin-scripting-jvm-2.2.21.jar",
+      "sha256": "83820c5fcc5d28f045f914ecd5900bbbcf8115b0d7007334de069fe6c70669e6"
+    },
+    {
+      "file": "kotlin-scripting-jvm-host-2.2.21.jar",
+      "sha256": "ef72f73d752157c9a57e2a6e173a80be5304023b25caf86bd6b5b17cc5e37ada"
+    },
+    {
+      "file": "kotlin-stdlib-2.2.21.jar",
+      "sha256": "6558a3d233da56a20934b32159f9db5f86ed5816ef098f78a2c223dc6abb79dd"
+    }
+  ],
+  "mutatingOrderEvidence": [
+    {
+      "file": "bookshelf.json",
+      "sourceOffset": 9782
+    },
+    {
+      "file": "bookmark.json",
+      "sourceOffset": 11397
+    },
+    {
+      "file": "highlight.json",
+      "sourceOffset": 11524
+    },
+    {
+      "file": "highlightRule.json",
+      "sourceOffset": 11977
+    },
+    {
+      "file": "bookGroup.json",
+      "sourceOffset": 12303
+    },
+    {
+      "file": "bookSource.json",
+      "sourceOffset": 12667
+    },
+    {
+      "file": "rssSources.json",
+      "sourceOffset": 13044
+    },
+    {
+      "file": "rssStar.json",
+      "sourceOffset": 13175
+    },
+    {
+      "file": "replaceRule.json",
+      "sourceOffset": 13299
+    },
+    {
+      "file": "sourceSub.json",
+      "sourceOffset": 13686
+    },
+    {
+      "file": "txtTocRule.json",
+      "sourceOffset": 13812
+    },
+    {
+      "file": "httpTTS.json",
+      "sourceOffset": 13945
+    },
+    {
+      "file": "dictRule.json",
+      "sourceOffset": 14069
+    },
+    {
+      "file": "keyboardAssists.json",
+      "sourceOffset": 14196
+    },
+    {
+      "file": "readRecord.json",
+      "sourceOffset": 14410
+    }
+  ],
+  "mediaRestoreOffset": 22129,
+  "autoTaskUpsertOffset": 22812,
+  "cases": 84,
+  "failures": 72
+}

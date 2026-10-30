@@ -1,0 +1,24 @@
+FAIL __tests__/sourceRule.test.ts
+  ● selects chained CSS nodes used by the real vikbook source instead of treating the final selector as an attribute
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      355 |   const response='<div id="page"><div itemscope itemtype="http://schema.org/Book"><a href="/?id=642932592530">西游记-吴承恩</a></div></div>';
+      356 |   const books=sourceRuleValues(response, '#page@div[itemscope]');
+    > 357 |   expect(books).toHaveLength(1);
+          |                 ^
+      358 |   expect(sourceRuleText(books[0], 'a.0@text')).toBe('西游记-吴承恩');
+      359 |   expect(sourceRuleText(books[0], 'a.0@href')).toBe('/?id=642932592530');
+      360 |   expect(sourceRuleValues(response, '@CSS:#page@div[itemscope]')).toHaveLength(1);
+
+      at Object.toHaveLength (__tests__/sourceRule.test.ts:357:17)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 20 passed, 21 total
+Snapshots:   0 total
+Time:        1.481 s
+Ran all test suites matching __tests__/sourceRule.test.ts.

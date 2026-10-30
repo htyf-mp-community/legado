@@ -1,0 +1,499 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/chapterTitleParity.test.ts
+
+FAIL __tests__/chapterTitleParity.test.ts
+  ● native duplicate chapter title boundary › matches every native matcher result and removal flag
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -   1
+    + Received  + 462
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "index": 1176,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1176,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01176-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1177,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1177,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01177-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1178,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1178,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01178-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1179,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1179,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01179-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1180,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1180,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01180-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1181,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1181,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01181-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1182,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1182,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01182-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1183,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1183,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01183-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1184,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1184,
+    +       "content": "第     十二     章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第     十二     章
+    + 正文",
+    +         "key": "01184-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1185,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1185,
+    +       "content": "【测试书】第     十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第     十二章
+    + 正文",
+    +         "key": "01185-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1186,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1186,
+    +       "content": "第     十二     章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第     十二     章
+    + 正文",
+    +         "key": "01186-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1187,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1187,
+    +       "content": "【测试书】第     十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第     十二章
+    + 正文",
+    +         "key": "01187-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1188,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1188,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01188-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1189,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1189,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01189-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1190,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1190,
+    +       "content": "第 十二 章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第 十二 章
+    + 正文",
+    +         "key": "01190-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1191,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1191,
+    +       "content": "【测试书】第 十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第 十二章
+    + 正文",
+    +         "key": "01191-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1192,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1192,
+    +       "content": "第　十二　章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第　十二　章
+    + 正文",
+    +         "key": "01192-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1193,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1193,
+    +       "content": "【测试书】第　十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第　十二章
+    + 正文",
+    +         "key": "01193-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1194,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1194,
+    +       "content": "第﻿十二﻿章
+    + 正文",
+    +       "displayTitle": "第 十二 章",
+    +       "expected": Object {
+    +         "content": "第﻿十二﻿章
+    + 正文",
+    +         "key": "01194-964654e2a87013c7.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二 章",
+    +     },
+    +   },
+    +   Object {
+    +     "index": 1195,
+    +     "result": Object {
+    +       "content": "正文",
+    +       "removed": true,
+    +     },
+    +     "row": Object {
+    +       "bookName": "测试书",
+    +       "chapterIndex": 1195,
+    +       "content": "【测试书】第﻿十二章
+    + 正文",
+    +       "displayTitle": "第 十二章",
+    +       "expected": Object {
+    +         "content": "【测试书】第﻿十二章
+    + 正文",
+    +         "key": "01195-87e1e949890923c1.nr",
+    +         "removed": false,
+    +       },
+    +       "replaceEnabled": true,
+    +       "skipRemoval": false,
+    +       "title": "第 十二章",
+    +     },
+    +   },
+    + ]
+
+      10 |         ? [] : [{ index, row, result }];
+      11 |     });
+    > 12 |     expect(failures).toEqual([]);
+         |                      ^
+      13 |   });
+      14 |   test('keeps a real first paragraph that only matches after deleting chapter-label characters', () => {
+      15 |     expect(removeDuplicateChapterTitle('十二\n正文', '第十二章')).toBe('十二\n正文');
+
+      at Object.toEqual (__tests__/chapterTitleParity.test.ts:12:22)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 passed, 4 total
+Snapshots:   0 total
+Time:        0.532 s, estimated 1 s
+Ran all test suites matching __tests__/chapterTitleParity.test.ts.

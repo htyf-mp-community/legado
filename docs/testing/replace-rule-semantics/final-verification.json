@@ -1,0 +1,46 @@
+{
+  "fullGoalComplete": false,
+  "productionInputsUnchanged": true,
+  "package": "package.json",
+  "workletAudit": "worklet-audit.json",
+  "qrPixelsMatchSavedUrlDistConfigAndReadme": true,
+  "originalGitStatus": [
+    "M .gitignore",
+    "?? .cursor/"
+  ],
+  "nativeDirsUnchanged": true,
+  "dependenciesUnchangedFrom0037": {
+    "package.json": "d21c755b602016dd9bf72b07bc6b14702f4e1c5c718eddf765deb15a78ac1042",
+    "package-lock.json": "8a8c75ffb48be5bfd299788e7c424696bad82864d0ddd9602d40826c51253ec8",
+    "yarn.lock": "fc291afbe3b5ced4c71cfc71a6c78b163605519f4d924a06ba09570f5730aa87"
+  },
+  "nativeReferenceSourcesUnchanged": true,
+  "diffCheck": "pass",
+  "reportLocalLinks": "pass",
+  "deletedMigrationDirectoryNotRecreated": true,
+  "tests": {
+    "suites": 206,
+    "tests": 1020,
+    "typecheck": "pass",
+    "lint": "pass"
+  },
+  "originalRecords": "preservation.json",
+  "finalColdStartPid": 36734,
+  "finalUiChecks": {
+    "shelfBooks": 9,
+    "continueBook": "西游记-吴承恩",
+    "web": false,
+    "mcp": false,
+    "tasks": false
+  },
+  "finalNonsemanticChange": "removed one blank EOF line; rebuilt bundle hash is byte-identical to the audited final-null-guard bundle",
+  "published": false,
+  "remoteConfigVersion": "0.0.34",
+  "realHostAcceptance": "pending",
+  "listenerChecks": {
+    "1122": false,
+    "1236": false,
+    "18209": false,
+    "8097": true
+  }
+}

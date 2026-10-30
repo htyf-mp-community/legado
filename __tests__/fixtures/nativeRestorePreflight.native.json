@@ -1,0 +1,4415 @@
+{
+  "metadata": {
+    "sources": [
+      {
+        "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+        "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/help/storage/BackupAES.kt",
+        "sha256": "90ce0173ca36054099eb0fd683a6c9e4e92cfe9085fc560e4ca43976d81c81ad"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/utils/MD5Utils.kt",
+        "sha256": "0024dda5817bf7500aca1991846b0d7e2f632aa584b06a6faf8b53583586520d"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/utils/GsonExtensions.kt",
+        "sha256": "b4fbe868051a2d20c4159059b56d172360ec0981b34d6d75b0ba01b20bf27eba"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/data/entities/Cookie.kt",
+        "sha256": "e6f3ac519e1929d30a40ce3f5bb1ac0220ca00687437ab45a72d8cf9825b15e9"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/data/entities/Cache.kt",
+        "sha256": "2ca9112a89b68592d34cfb1bfb5dccc57edf70494fd513cdc2c3ff03c7ac7e73"
+      }
+    ],
+    "jars": [
+      {
+        "name": "gson-2.14.0.jar",
+        "sha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f"
+      },
+      {
+        "name": "hutool-core-5.8.22.jar",
+        "sha256": "93912196a719b4c88c7f3b3e2cf0f490932d46f349061d5776ea22b4287a0fa3"
+      },
+      {
+        "name": "hutool-crypto-5.8.22.jar",
+        "sha256": "df84797bdb3dedeea68a442eed59c299b2db1f37751656cfd44af014a16a5b75"
+      }
+    ],
+    "boundary": "Unchanged strict parser functions extracted from Restore.kt; unchanged Gson extensions, Cookie/Cache entities, BackupAES and MD5Utils with pinned Gson/Hutool. Room annotations only are stubbed. No Android/Room execution.",
+    "passwords": "Only public agent-created fixture values; not user credentials."
+  },
+  "cases": [
+    {
+      "kind": "cookies",
+      "raw": "",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "cookies",
+      "raw": " ",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "null",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "{}",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "true",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "1",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "\"x\"",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[null]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[1]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[[]]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[true]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[\"x\"]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{},null]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{},]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[,]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[;]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[] trailing",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "/*c*/[]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "//c\n[]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{'key':'v_x'}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{key:\"v_x\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "﻿[]",
+      "rows": []
+    },
+    {
+      "kind": "cookies",
+      "raw": " []",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[]\u0000",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "runtime",
+      "raw": " ",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "null",
+      "error": "NullPointerException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "{}",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "true",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "1",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "\"x\"",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[null]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[1]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[[]]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[true]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[\"x\"]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{},null]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{},]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[,]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[;]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[] trailing",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "/*c*/[]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "//c\n[]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{'key':'v_x'}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{key:\"v_x\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "﻿[]",
+      "rows": []
+    },
+    {
+      "kind": "runtime",
+      "raw": " []",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[]\u0000",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":null,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":null,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"\",\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"\",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\" \",\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\" \",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\" \",\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\" \",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"﻿\",\"cookie\":\"sid=fixture\"}]",
+      "rows": [
+        {
+          "url": "﻿",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"﻿\",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "﻿",
+          "cookie": "sid=fixture"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"甲\",\"cookie\":\"sid=fixture\"}]",
+      "rows": [
+        {
+          "url": "甲",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"甲\",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "甲",
+          "cookie": "sid=fixture"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":true,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":true,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":false,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":false,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":0,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":0,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":-0,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":-0,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":1,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":1,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":-1,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":-1,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":1.0,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":1.0,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":1e3,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":1e3,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":1.25,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":1.25,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":9223372036854775807,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":9223372036854775807,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":9223372036854775808,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":9223372036854775808,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":9007199254740993,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":9007199254740993,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":1e300,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":1e300,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":NaN,\"cookie\":\"sid=fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":NaN,\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"1\",\"cookie\":\"sid=fixture\"}]",
+      "rows": [
+        {
+          "url": "1",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"1\",\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "1",
+          "cookie": "sid=fixture"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":{},\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":{},\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":[],\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":[],\"cookie\":\"sid=fixture\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":null}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":null},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": ""
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\"\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": ""
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\" \"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": " "
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\" \"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": " "
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\" \"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": " "
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\" \"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": " "
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"﻿\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "﻿"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\"﻿\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": "﻿"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"甲\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "甲"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\"甲\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": "甲"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":true}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":true},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":false}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":false},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":0},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":-0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":-0},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":1}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":1},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":-1}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":-1},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":1.0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":1.0},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":1e3}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":1e3},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":1.25}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":1.25},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":9223372036854775807}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":9223372036854775807},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":9223372036854775808}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":9223372036854775808},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":9007199254740993}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":9007199254740993},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":1e300}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":1e300},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":NaN}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":NaN},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"1\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "1"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":\"1\"},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "rows": [
+        {
+          "url": "first.invalid",
+          "cookie": "first=fixture"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": "1"
+        },
+        {
+          "url": "later.invalid",
+          "cookie": "last=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":{}}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":{}},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":[]}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"first.invalid\",\"cookie\":\"first=fixture\"},{\"url\":\"fixture.invalid\",\"cookie\":[]},{\"url\":\"later.invalid\",\"cookie\":\"last=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":null,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":null,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"\",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"\",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\" \",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\" \",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\" \",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\" \",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"﻿\",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"﻿\",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"甲\",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"甲\",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":true,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":true,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":false,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":false,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":0,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":0,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":-0,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":-0,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":1,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":1,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":-1,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":-1,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":1.0,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":1.0,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":1e3,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":1e3,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":1.25,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":1.25,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":9223372036854775807,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":9223372036854775807,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":9223372036854775808,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":9223372036854775808,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":9007199254740993,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":9007199254740993,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":1e300,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":1e300,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":NaN,\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":NaN,\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"1\",\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"1\",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":{},\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":{},\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":[],\"value\":\"fixture\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":[],\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": null,
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\" \",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": " ",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\" \",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": " ",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\" \",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": " ",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\" \",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": " ",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"﻿\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "﻿",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"﻿\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "﻿",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"甲\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "甲",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"甲\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "甲",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":true,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":true,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":false,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":false,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":0,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":0,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":-0,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":-0,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":1,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":1,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":-1,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":-1,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":1.0,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":1.0,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":1e3,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":1e3,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":1.25,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":1.25,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":9223372036854775807,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":9223372036854775807,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":9223372036854775808,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":9223372036854775808,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":9007199254740993,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":9007199254740993,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":1e300,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":1e300,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":NaN,\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":NaN,\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"1\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "1",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"1\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "1",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":{},\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":{},\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":[],\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":[],\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":null}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":null},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"\"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\" \"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\" \"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\" \"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\" \"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"﻿\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"﻿\"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"甲\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"甲\"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":true}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":true},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":false}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":false},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":-0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":-0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "0"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "1"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "1"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":-1}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":-1},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1.0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1.0},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1e3}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1e3},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1.25}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1.25},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9223372036854775807}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "9223372036854775807"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9223372036854775807},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "9223372036854775807"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9223372036854775808}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9223372036854775808},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9007199254740993}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "9007199254740993"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":9007199254740993},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_first",
+          "value": "first",
+          "deadline": "0"
+        },
+        {
+          "key": "v_fixture",
+          "value": "fixture",
+          "deadline": "9007199254740993"
+        },
+        {
+          "key": "v_later",
+          "value": "later",
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1e300}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":1e300},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":NaN}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":NaN},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"1\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":\"1\"},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":{}}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":{}},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":[]}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_first\",\"value\":\"first\",\"deadline\":0},{\"key\":\"v_fixture\",\"value\":\"fixture\",\"deadline\":[]},{\"key\":\"v_later\",\"value\":\"later\",\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"v_\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"userInfo_\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"loginHeader_\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"sourceVariable_\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"infoMap_\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"v_x\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "v_x",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"userInfo_x\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "userInfo_x",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"loginHeader_x\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "loginHeader_x",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"sourceVariable_x\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "sourceVariable_x",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"infoMap_x\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "infoMap_x",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"v_ \", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "v_ ",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"V_x\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"ordinary\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"__proto__\", \"value\": null, \"deadline\": 0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\": \"v_\\u0000\", \"value\": null, \"deadline\": 0}]",
+      "rows": [
+        {
+          "key": "v_\u0000",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[]",
+      "rows": []
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"value\":\"old\",\"deadline\":0},{\"key\":\"v_b\",\"value\":null,\"deadline\":1},{\"key\":\"v_a\",\"value\":\"new\",\"deadline\":2}]",
+      "rows": [
+        {
+          "key": "v_a",
+          "value": "new",
+          "deadline": "2"
+        },
+        {
+          "key": "v_b",
+          "value": null,
+          "deadline": "1"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"ordinary\",\"key\":\"v_a\",\"value\":null,\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_a",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"key\":\"ordinary\",\"value\":null,\"deadline\":0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"value\":null,\"deadline\":1.0,\"deadline\":2}]",
+      "rows": [
+        {
+          "key": "v_a",
+          "value": null,
+          "deadline": "2"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"value\":null,\"deadline\":2,\"deadline\":1.0}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"value\":null,\"deadline\":-0}]",
+      "rows": [
+        {
+          "key": "v_a",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_a\",\"value\":null,\"deadline\":0,\"extra\":1e300}]",
+      "rows": [
+        {
+          "key": "v_a",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[]",
+      "rows": []
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=one\"},{\"url\":\"fixture.invalid\",\"cookie\":\"sid=two\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "sid=one"
+        },
+        {
+          "url": "fixture.invalid",
+          "cookie": "sid=two"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":null,\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"url\":null,\"cookie\":\"sid=fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\",\"extra\":1e300}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "﻿[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "sid=fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\u0000b\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u0000\", \"cookie\": \"fixture\"}]",
+      "rows": [
+        {
+          "url": "\u0000",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\u0001b\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u0001\", \"cookie\": \"fixture\"}]",
+      "rows": [
+        {
+          "url": "\u0001",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\tb\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\t\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\nb\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\n\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\rb\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\r\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a\u001fb\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u001f\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"ab\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "ab"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u007f\", \"cookie\": \"fixture\"}]",
+      "rows": [
+        {
+          "url": "",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"ab\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "ab"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u0085\", \"cookie\": \"fixture\"}]",
+      "rows": [
+        {
+          "url": "",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a b\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "a b"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u2028\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a b\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "a b"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u2029\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a﻿b\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "a﻿b"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\ufeff\", \"cookie\": \"fixture\"}]",
+      "rows": [
+        {
+          "url": "﻿",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"a b\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "a b"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\": \"\\u00a0\", \"cookie\": \"fixture\"}]",
+      "error": "IllegalArgumentException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"fixture\"}]\n",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"fixture\"}]/*c*/",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "﻿[{\"url\":\"fixture.invalid\",\"cookie\":\"fixture\"}]",
+      "rows": [
+        {
+          "url": "fixture.invalid",
+          "cookie": "fixture"
+        }
+      ]
+    },
+    {
+      "kind": "cookies",
+      "raw": ")]}'\n[{\"url\":\"fixture.invalid\",\"cookie\":\"fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\"=\"fixture.invalid\",\"cookie\"=\"fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\";\"cookie\":\"fixture\"}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{'url':'fixture.invalid','cookie':'fixture'}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "cookies",
+      "raw": "[{\"url\":\"fixture.invalid\",\"cookie\":\"fixture\"},]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]\n",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]/*c*/",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "﻿[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "rows": [
+        {
+          "key": "v_fixture",
+          "value": null,
+          "deadline": "0"
+        }
+      ]
+    },
+    {
+      "kind": "runtime",
+      "raw": ")]}'\n[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\"=\"v_fixture\",\"value\"=null,\"deadline\"=0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\";\"value\":null;\"deadline\":0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{'key':'v_fixture','value':null,'deadline':0}]",
+      "error": "JsonSyntaxException"
+    },
+    {
+      "kind": "runtime",
+      "raw": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0},]",
+      "error": "JsonSyntaxException"
+    }
+  ],
+  "envelopes": [
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "6c5eacc63e450846f1172875589602ad",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "6C5EACC63E450846F1172875589602AD",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6sx\nj5FCE\nbxFyh\n1WJYC\nrQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6!sxj!5FC!Ebx!Fyh!1WJ!YCr!Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": " 6c5eacc63e450846f1172875589602ad ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "bF6sxj5FCEbxFyh1WJYCrQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "f1d605f8dc86d3b67c55b5a74c06ad273d8d60b7e1e4b7ff8b7a5c21692f1c3527afa4cbf1b484b9b489aa36ddd52c77defac71d47ca4279185e24476ffb9892",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "F1D605F8DC86D3B67C55B5A74C06AD273D8D60B7E1E4B7FF8B7A5C21692F1C3527AFA4CBF1B484B9B489AA36DDD52C77DEFAC71D47CA4279185E24476FFB9892",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF-NyG07Z8VbWnTAatJz2NYLfh5Lf_i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb_uYkg==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+\nNyG07\nZ8VbW\nnTAat\nJz2NY\nLfh5L\nf/i3p\ncIWkv\nHDUnr\n6TL8b\nSEubS\nJqjbd\n1Sx33\nvrHHU\nfKQnk\nYXiRH\nb/uYk\ng==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dY!F+N!yG0!7Z8!VbW!nTA!atJ!z2N!YLf!h5L!f/i!3pc!IWk!vHD!Unr!6TL!8bS!Eub!SJq!jbd!1Sx!33v!rHH!UfK!Qnk!YXi!RHb!/uY!kg=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": " f1d605f8dc86d3b67c55b5a74c06ad273d8d60b7e1e4b7ff8b7a5c21692f1c3527afa4cbf1b484b9b489aa36ddd52c77defac71d47ca4279185e24476ffb9892 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "8dYF+NyG07Z8VbWnTAatJz2NYLfh5Lf/i3pcIWkvHDUnr6TL8bSEubSJqjbd1Sx33vrHHUfKQnkYXiRHb/uYkg",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/Lq",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "7097fb30d04f13c5d0001161ebcb796b6a9386528ca553be889cfe3c0313a40ebd30a9c128d30f3e33db1c47f467f2ea",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "7097FB30D04F13C5D0001161EBCB796B6A9386528CA553BE889CFE3C0313A40EBD30A9C128D30F3E33DB1C47F467F2EA",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/Lq",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO-iJz-PAMTpA69MKnBKNMPPjPbHEf0Z_Lq",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7M\nNBPE8\nXQABF\nh68t5\na2qTh\nlKMpV\nO+iJz\n+PAMT\npA69M\nKnBKN\nMPPjP\nbHEf0\nZ/Lq",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf!7MN!BPE!8XQ!ABF!h68!t5a!2qT!hlK!MpV!O+i!Jz+!PAM!TpA!69M!KnB!KNM!PPj!PbH!Ef0!Z/L!q",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": " 7097fb30d04f13c5d0001161ebcb796b6a9386528ca553be889cfe3c0313a40ebd30a9c128d30f3e33db1c47f467f2ea ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/Lq!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/Lq=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/LqAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "cJf7MNBPE8XQABFh68t5a2qThlKMpVO+iJz+PAMTpA69MKnBKNMPPjPbHEf0Z/",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "aa6263d98a4f9f04b1f131633f0e39e0",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "AA6263D98A4F9F04B1F131633F0E39E0",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2\nYpPnw\nSx8TF\njPw45\n4A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJ!j2Y!pPn!wSx!8TF!jPw!454!A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": " aa6263d98a4f9f04b1f131633f0e39e0 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": "qmJj2YpPnwSx8TFjPw454A",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "28ae1ee141ebb8cd8d534127235cb5c5",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "28AE1EE141EBB8CD8D534127235CB5C5",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4\nUHruM\n2NU0E\nnI1y1\nxQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4!e4U!Hru!M2N!U0E!nI1!y1x!Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " 28ae1ee141ebb8cd8d534127235cb5c5 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "KK4e4UHruM2NU0EnI1y1xQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "ed4bfc55f15a27a9a237f4a44b869d77fa6ad9c20db1ecd11246793991faf07c1b8c77da44aebc5cd4e3d7801f18e40092720b774d59ff135c2b51487fec9d6a",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "ED4BFC55F15A27A9A237F4A44B869D77FA6AD9C20DB1ECD11246793991FAF07C1B8C77DA44AEBC5CD4E3D7801F18E40092720B774D59FF135C2B51487FEC9D6A",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN_SkS4add_pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z_xNcK1FIf-ydag==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8V\nfFaJ6\nmiN/S\nkS4ad\nd/pq2\ncINse\nzREkZ\n5OZH6\n8Hwbj\nHfaRK\n68XNT\nj14Af\nGOQAk\nnILd0\n1Z/xN\ncK1FI\nf+yda\ng==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv!8Vf!FaJ!6mi!N/S!kS4!add!/pq!2cI!Nse!zRE!kZ5!OZH!68H!wbj!Hfa!RK6!8XN!Tj1!4Af!GOQ!Akn!ILd!01Z!/xN!cK1!FIf!+yd!ag=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " ed4bfc55f15a27a9a237f4a44b869d77fa6ad9c20db1ecd11246793991faf07c1b8c77da44aebc5cd4e3d7801f18e40092720b774d59ff135c2b51487fec9d6a ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "7Uv8VfFaJ6miN/SkS4add/pq2cINsezREkZ5OZH68HwbjHfaRK68XNTj14AfGOQAknILd01Z/xNcK1FIf+ydag",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohB",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "b2e55877cb964a76ff0e320e9929d12a1100b696aa0e11ae866ed9b33b6367521c7eb1da69a26caabbe1db6f082e8841",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "B2E55877CB964A76FF0E320E9929D12A1100B696AA0E11AE866ED9B33B6367521C7EB1DA69A26CAABBE1DB6F082E8841",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohB",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb_DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohB",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd\n8uWSn\nb/DjI\nOmSnR\nKhEAt\npaqDh\nGuhm7\nZsztj\nZ1Icf\nrHaaa\nJsqrv\nh228I\nLohB",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suV!Yd8!uWS!nb/!DjI!OmS!nRK!hEA!tpa!qDh!Guh!m7Z!szt!jZ1!Icf!rHa!aaJ!sqr!vh2!28I!Loh!B",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " b2e55877cb964a76ff0e320e9929d12a1100b696aa0e11ae866ed9b33b6367521c7eb1da69a26caabbe1db6f082e8841 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohB!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohB=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILohBAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "suVYd8uWSnb/DjIOmSnRKhEAtpaqDhGuhm7ZsztjZ1IcfrHaaaJsqrvh228ILo",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "fb4d5e6aa67686d558649747ec92e29a",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "FB4D5E6AA67686D558649747EC92E29A",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "-01eaqZ2htVYZJdH7JLimg==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01ea\nqZ2ht\nVYZJd\nH7JLi\nmg==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01!eaq!Z2h!tVY!ZJd!H7J!Lim!g==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " fb4d5e6aa67686d558649747ec92e29a ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "+01eaqZ2htVYZJdH7JLimg",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "9676b0198806b1b652830a3193dd82d5",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "9676B0198806B1B652830A3193DD82D5",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawG\nYgGsb\nZSgwo\nxk92C\n1Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lna!wGY!gGs!bZS!gwo!xk9!2C1!Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " 9676b0198806b1b652830a3193dd82d5 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "lnawGYgGsbZSgwoxk92C1Q",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "26057fa0c0999947b517aa1b3db892feb7283cc2dfe709b814b3d5698a880db639afd5320a2f43400ac8988dd2a02da9dc75bb541e347d2fb80809a8d43db81d",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "26057FA0C0999947B517AA1B3DB892FEB7283CC2DFE709B814B3D5698A880DB639AFD5320A2F43400AC8988DD2A02DA9DC75BB541E347D2FB80809A8D43DB81D",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV_oMCZmUe1F6obPbiS_rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS-4CAmo1D24HQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/o\nMCZmU\ne1F6o\nbPbiS\n/rcoP\nMLf5w\nm4FLP\nVaYqI\nDbY5r\n9UyCi\n9DQAr\nImI3S\noC2p3\nHW7VB\n40fS+\n4CAmo\n1D24H\nQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV!/oM!CZm!Ue1!F6o!bPb!iS/!rco!PML!f5w!m4F!LPV!aYq!IDb!Y5r!9Uy!Ci9!DQA!rIm!I3S!oC2!p3H!W7V!B40!fS+!4CA!mo1!D24!HQ=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " 26057fa0c0999947b517aa1b3db892feb7283cc2dfe709b814b3d5698a880db639afd5320a2f43400ac8988dd2a02da9dc75bb541e347d2fb80809a8d43db81d ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "JgV/oMCZmUe1F6obPbiS/rcoPMLf5wm4FLPVaYqIDbY5r9UyCi9DQArImI3SoC2p3HW7VB40fS+4CAmo1D24HQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGU",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "2e597ccf1fddce008e115e28b6ed793ff0746620345f2fd14b2059e47a9489d920a1f47b0fa21237035f8ea3cbee4194",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "2E597CCF1FDDCE008E115E28B6ED793FF0746620345F2FD14B2059E47A9489D920A1F47B0FA21237035F8EA3CBEE4194",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGU",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx_dzgCOEV4otu15P_B0ZiA0Xy_RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGU",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8z\nx/dzg\nCOEV4\notu15\nP/B0Z\niA0Xy\n/RSyB\nZ5HqU\nidkgo\nfR7D6\nISNwN\nfjqPL\n7kGU",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll!8zx!/dz!gCO!EV4!otu!15P!/B0!ZiA!0Xy!/RS!yBZ!5Hq!Uid!kgo!fR7!D6I!SNw!Nfj!qPL!7kG!U",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " 2e597ccf1fddce008e115e28b6ed793ff0746620345f2fd14b2059e47a9489d920a1f47b0fa21237035f8ea3cbee4194 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGU!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGU=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7kGUAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "Lll8zx/dzgCOEV4otu15P/B0ZiA0Xy/RSyBZ5HqUidkgofR7D6ISNwNfjqPL7k",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "22466dc9987badb377e114c36c73d084",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "22466DC9987BADB377E114C36C73D084",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZty\nZh7rb\nN34RT\nDbHPQ\nhA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZ!tyZ!h7r!bN3!4RT!DbH!PQh!A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": " 22466dc9987badb377e114c36c73d084 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": "IkZtyZh7rbN34RTDbHPQhA",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "0ad26ccf973a35fb5bac44f2917ec83f",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "0AD26CCF973A35FB5BAC44F2917EC83F",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz\n5c6Nf\ntbrET\nykX7I\nPw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJ!sz5!c6N!ftb!rET!ykX!7IP!w==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " 0ad26ccf973a35fb5bac44f2917ec83f ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "CtJsz5c6NftbrETykX7IPw",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "10dd739c0d9068d9e9abb2a54fa1bce2695a5274d03122e8a71b3511a5126d36bf837d9a3adbde20b7e7752473225bd8d0f9eb274a79f56b656ab79717203839",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "10DD739C0D9068D9E9ABB2A54FA1BCE2695A5274D03122E8A71B3511A5126D36BF837D9A3ADBDE20B7E7752473225BD8D0F9EB274A79F56B656AB79717203839",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa_g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1zn\nA2QaN\nnpq7K\nlT6G8\n4mlaU\nnTQMS\nLopxs\n1EaUS\nbTa/g\n32aOt\nveILf\nndSRz\nIlvY0\nPnrJ0\np59Wt\nlareX\nFyA4O\nQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1!znA!2Qa!Nnp!q7K!lT6!G84!mla!UnT!QMS!Lop!xs1!EaU!SbT!a/g!32a!Otv!eIL!fnd!SRz!Ilv!Y0P!nrJ!0p5!9Wt!lar!eXF!yA4!OQ=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " 10dd739c0d9068d9e9abb2a54fa1bce2695a5274d03122e8a71b3511a5126d36bf837d9a3adbde20b7e7752473225bd8d0f9eb274a79f56b656ab79717203839 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "EN1znA2QaNnpq7KlT6G84mlaUnTQMSLopxs1EaUSbTa/g32aOtveILfndSRzIlvY0PnrJ0p59WtlareXFyA4OQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5NIh",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "dcceae147eccdad5f88c3a720e6c93a4a0855cb8f940e27f68f81c5bb47e9a9afe225e805aa9e0f7c5387ef1e4e4d221",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "DCCEAE147ECCDAD5F88C3A720E6C93A4A0855CB8F940E27F68F81C5BB47E9A9AFE225E805AA9E0F7C5387EF1E4E4D221",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5NIh",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ_aPgcW7R-mpr-Il6AWqng98U4fvHk5NIh",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uF\nH7M2t\nX4jDp\nyDmyT\npKCFX\nLj5QO\nJ/aPg\ncW7R+\nmpr+I\nl6AWq\nng98U\n4fvHk\n5NIh",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6!uFH!7M2!tX4!jDp!yDm!yTp!KCF!XLj!5QO!J/a!Pgc!W7R!+mp!r+I!l6A!Wqn!g98!U4f!vHk!5NI!h",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " dcceae147eccdad5f88c3a720e6c93a4a0855cb8f940e27f68f81c5bb47e9a9afe225e805aa9e0f7c5387ef1e4e4d221 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5NIh!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5NIh=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5NIhAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "3M6uFH7M2tX4jDpyDmyTpKCFXLj5QOJ/aPgcW7R+mpr+Il6AWqng98U4fvHk5N",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "2bdcc6ac4260243daf17217359bb426b",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "2BDCC6AC4260243DAF17217359BB426B",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGr\nEJgJD\n2vFyF\nzWbtC\naw==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9z!GrE!JgJ!D2v!FyF!zWb!tCa!w==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " 2bdcc6ac4260243daf17217359bb426b ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "K9zGrEJgJD2vFyFzWbtCaw",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture-password",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture-password",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "de96e0e9411eb15b2518d4db8dea57cd",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "DE96E0E9411EB15B2518D4DB8DEA57CD",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6\nUEesV\nslGNT\nbjepX\nzQ==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pb!g6U!Ees!Vsl!GNT!bje!pXz!Q==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " de96e0e9411eb15b2518d4db8dea57cd ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "3pbg6UEesVslGNTbjepXzQ",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ba0e7f194fa12f0f581c5df597f84dfe2a808447d71fa03f1fbbb215f49173e6ff93152c4db5119a9bf4abdbbfeacf7015227a18a80bb3e8934b1229b0f90985",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "BA0E7F194FA12F0F581C5DF597F84DFE2A808447D71FA03F1FBBB215F49173E6FF93152C4DB5119A9BF4ABDBBFEACF7015227A18A80BB3E8934B1229B0F90985",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5_GU-hLw9YHF31l_hN_iqAhEfXH6A_H7uyFfSRc-b_kxUsTbURmpv0q9u_6s9wFSJ6GKgLs-iTSxIpsPkJhQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/G\nU+hLw\n9YHF3\n1l/hN\n/iqAh\nEfXH6\nA/H7u\nyFfSR\nc+b/k\nxUsTb\nURmpv\n0q9u/\n6s9wF\nSJ6GK\ngLs+i\nTSxIp\nsPkJh\nQ==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5!/GU!+hL!w9Y!HF3!1l/!hN/!iqA!hEf!XH6!A/H!7uy!FfS!Rc+!b/k!xUs!TbU!Rmp!v0q!9u/!6s9!wFS!J6G!KgL!s+i!TSx!Ips!PkJ!hQ=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " ba0e7f194fa12f0f581c5df597f84dfe2a808447d71fa03f1fbbb215f49173e6ff93152c4db5119a9bf4abdbbfeacf7015227a18a80bb3e8934b1229b0f90985 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "ug5/GU+hLw9YHF31l/hN/iqAhEfXH6A/H7uyFfSRc+b/kxUsTbURmpv0q9u/6s9wFSJ6GKgLs+iTSxIpsPkJhQ",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2N",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "c7894e6176c9b9d30a7ff483754b0ff60e279a39459979fb091f66af18387629e85e0b1a2868925b61cd88ca5ddecd8d",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "C7894E6176C9B9D30A7FF483754B0FF60E279A39459979FB091F66AF18387629E85E0B1A2868925B61CD88CA5DDECD8D",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2N",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf_SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2N",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOY\nXbJud\nMKf/S\nDdUsP\n9g4nm\njlFmX\nn7CR9\nmrxg4\ndinoX\ngsaKG\niSW2H\nNiMpd\n3s2N",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4l!OYX!bJu!dMK!f/S!DdU!sP9!g4n!mjl!FmX!n7C!R9m!rxg!4di!noX!gsa!KGi!SW2!HNi!Mpd!3s2!N",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " c7894e6176c9b9d30a7ff483754b0ff60e279a39459979fb091f66af18387629e85e0b1a2868925b61cd88ca5ddecd8d ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2N!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2N=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s2NAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "x4lOYXbJudMKf/SDdUsP9g4nmjlFmXn7CR9mrxg4dinoXgsaKGiSW2HNiMpd3s",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "5fa1222d503daaa3c6441e1b60da9cd7",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "5FA1222D503DAAA3C6441E1B60DA9CD7",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiL\nVA9qq\nPGRB4\nbYNqc\n1w==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6E!iLV!A9q!qPG!RB4!bYN!qc1!w==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " 5fa1222d503daaa3c6441e1b60da9cd7 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "X6EiLVA9qqPGRB4bYNqc1w",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": " 密码 ",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": " 密码 ",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "a77515494df08734506f4b4da92d7b93",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "A77515494DF08734506F4B4DA92D7B93",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVS\nU3whz\nRQb0t\nNqS17\nkw==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3U!VSU!3wh!zRQ!b0t!NqS!17k!w==",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " a77515494df08734506f4b4da92d7b93 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw==!",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw===",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "p3UVSU3whzRQb0tNqS17kw",
+      "plaintext": "[]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "e36b564bdc82d3f5841e039c359718db843b31fddefd671dae4d61aa30f52430b1c08bab9b6f57c250f6742993719ebb113b58a0f306b006c58abb9d439a1c23",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "E36B564BDC82D3F5841E039C359718DB843B31FDDEFD671DAE4D61AA30F52430B1C08BAB9B6F57C250F6742993719EBB113B58A0F306B006C58ABB9D439A1C23",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0_WEHgOcNZcY24Q7Mf3e_Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS\n9yC0/\nWEHgO\ncNZcY\n24Q7M\nf3e/W\ncdrk1\nhqjD1\nJDCxw\nIurm2\n9XwlD\n2dCmT\ncZ67E\nTtYoP\nMGsAb\nFirud\nQ5ocI\nw==",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42t!WS9!yC0!/WE!HgO!cNZ!cY2!4Q7!Mf3!e/W!cdr!k1h!qjD!1JD!Cxw!Iur!m29!Xwl!D2d!CmT!cZ6!7ET!tYo!PMG!sAb!Fir!udQ!5oc!Iw=!=",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " e36b564bdc82d3f5841e039c359718db843b31fddefd671dae4d61aa30f52430b1c08bab9b6f57c250f6742993719ebb113b58a0f306b006c58abb9d439a1c23 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw==!",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw===",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "42tWS9yC0/WEHgOcNZcY24Q7Mf3e/Wcdrk1hqjD1JDCxwIurm29XwlD2dCmTcZ67ETtYoPMGsAbFirudQ5ocIw",
+      "plaintext": "[{\"url\":\"fixture.invalid\",\"cookie\":\"sid=fixture\"}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1WrUy",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "fb0d7bef2b86255ebda3225e3d16576948f159042234e6edf3fd908fc82151ececf722c3152d6207874047e7f55ab532",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "FB0D7BEF2B86255EBDA3225E3D16576948F159042234E6EDF3FD908FC82151ECECF722C3152D6207874047E7F55AB532",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1WrUy",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "-w177yuGJV69oyJePRZXaUjxWQQiNObt8_2Qj8ghUezs9yLDFS1iB4dAR-f1WrUy",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177\nyuGJV\n69oyJ\nePRZX\naUjxW\nQQiNO\nbt8/2\nQj8gh\nUezs9\nyLDFS\n1iB4d\nAR+f1\nWrUy",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w1!77y!uGJ!V69!oyJ!ePR!ZXa!Ujx!WQQ!iNO!bt8!/2Q!j8g!hUe!zs9!yLD!FS1!iB4!dAR!+f1!WrU!y",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " fb0d7bef2b86255ebda3225e3d16576948f159042234e6edf3fd908fc82151ececf722c3152d6207874047e7f55ab532 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1WrUy!",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1WrUy=",
+      "plaintext": "[{\"key\":\"v_fixture\",\"value\":null,\"deadline\":0}]",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1WrUyAAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "+w177yuGJV69oyJePRZXaUjxWQQiNObt8/2Qj8ghUezs9yLDFS1iB4dAR+f1Wr",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "f4dc9b39333745549f430989912706c4",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "F4DC9B39333745549F430989912706C4",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybO\nTM3RV\nSfQwm\nJkScG\nxA==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9Ny!bOT!M3R!VSf!Qwm!JkS!cGx!A==",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " f4dc9b39333745549f430989912706c4 ",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA==!",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA===",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA==AAAA",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "9NybOTM3RVSfQwmJkScGxA",
+      "plaintext": "甲😀\u0000﻿",
+      "accepted": true
+    },
+    {
+      "password": "fixture😀",
+      "encoded": "{}",
+      "plaintext": null,
+      "accepted": false
+    },
+    {
+      "password": "fixture😀",
+      "encoded": " ",
+      "plaintext": "",
+      "accepted": true
+    }
+  ]
+}

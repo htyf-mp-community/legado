@@ -1,0 +1,77 @@
+{
+  "method": "normal UI download/confirm/ZIP export",
+  "stages": {
+    "before": {
+      "bookshelf.manage.delete-original.v1": {
+        "type": "boolean",
+        "value": false
+      },
+      "book-source.batch-delay-seconds.v1": {
+        "type": "string",
+        "value": ""
+      },
+      "bookshelf.sort.v1": {
+        "type": "string",
+        "value": ""
+      }
+    },
+    "typed": {
+      "bookshelf.manage.delete-original.v1": {
+        "type": "boolean",
+        "value": true
+      },
+      "book-source.batch-delay-seconds.v1": {
+        "type": "number",
+        "value": 7
+      },
+      "bookshelf.sort.v1": {
+        "type": "number",
+        "value": 4
+      }
+    },
+    "changed": {
+      "bookshelf.manage.delete-original.v1": {
+        "type": "boolean",
+        "value": false
+      },
+      "book-source.batch-delay-seconds.v1": {
+        "type": "number",
+        "value": 2
+      },
+      "bookshelf.sort.v1": {
+        "type": "number",
+        "value": 1
+      }
+    },
+    "restored": {
+      "bookshelf.manage.delete-original.v1": {
+        "type": "boolean",
+        "value": true
+      },
+      "book-source.batch-delay-seconds.v1": {
+        "type": "number",
+        "value": 7
+      },
+      "bookshelf.sort.v1": {
+        "type": "number",
+        "value": 4
+      }
+    },
+    "after": {
+      "bookshelf.manage.delete-original.v1": {
+        "type": "boolean",
+        "value": false
+      },
+      "book-source.batch-delay-seconds.v1": {
+        "type": "string",
+        "value": ""
+      },
+      "bookshelf.sort.v1": {
+        "type": "string",
+        "value": ""
+      }
+    }
+  },
+  "exportedSubsetRestoredExactly": true,
+  "fullBackupsRemainPrivate": true
+}

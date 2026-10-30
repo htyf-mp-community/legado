@@ -1,22 +1,32 @@
-import type { ReplaceRule } from '../types';
+import type { Book, ReplaceRule } from '../types';
 import { appStorage } from './storage';
+import { sqliteLike } from '../core/sqliteLike';
+import { replaceJavaGroups } from '../core/javaReplacement';
+import { compileSourceRegex } from '../core/sourceRegex';
 
 const KEY = 'replace.rules.v1';
+
+/** Native replacement scopes identify books by name and source origin, not the HTYF library ID. */
+export function replacementContextForBook(book: Pick<Book, 'name' | 'origin'>) {
+  return { name: book.name, origin: !book.origin || book.origin === 'local' ? 'loc_book' : book.origin };
+}
 const text = (value: unknown) =>
   typeof value === 'string' ? value.trim() : '';
+const rawText = (value: unknown) => typeof value === 'string' ? value : '';
+const nullableText = (value: unknown) => typeof value === 'string' ? value : undefined;
 
 export function normalizeReplaceRule(
   value: Record<string, unknown>,
   fallbackId = Date.now(),
 ): ReplaceRule {
-  const currentPattern = text(value.pattern);
-  const legacy = !currentPattern && !!text(value.regex);
-  const pattern = currentPattern || text(value.regex);
+  const currentPattern = rawText(value.pattern);
+  const legacy = !currentPattern && !!rawText(value.regex);
+  const pattern = currentPattern || rawText(value.regex);
   if (!pattern) throw new Error('替换规则缺少匹配内容');
   const isRegex = legacy ? value.isRegex === true : value.isRegex !== false;
   if (isRegex) {
     try {
-      new RegExp(pattern, 'gu');
+      compileSourceRegex(pattern, 'u');
     } catch {
       throw new Error(`正则表达式无效: ${pattern}`);
     }
@@ -29,8 +39,8 @@ export function normalizeReplaceRule(
     group: text(value.group) || undefined,
     pattern,
     replacement: typeof value.replacement === 'string' ? value.replacement : '',
-    scope: text(value.scope) || text(value.useTo) || undefined,
-    excludeScope: text(value.excludeScope) || undefined,
+    scope: legacy ? nullableText(value.useTo) : nullableText(value.scope),
+    excludeScope: nullableText(value.excludeScope),
     scopeTitle: value.scopeTitle === true,
     scopeSource: value.scopeSource === true,
     scopeContent: value.scopeContent !== false,
@@ -97,11 +107,12 @@ export function exportReplaceRules(rules: ReplaceRule[]) {
 }
 
 function applies(rule: ReplaceRule, name: string, origin: string) {
-  const scope = rule.scope ?? '';
-  const excluded = rule.excludeScope ?? '';
+  const scope = rule.scope;
+  const excluded = rule.excludeScope;
+  const matches = (value: string) => sqliteLike(value, `%${name}%`) || sqliteLike(value, `%${origin}%`);
   return (
-    (!scope || scope.includes(name) || scope.includes(origin)) &&
-    (!excluded || (!excluded.includes(name) && !excluded.includes(origin)))
+    (scope == null || scope === '' || matches(scope)) &&
+    (excluded == null || !matches(excluded))
   );
 }
 const applicableRules = (
@@ -122,17 +133,35 @@ const applicableRules = (
     )
     .sort((a, b) => a.order - b.order);
 
-function replaceOnce(input: string, rule: ReplaceRule) {
+export type ReplaceRuleIssue = {
+  rule: ReplaceRule;
+  code: 'invalid-pattern' | 'invalid-replacement' | 'unsupported-script';
+  message: string;
+};
+
+function replaceOnce(input: string, rule: ReplaceRule, target: 'title' | 'content' | 'source') {
+  let code: ReplaceRuleIssue['code'] = 'invalid-pattern';
   try {
-    return rule.isRegex
-      ? input.replace(new RegExp(rule.pattern, 'gu'), rule.replacement)
-      : input.split(rule.pattern).join(rule.replacement);
-  } catch {
-    return input;
+    let result: string;
+    if (rule.isRegex) {
+      const expression = compileSourceRegex(rule.pattern, 'u');
+      code = 'invalid-replacement';
+      if (rule.replacement.startsWith('@js:') && expression.test(input)) {
+        code = 'unsupported-script';
+        throw new Error('当前宿主尚未提供可中断的替换脚本执行环境');
+      }
+      expression.lastIndex = 0;
+      result = replaceJavaGroups(input, expression, rule.replacement);
+    } else result = input.split(rule.pattern).join(rule.replacement);
+    // BookChapter keeps the previous display title if an individual rule blanks it.
+    const blank = !/[^\t\n\x0B\f\r\x1C-\x20\p{Zs}\u2028\u2029]/u.test(result);
+    return { value: target === 'title' && blank ? input : result };
+  } catch (error) {
+    return { value: input, issue: { rule, code, message: error instanceof Error ? error.message : String(error) } };
   }
 }
 
-export function effectiveReplaceRuleHits(
+export function runReplaceRules(
   input: string,
   rules: ReplaceRule[],
   target: 'title' | 'content' | 'source',
@@ -140,12 +169,21 @@ export function effectiveReplaceRuleHits(
 ) {
   let value = input;
   const hits: ReplaceRule[] = [];
+  const issues: ReplaceRuleIssue[] = [];
   applicableRules(rules, target, context).forEach(rule => {
-    const next = replaceOnce(value, rule);
-    if (next !== value) hits.push(rule);
-    value = next;
+    if (!rule.pattern) return;
+    const next = replaceOnce(value, rule, target);
+    if (next.issue) issues.push(next.issue);
+    if (next.value !== value) hits.push(rule);
+    value = next.value;
   });
-  return hits;
+  return { value, hits, issues };
+}
+
+export function effectiveReplaceRuleHits(
+  ...args: Parameters<typeof runReplaceRules>
+) {
+  return runReplaceRules(...args).hits;
 }
 
 export function applyReplaceRules(
@@ -154,5 +192,5 @@ export function applyReplaceRules(
   target: 'title' | 'content' | 'source',
   context: { name: string; origin: string },
 ) {
-  return applicableRules(rules, target, context).reduce(replaceOnce, input);
+  return runReplaceRules(input, rules, target, context).value;
 }

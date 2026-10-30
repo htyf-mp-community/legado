@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-29",
+  "scope": "Native duplicate-title matching and per-chapter retention; full 1:1 goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "reference": {
+    "sources": {
+      "help/book/ContentProcessor.kt": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666",
+      "help/book/BookHelp.kt": "88f0bb07076e5b99d023610e85a130f0ce07f3a0a4269d3afeb155df1b942ba3",
+      "utils/StringExtensions.kt": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51",
+      "constant/AppPattern.kt": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa",
+      "data/entities/BookChapter.kt": "270974eef0f026143327534963ff06fa0a4621c0ecbf95b5fd9fc57665c99434",
+      "utils/MD5Utils.kt": "0024dda5817bf7500aca1991846b0d7e2f632aa584b06a6faf8b53583586520d"
+    },
+    "caseCount": 1203,
+    "removedCases": 695,
+    "contentAndFlagMatch": true,
+    "nrIdentityMatch": true,
+    "isolation": "unchanged matcher/escapeRegex/constants plus copied ContentProcessor call statements; explicit display title, JDK MD5 and native filename format"
+  },
+  "regressions": {
+    "falsePositiveChapterNumber": "red then green",
+    "bookNamePunctuationPrefix": "red then green",
+    "javaAsciiWhitespace": "38 added native cases; red then green"
+  },
+  "realCachedTitleComparison": {
+    "source": "📂阅读书屋",
+    "chapterIndex": 3,
+    "title": "第二回 悟彻菩提真妙理断魔归本合元神第4页",
+    "bookName": "西游记-吴承恩",
+    "replaceEnabled": false,
+    "skipRemoval": false,
+    "nativeRemoved": false,
+    "targetRemoved": false,
+    "equal": true,
+    "inputUtf16Units": 7152,
+    "outputUtf16Units": 7152,
+    "inputSha256": "e0c3d612dddc79586893f87db14b0723e790c76a43805cf01e6835daa3d8dd27",
+    "nativeSha256": "e0c3d612dddc79586893f87db14b0723e790c76a43805cf01e6835daa3d8dd27",
+    "targetSha256": "e0c3d612dddc79586893f87db14b0723e790c76a43805cf01e6835daa3d8dd27",
+    "snapshotStored": "temporary directory only"
+  },
+  "ios": {
+    "controlledSource": {
+      "searchCount": 1,
+      "tocCount": 2,
+      "defaultRemoval": true,
+      "defaultSwitch": true,
+      "defaultScreenshot": "default-removed.png",
+      "retentionSwitch": false,
+      "retentionKey": "00000-c09d060914483afb.nr",
+      "retentionScreenshot": "kept-title.png",
+      "coldRetention": {
+        "pid": 52016,
+        "pass": true,
+        "switch": false,
+        "screenshot": "cold-kept-title.png"
+      },
+      "reEnabled": true,
+      "finalExclusionKeys": [],
+      "rawCacheUnchanged": true,
+      "noMatch": {
+        "chapterTitle": "第十二章",
+        "firstBodyParagraph": "十二",
+        "switchAfterAttempt": false,
+        "messageObservedInAccessibilityTree": "未找到可移除的重复标题",
+        "bodyScreenshot": "no-match-body.png",
+        "messagePixelEvidence": false
+      },
+      "requestCounts": {
+        "/fixture.json": 1,
+        "/search": 1,
+        "/book": 1,
+        "/toc": 1,
+        "/chapter/1": 2,
+        "/chapter/2": 1,
+        "/__state": 1
+      }
+    },
+    "finalColdStart": {
+      "pid": 95894,
+      "shelfCount": 9,
+      "result": "pass"
+    },
+    "realSourceLiveDebug": {
+      "source": "📂阅读书屋",
+      "originalRulesUnmodified": true,
+      "query": "西游记",
+      "searchCount": 1,
+      "info": "pass; unknown author remains",
+      "tocCount": 105,
+      "firstNonVolumeContentChars": 119,
+      "contentKind": "front matter, not long chapter re-fetch",
+      "screenshot": "real-source-debug.png"
+    },
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68"
+      }
+    },
+    "preservationHashEncoding": "SHA-256 of UTF-8 compact JSON, sorted record keys and sorted records by id/source URL",
+    "temporaryBookRemoved": true,
+    "temporarySourcesRemoved": 1,
+    "fixtureServiceStopped": true,
+    "fixtureExitCode": 143,
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "finalScreen": "书架",
+    "limitations": [
+      "Full controlled UI sequence preceded final ASCII-only narrowing; final code rerun through native corpus and real-source cold-start debug",
+      "CUA lost app accessibility subtree after no-match while screenshot remained normal; cold launch restored tool control",
+      "Development hot reload native Web-listener lifecycle issue remains unresolved"
+    ]
+  },
+  "verification": {
+    "suites": 202,
+    "tests": 998,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "dependenciesAndLocksUnchangedThisIteration": true,
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass",
+    "finalVerification": "final-verification.json"
+  },
+  "package": {
+    "version": "0.0.35",
+    "bytes": 1683907,
+    "sha256": "c5ca20873fc08a8f52ef85876e72d99ee14e7fa8fab375cee62c3880531ecfb7",
+    "zipIntegrity": "pass",
+    "productionInputCount": 320,
+    "productionInputSha256": "f7716f603c0616be6d96ff76575f45cd6f10044e457375a95263c75a4cf3f226",
+    "productionInputsUnchanged": true,
+    "licensesRetained": true,
+    "fixtureDataEmbedded": false,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "workletAudit": {
+    "compiledArrayClosures": 460,
+    "unexpectedClosureAssignments": 0,
+    "libraryJestHelpers": [
+      "w.__closure={...original.__closure}",
+      "fn.__closure={}"
+    ],
+    "syntaxErrors": 0
+  },
+  "remoteAvailability": {
+    "checkedAt": "2026-10-29T09:00:27.620933+00:00",
+    "localVersion": "0.0.35",
+    "qrPixelsMatchConfig": true,
+    "config": {
+      "status": 200,
+      "version": "0.0.34"
+    },
+    "package": {
+      "status": 200
+    }
+  },
+  "remainingGaps": [
+    "Legacy backup filesystem .nr import; target currently stores logical identities in existing MMKV Book data",
+    "Complete ContentProcessor conversion/resegmentation/replacement ordering and invalidation",
+    "Unicode/locale edge matrices and complete Java regex grammar",
+    "Intro/EPUB/rich-media/image-request-option rendering",
+    "Physical gestures, full application visual/behavior inventory",
+    "General JS sandbox and real HTYF host/device acceptance"
+  ]
+}

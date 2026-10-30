@@ -313,3 +313,34 @@ test('retains native reading cursor separately from progress and requires a comp
   expect(book.progress).toBeCloseTo(5 / 12);
   expect(book.progress).toBeLessThanOrEqual(1);
 });
+
+test('imports native device/title read records without inventing shelf IDs or rounding Long counters', () => {
+  const preview = convertLegacyBackup(
+    {
+      'readRecord.json':
+        '[{"deviceId":"other","bookName":" Same ","author":" A ","readTime":9007199254740993,"lastRead":9223372036854775807},{"bookName":"legacy"}]',
+    },
+    123,
+  );
+  expect(preview.importedFiles).toEqual(['readRecord.json']);
+  const rows = JSON.parse(
+    preview.payload.entries['reading.records.v1'].value as string,
+  );
+  expect(rows).toEqual([
+    {
+      deviceId: 'other',
+      bookName: ' Same ',
+      author: ' A ',
+      readTime: '9007199254740993',
+      lastRead: '9223372036854775807',
+    },
+    {
+      deviceId: '',
+      bookName: 'legacy',
+      author: '',
+      readTime: 0,
+      lastRead: expect.any(Number),
+    },
+  ]);
+  expect(preview.warnings).toEqual([]);
+});

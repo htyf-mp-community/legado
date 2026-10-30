@@ -1,0 +1,14 @@
+{
+  "productionInputCount": 346,
+  "productionInputsUnchanged": true,
+  "archiveSha256": "95bb8517ecbc2f00dbb5a89dcd82f1794c91c4e0abb66db7631ecc760ceffeee",
+  "archiveMatchesPackage": true,
+  "dependencyHashesUnchangedFrom043": true,
+  "nativeProjectChanges": false,
+  "originalRepositoryStatusUnchanged": true,
+  "removedMigrationDirectoryStillAbsent": true,
+  "normalUiExportOnly": true,
+  "privateExportsExcludedFromRepo": true,
+  "cleanupPendingExplicitConsent": true,
+  "allNewReportLinksExist": true
+}

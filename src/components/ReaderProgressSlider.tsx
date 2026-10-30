@@ -25,7 +25,7 @@ export function ReaderProgressSlider({
       accessible
       accessibilityRole="adjustable"
       accessibilityLabel={label}
-      accessibilityValue={{ min: 0, max, now: value }}
+      accessibilityValue={{ min: 0, max, now: value, ...(max === 0 ? { text: '0%' } : {}) }}
       accessibilityState={{ disabled }}
       accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
       onAccessibilityAction={event => {

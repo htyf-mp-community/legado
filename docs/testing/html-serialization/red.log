@@ -1,0 +1,82 @@
+FAIL __tests__/htmlSerialization.test.ts
+  ● serializes the selected collection as one outer-HTML result
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 2
+    Received array:  ["<b>A</b>", "<b>B</b>"]
+
+      4 |   const html = '<main><div class="item"><b>A</b></div><div class="item"><b>B</b></div></main>';
+      5 |   const result = sourceRuleTexts(html, '.item@html');
+    > 6 |   expect(result).toHaveLength(1);
+        |                  ^
+      7 |   expect(result[0]).toContain('<div class="item">');
+      8 |   expect(result[0]).toContain('</div>\n<div class="item">');
+      9 | });
+
+      at Object.toHaveLength (__tests__/htmlSerialization.test.ts:6:18)
+
+  ● html removes descendant script/style nodes in the original selected DOM, while all retains them
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "<div>"
+    Received string:    "<script>secret()</script><style>.x{color:red}</style><p>Body</p>"
+
+      13 |   expect(sourceRuleText(html, 'div@all')).toContain('<script>secret()</script>');
+      14 |   const root = sourceRuleValues(html, 'section')[0];
+    > 15 |   expect(sourceRuleText(root, 'div@html')).toContain('<div>');
+         |                                            ^
+      16 |   expect(sourceRuleText(root, 'div@all')).not.toMatch(/script|style|secret/);
+      17 |   expect(sourceRuleValues(root, 'script')).toHaveLength(0);
+      18 | });
+
+      at Object.toContain (__tests__/htmlSerialization.test.ts:15:44)
+
+  ● keeps native attribute and entity serialization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "<p data-value=\"a&amp;&quot;<\" hidden>A&nbsp;&amp;&lt;&gt;😀</p>"
+    Received: "<p data-value=\"a&amp;&quot;&lt;\" hidden=\"hidden\">A&#xa0;&amp;&lt;&gt;&#x1f600;</p>"
+
+      20 | test('keeps native attribute and entity serialization', () => {
+      21 |   const html = '<p data-value="a&amp;&quot;&lt;" hidden="hidden">A&nbsp;&amp;&lt;&gt;😀</p>';
+    > 22 |   expect(sourceRuleText(html, 'p@all')).toBe('<p data-value="a&amp;&quot;<" hidden>A&nbsp;&amp;&lt;&gt;😀</p>');
+         |                                         ^
+      23 | });
+      24 |
+      25 | test('formats native block/text boundaries with one-space indentation', () => {
+
+      at Object.toBe (__tests__/htmlSerialization.test.ts:22:41)
+
+  ● formats native block/text boundaries with one-space indentation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 6
+    + Received  + 1
+
+    - <div id="x">
+    -  Hello<br>
+    -  World
+    -  <p>A</p>
+    -  <p>B</p>
+    + Hello<br>World<p>A</p><p>B</p>
+    - </div>
+
+      24 |
+      25 | test('formats native block/text boundaries with one-space indentation', () => {
+    > 26 |   expect(sourceRuleText('<div id="x">Hello<br>World<p>A</p><p>B</p></div>', '#x@html')).toBe('<div id="x">\n Hello<br>\n World\n <p>A</p>\n <p>B</p>\n</div>');
+         |                                                                                         ^
+      27 | });
+      28 |
+
+      at Object.toBe (__tests__/htmlSerialization.test.ts:26:89)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 4 total
+Snapshots:   0 total
+Time:        0.553 s
+Ran all test suites matching __tests__/htmlSerialization.test.ts.

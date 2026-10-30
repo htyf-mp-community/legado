@@ -66,6 +66,7 @@ export function switchLibraryBookSource(
     'imageStyle',
     'removeDuplicateTitle',
     'removeDuplicateTitleChapterIds',
+    'keepDuplicateTitleKeys',
     'manualReplaceRuleIds',
     'useReplaceRules',
     'reverseToc',

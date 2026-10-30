@@ -3,13 +3,13 @@ import {
   displayTextOffset,
 } from '../src/core/readerPosition';
 import { paginateText, paginateTextRanges } from '../src/core/pagination';
-test('uses actual trimmed page ranges instead of page index times capacity', () => {
+test('uses actual page ranges including indentation instead of page index times capacity', () => {
   const text = '  abc\n def\n';
   expect(paginateTextRanges(text, 5)).toEqual([
-    { text: 'abc', start: 2, end: 5 },
-    { text: 'def', start: 7, end: 10 },
+    { text: '  abc', start: 0, end: 5 },
+    { text: ' def', start: 6, end: 10 },
   ]);
-  expect(paginateText(text, 5)).toEqual(['abc', 'def']);
+  expect(paginateText(text, 5)).toEqual(['  abc', ' def']);
 });
 test('special page breaks retain offsets in the original chapter text', () => {
   expect(paginateTextRanges('a\n[newpage]\nb', 100, true)).toEqual([

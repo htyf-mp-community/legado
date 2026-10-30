@@ -1,0 +1,12 @@
+{
+  "books": {
+    "count": 9,
+    "fullRecordsEqual": true,
+    "sha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f"
+  },
+  "sources": {
+    "count": 8,
+    "fullRecordsEqual": true,
+    "sha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68"
+  }
+}

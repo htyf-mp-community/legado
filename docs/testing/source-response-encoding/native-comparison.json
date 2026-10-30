@@ -1,0 +1,71 @@
+{
+  "sources": [
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetDetector.java",
+      "sha256": "98988942b54f8fc841e440e821b126b2cb4afc32808cc3d1a6872add4e7de226"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetMatch.java",
+      "sha256": "e24dacc5ee1b53df9f9fa42ae11c651f31a96cdbe555fb90253568fda0c98635"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecog_2022.java",
+      "sha256": "4cc3a7641da6dfbb3f177fa35f2c89021109fcd03bd0eeec32afc23022017631"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecog_UTF8.java",
+      "sha256": "52adb7b42afd02f4884b0ef725f0691012225bb923cdf1cee3bf8047263d707d"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecog_Unicode.java",
+      "sha256": "2337825722cc44471fdcb7b1192c4245d368272fda5241fbcaadef31320c95dc"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecog_mbcs.java",
+      "sha256": "aa9d209807f092d2fda3044d432538d4f0d3a50dc7aabaecf1a26b84316199a5"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecog_sbcs.java",
+      "sha256": "02e613b3fcb62e5a61ad42519ab6698a7479664834a920b7e9bc2e30fcaa7f2e"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/lib/icu4j/CharsetRecognizer.java",
+      "sha256": "e0d5d65501b92a7a56352034989603da2be08fd6c4b34275b957fb3e9a2a4e38"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/EncodingDetect.kt",
+      "sha256": "b5ed529ce2a288f8d527b3778b892e63eff1e03f2b7c3b54a62e417047832ea1"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/Utf8BomUtils.kt",
+      "sha256": "8884cbb57c7e760856b666c9e6d3bd9a9ad6d41dedac0a0a103ceb304fb7b60f"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/ByteArrayExtensions.kt",
+      "sha256": "8a0a809269d6e56075c118f28d4b962cd74a0694425010503cc757b220674e7b"
+    }
+  ],
+  "tablesSha256": "c25e8d8d49dac3caea83cec1016a0be4b2db5e53fe4cbc3335ef927bbe4315a5",
+  "decoderTablesSha256": "256a9af1bb985e39120630e6e23bac6e43b26a28ed718c53cb95e9e941cca1bf",
+  "jsoupVersion": "1.16.2",
+  "jsoupSha256": "a73a1eb5d02b51490547c46485e30f4f14e68af3624840b57abe8c4580a00b83",
+  "javaVersion": "openjdk version \"17.0.18\" 2026-01-20 LTS\nOpenJDK Runtime Environment Zulu17.64+17-CA (build 17.0.18+8-LTS)\nOpenJDK 64-Bit Server VM Zulu17.64+17-CA (build 17.0.18+8-LTS, mixed mode, sharing)\n",
+  "icuVersion": "ICU 77.1",
+  "icuReplacement": "Java CharsetDecoder U+FFFD callback",
+  "icuSourceSha256": "25f77bee2f008e4430f8bc0162f470d73648364f63e714e42021e6ec6f1218b8",
+  "mediaTypeSourceSha256": "60a3cd4bf933069135c383294874c11995a51fe99a84a82582b893b0b4f2f337",
+  "okhttpVersion": "5.4.0",
+  "adaptations": [
+    "Android file-descriptor APIs are throwing boundary stubs; byte-array methods unchanged",
+    "Unchanged source-pinned OkHttp MediaType parser; ICU support/decoding provided by the separate ICU 77.1 reference",
+    "JVM decoding digests are diagnostic only; source Android uses ICU and no Android runtime is tested",
+    "Frozen ICU 77.1 converter profile; other OS ICU versions remain an acceptance boundary"
+  ],
+  "caseCount": 3398,
+  "candidateRecords": 18737,
+  "detectionAndHtmlAllEqual": true,
+  "icuProfileDecodeAllEqual": true,
+  "headerParserAllEqual": true,
+  "jvmDecodeDifferences": 1746,
+  "corpusSha256": "4dbec37c648928ab094f144b9debb6818abad538717a37176356e234c5777413"
+}

@@ -1,0 +1,69 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent __tests__/replaceRuleCompatibility.test.ts
+
+FAIL __tests__/replaceRuleCompatibility.test.ts
+  ● retains literal spaces and distinguishes empty exclusions from null
+
+    替换规则缺少匹配内容
+
+      18 |   const legacy = !currentPattern && !!text(value.regex);
+      19 |   const pattern = currentPattern || text(value.regex);
+    > 20 |   if (!pattern) throw new Error('替换规则缺少匹配内容');
+         |                       ^
+      21 |   const isRegex = legacy ? value.isRegex === true : value.isRegex !== false;
+      22 |   if (isRegex) {
+      23 |     try {
+
+      at normalizeReplaceRule (src/data/replaceRules.ts:20:23)
+      at normalizeReplaceRule (src/data/replaceRules.ts:71:12)
+          at Array.map (<anonymous>)
+      at map (src/data/replaceRules.ts:68:15)
+      at rule (__tests__/replaceRuleCompatibility.test.ts:6:72)
+      at Object.rule (__tests__/replaceRuleCompatibility.test.ts:11:10)
+
+  ● uses native SQL LIKE semantics for ASCII case, wildcard book names and source scope
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "<甲/甲0>"
+    Received: "甲"
+
+      14 |
+      15 | test('uses native SQL LIKE semantics for ASCII case, wildcard book names and source scope', () => {
+    > 16 |   expect(applyReplaceRules('甲', [rule({ scope: 'https://example.com/' })], 'content', context)).toBe('<甲/甲0>');
+         |                                                                                                 ^
+      17 |   expect(applyReplaceRules('甲', [rule({ scope: 'prefix IOS😀abc suffix' })], 'content', context)).toBe('<甲/甲0>');
+      18 |   expect(applyReplaceRules('甲', [rule({ scope: 'other', excludeScope: context.origin, scopeSource: true })], 'source', context)).toBe('<甲/甲0>');
+      19 | });
+
+      at Object.toBe (__tests__/replaceRuleCompatibility.test.ts:16:97)
+
+  ● uses Matcher replacement syntax and continues after an invalid per-rule replacement
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "$1/甲"
+    Received: "\\甲/$0"
+
+      21 | test('uses Matcher replacement syntax and continues after an invalid per-rule replacement', () => {
+      22 |   const rules = [rule({ replacement: '$&' }), rule({ id: 2, replacement: '\\$1/$0', order: 1 })];
+    > 23 |   expect(applyReplaceRules('甲', rules, 'content', context)).toBe('$1/甲');
+         |                                                             ^
+      24 | });
+      25 |
+
+      at Object.toBe (__tests__/replaceRuleCompatibility.test.ts:23:61)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.544 s

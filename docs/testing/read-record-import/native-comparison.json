@@ -1,0 +1,24 @@
+{
+  "sourceRoot": "/Users/dgz/code/github/legado",
+  "sources": [
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecord.kt",
+      "sha256": "2ea5d212e5e9145f081856ee9923e0db4e0a3dfcf3654e0be997f9e290102161"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/GsonExtensions.kt",
+      "sha256": "b4fbe868051a2d20c4159059b56d172360ec0981b34d6d75b0ba01b20bf27eba"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+      "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+    }
+  ],
+  "gsonVersion": "2.14.0",
+  "gsonSha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f",
+  "clock": "Constructor defaults observed within before/after System.currentTimeMillis and encoded as @now",
+  "boundary": "Unchanged Gson.fromJsonArray(InputStream), entities and Gson adapters. No Room/native execution; nullable decoded fields can fail later during native insertion.",
+  "cases": 769,
+  "decoded": 607,
+  "rejected": 162
+}

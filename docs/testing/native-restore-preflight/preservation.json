@@ -1,0 +1,27 @@
+{
+  "entries": 27,
+  "all27EntriesExactlyUnchanged": true,
+  "normalUiZipExportsOnly": true,
+  "noMmkvFileRead": true,
+  "beforeEquals046Final": true,
+  "priorCleanupPending": true,
+  "generatedExportZipsRetained": 0,
+  "core": {
+    "library.v1": {
+      "count": 10,
+      "sha256": "28fa16c723121e43b17851952371350b4ef196752e40325b91b4042d6c26cade"
+    },
+    "sources.v1": {
+      "count": 9,
+      "sha256": "eb22d998d37874e13d1c7ff74f9f8d6977a0c45ab8e415e535dfc6c88b6ecc3d"
+    },
+    "replace.rules.v1": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "reading.records.v1": {
+      "count": 16,
+      "sha256": "f1675ac7ea545ffab68c4b9dea0b7b80320807581af3001df5c3a36396fe4815"
+    }
+  }
+}

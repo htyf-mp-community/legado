@@ -1,0 +1,53 @@
+{
+  "strictParserCases": 349,
+  "accepted": 77,
+  "rejected": 272,
+  "envelopeCases": 336,
+  "decryptAccepted": 258,
+  "allMatched": true,
+  "sourceMetadata": {
+    "sources": [
+      {
+        "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+        "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/help/storage/BackupAES.kt",
+        "sha256": "90ce0173ca36054099eb0fd683a6c9e4e92cfe9085fc560e4ca43976d81c81ad"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/utils/MD5Utils.kt",
+        "sha256": "0024dda5817bf7500aca1991846b0d7e2f632aa584b06a6faf8b53583586520d"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/utils/GsonExtensions.kt",
+        "sha256": "b4fbe868051a2d20c4159059b56d172360ec0981b34d6d75b0ba01b20bf27eba"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/data/entities/Cookie.kt",
+        "sha256": "e6f3ac519e1929d30a40ce3f5bb1ac0220ca00687437ab45a72d8cf9825b15e9"
+      },
+      {
+        "path": "app/src/main/java/io/legado/app/data/entities/Cache.kt",
+        "sha256": "2ca9112a89b68592d34cfb1bfb5dccc57edf70494fd513cdc2c3ff03c7ac7e73"
+      }
+    ],
+    "jars": [
+      {
+        "name": "gson-2.14.0.jar",
+        "sha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f"
+      },
+      {
+        "name": "hutool-core-5.8.22.jar",
+        "sha256": "93912196a719b4c88c7f3b3e2cf0f490932d46f349061d5776ea22b4287a0fa3"
+      },
+      {
+        "name": "hutool-crypto-5.8.22.jar",
+        "sha256": "df84797bdb3dedeea68a442eed59c299b2db1f37751656cfd44af014a16a5b75"
+      }
+    ],
+    "boundary": "Unchanged strict parser functions extracted from Restore.kt; unchanged Gson extensions, Cookie/Cache entities, BackupAES and MD5Utils with pinned Gson/Hutool. Room annotations only are stubbed. No Android/Room execution.",
+    "passwords": "Only public agent-created fixture values; not user credentials."
+  },
+  "jvm": "openjdk version \"17.0.18\" 2026-01-20 LTS\nOpenJDK Runtime Environment Zulu17.64+17-CA (build 17.0.18+8-LTS)\nOpenJDK 64-Bit Server VM Zulu17.64+17-CA (build 17.0.18+8-LTS, mixed mode, sharing)"
+}

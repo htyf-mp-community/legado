@@ -1,0 +1,51 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/sourceUrlRuntime.test.ts
+
+FAIL __tests__/sourceUrlRuntime.test.ts
+  ● builds the actual iOS spaced search URL without embedding an absolute URL in its path
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "http://127.0.0.1:18212/search?q=iOS%20%E6%90%9C%E7%B4%A2%E9%AA%8C%E6%94%B6"
+    Received: "http://127.0.0.1:18212/http://127.0.0.1:18212/search?q=iOS 搜索验收"
+
+      12 | test('builds the actual iOS spaced search URL without embedding an absolute URL in its path', () => {
+      13 |   expect(buildSourceRequest(source, `${source.bookSourceUrl}/search?q={{key}}`, 'iOS 搜索验收').url)
+    > 14 |     .toBe('http://127.0.0.1:18212/search?q=iOS%20%E6%90%9C%E7%B4%A2%E9%AA%8C%E6%94%B6');
+         |      ^
+      15 | });
+      16 |
+      17 | test('resolves relative book links against the response directory in the native runtime', () => {
+
+      at Object.toBe (__tests__/sourceUrlRuntime.test.ts:14:6)
+
+  ● resolves relative book links against the response directory in the native runtime
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "http://127.0.0.1:18212/book/1"
+    Received: "http://127.0.0.1:18212/dir/search?q=x/../book/1"
+
+      17 | test('resolves relative book links against the response directory in the native runtime', () => {
+      18 |   expect(resolveWebBookUrl('../book/1', 'http://127.0.0.1:18212/dir/search?q=x'))
+    > 19 |     .toBe('http://127.0.0.1:18212/book/1');
+         |      ^
+      20 | });
+      21 |
+
+      at Object.toBe (__tests__/sourceUrlRuntime.test.ts:19:6)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        1.399 s
+Ran all test suites matching __tests__/sourceUrlRuntime.test.ts.

@@ -20,9 +20,10 @@ test('rich HTML is rendered in-tree with dynamic height and link handoff', () =>
   expect(reader).toContain('specialHtmlPageHeight={Math.max(');
 });
 
-test('reader applies the persisted special-style preference before replacement', () => {
-  expect(reader).toContain('applyReaderSpecialStylePreference(');
-  expect(reader).toContain('protectReaderHtmlMarkers(');
+test('reader decodes cache before processing and adapts HTML after native paragraph formatting', () => {
+  expect(reader).toContain('decodeReaderContent(chapter.content,');
+  expect(reader).toContain('protectNativeReaderHtml(');
+  expect(reader).toContain('renderNativeReaderContent(formatReaderParagraphs(');
   expect(reader).toContain('protectedReplaceContent.restore(');
   expect(reader).toContain('prefs.adaptSpecialStyle,');
 });

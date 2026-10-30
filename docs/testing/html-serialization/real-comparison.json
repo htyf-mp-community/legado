@@ -1,0 +1,15 @@
+{
+  "nativeItems": 1,
+  "targetItems": 1,
+  "nativeChars": 9281,
+  "targetChars": 9281,
+  "nativeSha256": "d6fdf81c855eafdcc3e859849c09383830788af17b3d23de63ffa6e84ac526ba",
+  "targetSha256": "d6fdf81c855eafdcc3e859849c09383830788af17b3d23de63ffa6e84ac526ba",
+  "equal": true,
+  "url": "https://www.vikbook.com/?id=642932592530&display=fulltext&p=3",
+  "inputBytes": 59052,
+  "inputSha256": "74740b4bf27281d22339b6dbe4aa8f22a8c0d6e5c114f136768f9f17767bf9f7",
+  "rule": ".calibre@html",
+  "hashEncoding": "SHA-256 of UTF-8 JSON.stringify(resultStringArray)",
+  "snapshotStored": "temporary directory only"
+}

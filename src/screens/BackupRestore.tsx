@@ -5,6 +5,7 @@ import {
 } from '../core/remoteBackupArchive';
 import { useBackupPreview } from '../hooks/useBackupPreview';
 import { restoreBackupPreview } from '../core/restoreBackupPreview';
+import { LegacyRestoreError } from '../data/legacyRestore';
 import {
   loadRestoreIgnore,
   saveRestoreIgnore,
@@ -41,6 +42,7 @@ import {
   type RemoteBackupEntry,
 } from '../data/remoteBackup';
 import { inspectLegacyBackupArchive } from '../core/legacyBackupArchive';
+import { loadLocalPassword } from '../data/localPassword';
 import { inspectBackupArchive, saveBackupArchive } from '../core/backupArchive';
 import { useAppTheme } from '../theme/AppTheme';
 import {
@@ -108,7 +110,7 @@ export function BackupRestore({
   const [backupPreferences, setBackupPreferences] = useState(
     loadBackupPreferences,
   );
-  const [legacyPassword, setLegacyPassword] = useState('');
+  const [legacyPassword, setLegacyPassword] = useState(loadLocalPassword);
   const [running, setRunning] = useState('');
   const [remoteError, setRemoteError] = useState('');
   const [remoteBackups, setRemoteBackups] = useState<
@@ -154,10 +156,22 @@ export function BackupRestore({
       await onRestored();
       void jssdk.showToast({ type: 'success', title: t('restoreComplete') });
     } catch (error) {
+      let description = error instanceof Error ? error.message : String(error);
+      if (error instanceof LegacyRestoreError && error.committedKeys.length) {
+        const [refreshed] = await Promise.allSettled([
+          Promise.resolve().then(async () => {
+            setBackupPreferences(loadBackupPreferences());
+            setWebDav(loadWebDavConfig());
+            await onRestored();
+          }),
+        ]);
+        if (refreshed.status === 'rejected')
+          description += `\n${String(refreshed.reason)}`;
+      }
       void jssdk.showToast({
         type: 'error',
-        title: t('restoreFailed'),
-        description: error instanceof Error ? error.message : String(error),
+        title: t(current.legacyFiles ? 'nativeRestoreFailed' : 'restoreFailed'),
+        description,
       });
     } finally {
       restoringRef.current = false;

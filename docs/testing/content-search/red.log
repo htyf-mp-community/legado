@@ -1,0 +1,70 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent __tests__/contentSearch.test.ts
+
+FAIL __tests__/contentSearch.test.ts
+  ● book content search › uses native case-sensitive literal search
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 3
+    Received array:  [{"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 2, "excerpt": "Aa aa AA", "match": "Aa", "start": 0}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 5, "excerpt": "Aa aa AA", "match": "aa", "start": 3}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 8, "excerpt": "Aa aa AA", "match": "AA", "start": 6}]
+
+      19 |     expect(
+      20 |       searchChapters([{ id: 'x', title: 'x', content: 'Aa aa AA' }], 'aa'),
+    > 21 |     ).toHaveLength(1));
+         |       ^
+      22 |   test('does not truncate a book at 100 results', () => {
+      23 |     expect(searchChapters([{ id: 'x', title: 'x', content: '甲'.repeat(125) }], '甲')).toHaveLength(125);
+      24 |   });
+
+      at Object.toHaveLength (__tests__/contentSearch.test.ts:21:7)
+
+  ● book content search › does not truncate a book at 100 results
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 125
+    Received length: 100
+    Received array:  [{"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 1, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 0}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 2, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 1}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 3, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 2}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 4, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 3}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 5, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 4}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 6, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 5}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 7, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 6}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 8, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 7}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 9, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 8}, {"chapterId": "x", "chapterIndex": 0, "chapterTitle": "x", "end": 10, "excerpt": "甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲…", "match": "甲", "start": 9}, …]
+
+      21 |     ).toHaveLength(1));
+      22 |   test('does not truncate a book at 100 results', () => {
+    > 23 |     expect(searchChapters([{ id: 'x', title: 'x', content: '甲'.repeat(125) }], '甲')).toHaveLength(125);
+         |                                                                                      ^
+      24 |   });
+      25 |   test('uses the native 20-unit excerpt without inserted ellipses', () => {
+      26 |     const text = '前'.repeat(35) + '甲' + '后'.repeat(35);
+
+      at Object.toHaveLength (__tests__/contentSearch.test.ts:23:86)
+
+  ● book content search › uses the native 20-unit excerpt without inserted ellipses
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "前前前前前前前前前前前前前前前前前前前前甲后后后后后后后后后后后后后后后后后后后后"
+    Received: "…前前前前前前前前前前前前前前前前前前前前前前前前前前前前甲后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后"
+
+      25 |   test('uses the native 20-unit excerpt without inserted ellipses', () => {
+      26 |     const text = '前'.repeat(35) + '甲' + '后'.repeat(35);
+    > 27 |     expect(searchChapters([{ id: 'x', title: 'x', content: text }], '甲')[0].excerpt).toBe('前'.repeat(20) + '甲' + '后'.repeat(20));
+         |                                                                                      ^
+      28 |   });
+      29 |   test('returns no results for blank query', () =>
+      30 |     expect(searchChapters(chapters, '   ')).toEqual([]));
+
+      at Object.toBe (__tests__/contentSearch.test.ts:27:86)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 2 passed, 5 total
+Snapshots:   0 total
+Time:        0.593 s, estimated 1 s

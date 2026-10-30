@@ -1,0 +1,75 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent
+
+FAIL __tests__/coreEngine.test.ts
+  ● core source engine › decodes legacy source responses with the declared GBK charset
+
+    expect(received).resolves.toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "data": "三体",
+    +   "data": "ΘύΜε",
+      }
+
+      325 |         buildSourceRequest(source, "/search,{'charset':'gbk'}"),
+      326 |       ),
+    > 327 |     ).resolves.toMatchObject({ data: '三体' });
+          |                ^
+      328 |     fetchMock.mockRestore();
+      329 |   });
+      330 |   test('parses and deduplicates search results', () =>
+
+      at Object.toMatchObject (node_modules/@jest/expect/node_modules/expect/build/index.js:2140:20)
+      at Object.toMatchObject (__tests__/coreEngine.test.ts:327:16)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+
+Summary of all failing tests
+FAIL __tests__/coreEngine.test.ts
+  ● core source engine › decodes legacy source responses with the declared GBK charset
+
+    expect(received).resolves.toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "data": "三体",
+    +   "data": "ΘύΜε",
+      }
+
+      325 |         buildSourceRequest(source, "/search,{'charset':'gbk'}"),
+      326 |       ),
+    > 327 |     ).resolves.toMatchObject({ data: '三体' });
+          |                ^
+      328 |     fetchMock.mockRestore();
+      329 |   });
+      330 |   test('parses and deduplicates search results', () =>
+
+      at Object.toMatchObject (node_modules/@jest/expect/node_modules/expect/build/index.js:2140:20)
+      at Object.toMatchObject (__tests__/coreEngine.test.ts:327:16)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+
+Test Suites: 1 failed, 212 passed, 213 total
+Tests:       1 failed, 1051 passed, 1052 total
+Snapshots:   0 total
+Time:        16.187 s

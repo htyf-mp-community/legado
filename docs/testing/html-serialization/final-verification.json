@@ -1,0 +1,10 @@
+{
+  "packageSha256": "f8ea8577ca9224c5ec5822e87010add5325f2893ba13fb93bcd6c59e57a37e10",
+  "productionInputsUnchanged": 316,
+  "existingDependencyPinsUnchanged": true,
+  "existingNpmLockEntriesUnchanged": true,
+  "nativeDirsUnchanged": true,
+  "sourceKotlinUnchanged": true,
+  "diffCheck": "pass",
+  "localMarkdownLinks": "pass"
+}

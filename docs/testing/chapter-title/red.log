@@ -1,0 +1,45 @@
+FAIL __tests__/chapterTitleParity.test.ts
+  ● native duplicate chapter title boundary › keeps a real first paragraph that only matches after deleting chapter-label characters
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    - 十二
+      正文
+
+      3 | describe('native duplicate chapter title boundary', () => {
+      4 |   test('keeps a real first paragraph that only matches after deleting chapter-label characters', () => {
+    > 5 |     expect(removeDuplicateChapterTitle('十二\n正文', '第十二章')).toBe('十二\n正文');
+        |                                                           ^
+      6 |   });
+      7 |   test('removes the exact title line after the native book-name and punctuation prefix', () => {
+      8 |     expect(removeDuplicateChapterTitle('【测试书】第一章\n正文', '第一章', '测试书')).toBe('正文');
+
+      at Object.toBe (__tests__/chapterTitleParity.test.ts:5:59)
+
+  ● native duplicate chapter title boundary › removes the exact title line after the native book-name and punctuation prefix
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 0
+    + Received  + 1
+
+    + 【测试书】第一章
+      正文
+
+       6 |   });
+       7 |   test('removes the exact title line after the native book-name and punctuation prefix', () => {
+    >  8 |     expect(removeDuplicateChapterTitle('【测试书】第一章\n正文', '第一章', '测试书')).toBe('正文');
+         |                                                                       ^
+       9 |   });
+      10 |   test('preserves the whole first line when the title has extra words', () => {
+      11 |     expect(removeDuplicateChapterTitle('第一章 补充标题\n正文', '第一章')).toBe('第一章 补充标题\n正文');
+
+      at Object.toBe (__tests__/chapterTitleParity.test.ts:8:71)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 1 passed, 3 total
+Snapshots:   0 total
+Time:        0.62 s

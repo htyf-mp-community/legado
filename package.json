@@ -36,6 +36,8 @@
     "htmlparser2": "^10.0.0",
     "immer": "^11.1.18",
     "iconv-lite": "0.7.3",
+    "parse5": "7.3.0",
+    "parse5-htmlparser2-tree-adapter": "7.1.0",
     "react": "19.2.3",
     "react-airplay": "2.0.2",
     "react-native": "0.86.2",

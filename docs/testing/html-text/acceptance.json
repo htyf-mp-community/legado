@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-29",
+  "scope": "HTML visible/direct text, attribute lists and standard list combination; overall goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "reference": {
+    "sources": {
+      "AnalyzeByJSoup.kt": "d4e87034a0e7db3ab94148b45ec8e0aa257e222924723cfb2adda41e20a97cd8",
+      "RuleAnalyzer.kt": "74ab0152bce9d5e014cc69d9c6974cbb093d8353200f1452066f7d05102265a7"
+    },
+    "jsoupVersion": "1.16.2",
+    "xpathVersion": "2.5.3",
+    "jsoupJarSha256": "a73a1eb5d02b51490547c46485e30f4f14e68af3624840b57abe8c4580a00b83",
+    "xpathJarSha256": "1bcd0643910663a6eb0e506803011b9145b5192b8905b1522ab07d0702ce394a",
+    "caseCount": 103
+  },
+  "nativeFixtureMatches": "pass",
+  "ios": {
+    "controlledSource": {
+      "searchCount": 1,
+      "info": "pass",
+      "tocCount": 1,
+      "contentChars": 14,
+      "contentExpected": "第一段\n第二段 续行\n第三段",
+      "allFourStages": "pass",
+      "screenshot": "source-debug.png"
+    },
+    "realSource": {
+      "name": "📂阅读书屋",
+      "originalRulesUnmodified": true,
+      "searchBook": "西游记-吴承恩",
+      "tocItems": 105,
+      "screenshot": "real-source.png"
+    },
+    "temporarySourceRemoved": true,
+    "libraryBookAdded": false,
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "33e751652368cc8db031bfb3aaf8865bb9701f8581a01861b4bf62a59f49f814"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "cfcaefd8c9223d11c7f4f6fc9df2d4a1db286e4f69c5a0c728d73f0ab18fa95b"
+      }
+    },
+    "fixtureServerStopped": true,
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "coldResume": {
+      "result": "pass",
+      "chapter": "第二回",
+      "page": "2/24",
+      "bookCount": 9,
+      "screenshot": "cold-resume.png",
+      "debugBundlePort": 8097
+    }
+  },
+  "verification": {
+    "suites": 197,
+    "tests": 967,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "runtimeDependencyPinsUnchanged": true,
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass"
+  },
+  "package": {
+    "version": "0.0.31",
+    "bytes": 1615981,
+    "sha256": "17f4817b2b68328810252328bdd5215044d2299386200c45fe751e735cbae61f",
+    "zipIntegrity": "pass",
+    "productionInputCount": 309,
+    "productionInputSha256": "f382161ffb84f497cb37279fe91488e6b6246c790276da7a8f0dbbf243f57a28",
+    "mitNoticeInBundle": true,
+    "fixtureDataEmbedded": false,
+    "qrPixelPayloadMatchesConfig": true,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "remainingGaps": [
+    "General JavaScript sandbox, including interruption and memory/stack limits",
+    "Exact collection-level html/all serialization and script/style stripping",
+    "Full explicit CSS mode, mixed rule grammar and HTML5/XML parser edge parity",
+    "Complete UI/interaction inventory and real HTYF-host/device acceptance"
+  ]
+}

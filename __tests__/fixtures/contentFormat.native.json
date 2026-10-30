@@ -1,0 +1,3994 @@
+{
+  "sources": {
+    "utils/HtmlFormatter.kt": "5375043333e6490bae3804891ea37b035330e57662b60fdf5644e7eb1842b63e",
+    "utils/NetworkUtils.kt": "6d0a69c1408ba10223afef06181d96421d2542d0fd7e36e8b5a8213ba3f64d48",
+    "utils/StringExtensions.kt": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51",
+    "constant/AppPattern.kt": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa",
+    "model/analyzeRule/AnalyzeUrl.kt": "f523dbaed6fbf03bf005e3ed7692669e9d0bde033a1f80711e823dd5680411d4",
+    "model/webBook/BookContent.kt": "127b502b020c9a89aba022ede5e2b6ce364cd9d70b6aa559ab1b269fb01dc892",
+    "help/book/ContentProcessor.kt": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666"
+  },
+  "commonsTextVersion": "1.13.1",
+  "commonsTextJarSha256": "76434bd2dd778ab140d84b3c6ffa40c40fe6219909f5ed1d8b8977c5ae8e50c8",
+  "caseCount": 639,
+  "cases": [
+    {
+      "html": null,
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": null,
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": null,
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": null,
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": null,
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": null,
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "A",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": " A ",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": " A ",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": " A ",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": " A ",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": " A ",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": " A ",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　"
+    },
+    {
+      "html": "\nA\n",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\r\nB",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A\n　　B"
+    },
+    {
+      "html": "A\rB",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\rB"
+    },
+    {
+      "html": "A\rB",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\rB"
+    },
+    {
+      "html": "A\rB",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\rB"
+    },
+    {
+      "html": "A\rB",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\rB"
+    },
+    {
+      "html": "A\rB",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\rB"
+    },
+    {
+      "html": "A\rB",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A\n　　B"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\n\n B",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A\n　　B"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>A</div><div>B</div>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<div>A</div><div>B</div>"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB\nC"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C"
+    },
+    {
+      "html": "A<p>B</p>C",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<p>B</p>C"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div><p>A</p><p>B</p></div>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<div><p>A</p><p>B</p></div>"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<div>\n A\n <br>\n B\n</div>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<div>\n　　A\n　　<br>\n　　B\n　　</div>"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　"
+    },
+    {
+      "html": "<p> A </p>\n\n<p> B </p>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<p> A </p>\n　　<p> B </p>"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E\n　　F\n　　"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB\nC\nD\nE\nF"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E\n　　F\n　　"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E\n　　F\n　　"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E\n　　F\n　　"
+    },
+    {
+      "html": "A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<br>B<hr>C<article>D</article><dd>E</dd><dl>F</dl>"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB\nC\nD\nE"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B\n　　C\n　　D\n　　E"
+    },
+    {
+      "html": "A<h1>B</h1>C<h9>D</h9>E",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<h1>B</h1>C<h9>D</h9>E"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD"
+    },
+    {
+      "html": "A<BR>B<DIV>C</DIV>D",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<BR>B<DIV>C</DIV>D"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCDE"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCDE"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCDE"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCDE"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCDE"
+    },
+    {
+      "html": "A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<li>B</li><section>C</section><table><tr><td>D</td></tr></table>E"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　C\n　　"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB\nC"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　C\n　　"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　C\n　　"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　A\n　　B\n　　C\n　　"
+    },
+    {
+      "html": "<divine>A</divine><pre>B</pre><panda>C</panda>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<divine>A</divine><pre>B</pre><panda>C</panda>"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<!--normal-->A<!-- odd > comment -->B",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<!--normal-->A<!-- odd > comment -->B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "bad()A.ad{}B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "bad()A.ad{}B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "bad()A.ad{}B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "bad()A.ad{}B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "bad()A.ad{}B"
+    },
+    {
+      "html": "<script>bad()</script>A<style>.ad{}</style>B",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<script>bad()</script>A<style>.ad{}</style>B"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<b>literal</b> &lt;b&gt; &amp;"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<b>literal</b> &lt;b&gt; &amp;"
+    },
+    {
+      "html": "&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　&lt;b&gt;literal&lt;/b&gt; &amp;lt;b&amp;gt; &amp;amp;"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A B CDEF"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A B CDEF"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A B CDEF"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A B CDEF"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A B CDEF"
+    },
+    {
+      "html": "&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　&nbsp;&nbsp;A&ensp;B&emsp;C&thinsp;D&zwnj;E&zwj;F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD​E﻿F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD​E﻿F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD​E﻿F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD​E﻿F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "ABCD​E﻿F"
+    },
+    {
+      "html": "A B‌C‍D​E﻿F",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A B‌C‍D​E﻿F"
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　A \n　　　B "
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　A \n　B "
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　A \n　　　B "
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　A \n　　　B "
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　A \n　　　B "
+    },
+    {
+      "html": "　A \n　B ",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A \n　　B "
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A\n　　B"
+    },
+    {
+      "html": "A\t \u000b\f\n \t B",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A\n　　B"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　Title\n　　漢kan正文"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "Title\n漢kan正文"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　Title\n　　漢kan正文"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　Title\n　　漢kan正文"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　Title\n　　漢kan正文"
+    },
+    {
+      "html": "<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<h2>Title</h2><ruby>漢<rt>kan</rt></ruby>正文"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "AB"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "AB"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<img src=\"https://books.example/a.jpg\">B"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<img src=\"https://books.example/a.jpg\">B"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A<img src=\"https://books.example/a.jpg\">B"
+    },
+    {
+      "html": "A<img src=\"/a.jpg\">B",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A<img src=\"/a.jpg\">B"
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/a.jpg\">"
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/a.jpg\">"
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/a.jpg\">"
+    },
+    {
+      "html": "<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img data-original=\"/a.jpg\" src=\"/thumb.jpg\">"
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/three.jpg\">"
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/three.jpg\">"
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/three.jpg\">"
+    },
+    {
+      "html": "<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img srcset=\"/one.jpg 1x, /two.jpg 2x\" data-srcset=\"/three.jpg\">"
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=unquoted.jpg><img alt=\"missing\">"
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=unquoted.jpg><img alt=\"missing\">"
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=unquoted.jpg><img alt=\"missing\">"
+    },
+    {
+      "html": "<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img src=unquoted.jpg><img alt=\"missing\"><IMG SRC=\"UPPER.JPG\">"
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/generic.jpg\"><img src=\"https://books.example/single.jpg\">"
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/generic.jpg\"><img src=\"https://books.example/single.jpg\">"
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/generic.jpg\"><img src=\"https://books.example/single.jpg\">"
+    },
+    {
+      "html": "<img data-any=\"/generic.jpg\"><img src='/single.jpg'>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img data-any=\"/generic.jpg\"><img src='/single.jpg'>"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{'headers':{'referer':'https://ref.test'}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{'headers':{'referer':'https://ref.test'}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{'headers':{'referer':'https://ref.test'}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img src=\"/image.jpg, {'headers':{'referer':'https://ref.test'}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{\"headers\":{\"referer\":\"https://ref.test\"}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://books.example/image.jpg,{\"headers\":{\"referer\":\"https://ref.test\"}}\">"
+    },
+    {
+      "html": "<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img src=\"/image.jpg, {&quot;headers&quot;:{&quot;referer&quot;:&quot;https://ref.test&quot;}}\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"data:image/png;base64,AAAA\"><img src=\"\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"data:image/png;base64,AAAA\"><img src=\"\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"data:image/png;base64,AAAA\"><img src=\"\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img src=\"data:image/png;base64,AAAA\"><img src=\"javascript:bad()\">"
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://cdn.test/image.jpg\"><img src=\"https://books.example/image.jpg\"><img src=\"https://books.example/dir/?image=1\">"
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://cdn.test/image.jpg\"><img src=\"https://books.example/image.jpg\"><img src=\"https://books.example/dir/?image=1\">"
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<img src=\"https://cdn.test/image.jpg\"><img src=\"https://books.example/image.jpg\"><img src=\"https://books.example/dir/?image=1\">"
+    },
+    {
+      "html": "<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<img src=\"//cdn.test/image.jpg\"><img src=\"../image.jpg\"><img src=\"?image=1\">"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　raw\n　　body\n　　"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "raw\nbody"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　raw\n　　body\n　　<img src=\"https://books.example/dir/a.jpg\">"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　raw\n　　body\n　　<img src=\"https://books.example/dir/a.jpg\">"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>"
+    },
+    {
+      "html": "<usehtml><p>raw\nbody</p><img src=\"a.jpg\"></usehtml>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<usehtml><p>raw\n　　body</p><img src=\"a.jpg\"></usehtml>"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A&nbsp;B &apos; &NotEqualTilde;  😀"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "A&nbsp;B &apos; &NotEqualTilde;  😀"
+    },
+    {
+      "html": "A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　A&amp;nbsp;B &apos; &NotEqualTilde; &#128; &#x1F600;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "\u0000 ퟿  􏿿 &#9999999999999999;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "\u0000 ퟿  􏿿 &#9999999999999999;"
+    },
+    {
+      "html": "&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　&#0; &#xD7FF; &#xE000; &#x10FFFF; &#9999999999999999;"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段 续行\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n第二段 续行\n第三段"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段 续行\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段 续行\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段 续行\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段 续行\n第三段",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　第一段\n　　第二段 续行\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n第二段\n第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一段\n　　第二段\n　　第三段"
+    },
+    {
+      "html": "第一段\n第二段\n第三段",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　第一段\n　　第二段\n　　第三段"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第一页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第一页"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第一页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第一页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第一页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第一页</div>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<div class=\"con\">第一页</div>"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第二页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "第二页"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第二页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第二页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　第二页\n　　"
+    },
+    {
+      "html": "<div class=\"con\">第二页</div>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<div class=\"con\">第二页</div>"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "format",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　正文\n　　"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "intro",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "正文"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "keepImg",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　正文\n　　"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "web",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　正文\n　　"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "webSpecial",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　　　正文\n　　"
+    },
+    {
+      "html": "<p>正文</p>",
+      "mode": "paragraphs",
+      "baseUrl": "https://books.example/dir/chapter.html",
+      "value": "　　<p>正文</p>"
+    },
+    {
+      "html": "&AElig;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Æ"
+    },
+    {
+      "html": "&Aacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Á"
+    },
+    {
+      "html": "&Acirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Â"
+    },
+    {
+      "html": "&Agrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "À"
+    },
+    {
+      "html": "&Alpha;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Α"
+    },
+    {
+      "html": "&Aring;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Å"
+    },
+    {
+      "html": "&Atilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ã"
+    },
+    {
+      "html": "&Auml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ä"
+    },
+    {
+      "html": "&Beta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Β"
+    },
+    {
+      "html": "&Ccedil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ç"
+    },
+    {
+      "html": "&Chi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Χ"
+    },
+    {
+      "html": "&Dagger;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‡"
+    },
+    {
+      "html": "&Delta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Δ"
+    },
+    {
+      "html": "&ETH;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ð"
+    },
+    {
+      "html": "&Eacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "É"
+    },
+    {
+      "html": "&Ecirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ê"
+    },
+    {
+      "html": "&Egrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "È"
+    },
+    {
+      "html": "&Epsilon;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ε"
+    },
+    {
+      "html": "&Eta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Η"
+    },
+    {
+      "html": "&Euml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ë"
+    },
+    {
+      "html": "&Gamma;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Γ"
+    },
+    {
+      "html": "&Iacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Í"
+    },
+    {
+      "html": "&Icirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Î"
+    },
+    {
+      "html": "&Igrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ì"
+    },
+    {
+      "html": "&Iota;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ι"
+    },
+    {
+      "html": "&Iuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ï"
+    },
+    {
+      "html": "&Kappa;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Κ"
+    },
+    {
+      "html": "&Lambda;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Λ"
+    },
+    {
+      "html": "&Mu;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Μ"
+    },
+    {
+      "html": "&Ntilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ñ"
+    },
+    {
+      "html": "&Nu;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ν"
+    },
+    {
+      "html": "&OElig;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Œ"
+    },
+    {
+      "html": "&Oacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ó"
+    },
+    {
+      "html": "&Ocirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ô"
+    },
+    {
+      "html": "&Ograve;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ò"
+    },
+    {
+      "html": "&Omega;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ω"
+    },
+    {
+      "html": "&Omicron;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ο"
+    },
+    {
+      "html": "&Oslash;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ø"
+    },
+    {
+      "html": "&Otilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Õ"
+    },
+    {
+      "html": "&Ouml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ö"
+    },
+    {
+      "html": "&Phi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Φ"
+    },
+    {
+      "html": "&Pi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Π"
+    },
+    {
+      "html": "&Prime;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "″"
+    },
+    {
+      "html": "&Psi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ψ"
+    },
+    {
+      "html": "&Rho;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ρ"
+    },
+    {
+      "html": "&Scaron;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Š"
+    },
+    {
+      "html": "&Sigma;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Σ"
+    },
+    {
+      "html": "&THORN;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Þ"
+    },
+    {
+      "html": "&Tau;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Τ"
+    },
+    {
+      "html": "&Theta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Θ"
+    },
+    {
+      "html": "&Uacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ú"
+    },
+    {
+      "html": "&Ucirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Û"
+    },
+    {
+      "html": "&Ugrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ù"
+    },
+    {
+      "html": "&Upsilon;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Υ"
+    },
+    {
+      "html": "&Uuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ü"
+    },
+    {
+      "html": "&Xi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ξ"
+    },
+    {
+      "html": "&Yacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ý"
+    },
+    {
+      "html": "&Yuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ÿ"
+    },
+    {
+      "html": "&Zeta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "Ζ"
+    },
+    {
+      "html": "&aacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "á"
+    },
+    {
+      "html": "&acirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "â"
+    },
+    {
+      "html": "&acute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "´"
+    },
+    {
+      "html": "&aelig;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "æ"
+    },
+    {
+      "html": "&agrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "à"
+    },
+    {
+      "html": "&alefsym;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ℵ"
+    },
+    {
+      "html": "&alpha;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "α"
+    },
+    {
+      "html": "&amp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "&"
+    },
+    {
+      "html": "&and;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∧"
+    },
+    {
+      "html": "&ang;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∠"
+    },
+    {
+      "html": "&aring;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "å"
+    },
+    {
+      "html": "&asymp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≈"
+    },
+    {
+      "html": "&atilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ã"
+    },
+    {
+      "html": "&auml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ä"
+    },
+    {
+      "html": "&bdquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "„"
+    },
+    {
+      "html": "&beta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "β"
+    },
+    {
+      "html": "&brvbar;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¦"
+    },
+    {
+      "html": "&bull;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "•"
+    },
+    {
+      "html": "&cap;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∩"
+    },
+    {
+      "html": "&ccedil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ç"
+    },
+    {
+      "html": "&cedil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¸"
+    },
+    {
+      "html": "&cent;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¢"
+    },
+    {
+      "html": "&chi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "χ"
+    },
+    {
+      "html": "&circ;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ˆ"
+    },
+    {
+      "html": "&clubs;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "♣"
+    },
+    {
+      "html": "&cong;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≅"
+    },
+    {
+      "html": "&copy;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "©"
+    },
+    {
+      "html": "&crarr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "↵"
+    },
+    {
+      "html": "&cup;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∪"
+    },
+    {
+      "html": "&curren;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¤"
+    },
+    {
+      "html": "&dArr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⇓"
+    },
+    {
+      "html": "&dagger;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "†"
+    },
+    {
+      "html": "&darr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "↓"
+    },
+    {
+      "html": "&deg;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "°"
+    },
+    {
+      "html": "&delta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "δ"
+    },
+    {
+      "html": "&diams;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "♦"
+    },
+    {
+      "html": "&divide;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "÷"
+    },
+    {
+      "html": "&eacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "é"
+    },
+    {
+      "html": "&ecirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ê"
+    },
+    {
+      "html": "&egrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "è"
+    },
+    {
+      "html": "&empty;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∅"
+    },
+    {
+      "html": "&emsp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "　　"
+    },
+    {
+      "html": "&ensp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "　　"
+    },
+    {
+      "html": "&epsilon;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ε"
+    },
+    {
+      "html": "&equiv;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≡"
+    },
+    {
+      "html": "&eta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "η"
+    },
+    {
+      "html": "&eth;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ð"
+    },
+    {
+      "html": "&euml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ë"
+    },
+    {
+      "html": "&euro;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "€"
+    },
+    {
+      "html": "&exist;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∃"
+    },
+    {
+      "html": "&fnof;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ƒ"
+    },
+    {
+      "html": "&forall;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∀"
+    },
+    {
+      "html": "&frac12;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "½"
+    },
+    {
+      "html": "&frac14;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¼"
+    },
+    {
+      "html": "&frac34;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¾"
+    },
+    {
+      "html": "&frasl;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⁄"
+    },
+    {
+      "html": "&gamma;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "γ"
+    },
+    {
+      "html": "&ge;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≥"
+    },
+    {
+      "html": "&gt;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": ">"
+    },
+    {
+      "html": "&hArr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⇔"
+    },
+    {
+      "html": "&harr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "↔"
+    },
+    {
+      "html": "&hearts;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "♥"
+    },
+    {
+      "html": "&hellip;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "…"
+    },
+    {
+      "html": "&iacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "í"
+    },
+    {
+      "html": "&icirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "î"
+    },
+    {
+      "html": "&iexcl;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¡"
+    },
+    {
+      "html": "&igrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ì"
+    },
+    {
+      "html": "&image;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ℑ"
+    },
+    {
+      "html": "&infin;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∞"
+    },
+    {
+      "html": "&int;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∫"
+    },
+    {
+      "html": "&iota;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ι"
+    },
+    {
+      "html": "&iquest;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¿"
+    },
+    {
+      "html": "&isin;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∈"
+    },
+    {
+      "html": "&iuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ï"
+    },
+    {
+      "html": "&kappa;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "κ"
+    },
+    {
+      "html": "&lArr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⇐"
+    },
+    {
+      "html": "&lambda;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "λ"
+    },
+    {
+      "html": "&lang;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "〈"
+    },
+    {
+      "html": "&laquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "«"
+    },
+    {
+      "html": "&larr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "←"
+    },
+    {
+      "html": "&lceil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⌈"
+    },
+    {
+      "html": "&ldquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "“"
+    },
+    {
+      "html": "&le;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≤"
+    },
+    {
+      "html": "&lfloor;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⌊"
+    },
+    {
+      "html": "&lowast;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∗"
+    },
+    {
+      "html": "&loz;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "◊"
+    },
+    {
+      "html": "&lrm;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‎"
+    },
+    {
+      "html": "&lsaquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‹"
+    },
+    {
+      "html": "&lsquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‘"
+    },
+    {
+      "html": "&lt;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "<"
+    },
+    {
+      "html": "&macr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¯"
+    },
+    {
+      "html": "&mdash;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "—"
+    },
+    {
+      "html": "&micro;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "µ"
+    },
+    {
+      "html": "&middot;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "·"
+    },
+    {
+      "html": "&minus;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "−"
+    },
+    {
+      "html": "&mu;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "μ"
+    },
+    {
+      "html": "&nabla;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∇"
+    },
+    {
+      "html": "&nbsp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "　　"
+    },
+    {
+      "html": "&ndash;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "–"
+    },
+    {
+      "html": "&ne;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "≠"
+    },
+    {
+      "html": "&ni;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∋"
+    },
+    {
+      "html": "&not;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¬"
+    },
+    {
+      "html": "&notin;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∉"
+    },
+    {
+      "html": "&nsub;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊄"
+    },
+    {
+      "html": "&ntilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ñ"
+    },
+    {
+      "html": "&nu;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ν"
+    },
+    {
+      "html": "&oacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ó"
+    },
+    {
+      "html": "&ocirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ô"
+    },
+    {
+      "html": "&oelig;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "œ"
+    },
+    {
+      "html": "&ograve;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ò"
+    },
+    {
+      "html": "&oline;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‾"
+    },
+    {
+      "html": "&omega;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ω"
+    },
+    {
+      "html": "&omicron;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ο"
+    },
+    {
+      "html": "&oplus;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊕"
+    },
+    {
+      "html": "&or;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∨"
+    },
+    {
+      "html": "&ordf;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ª"
+    },
+    {
+      "html": "&ordm;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "º"
+    },
+    {
+      "html": "&oslash;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ø"
+    },
+    {
+      "html": "&otilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "õ"
+    },
+    {
+      "html": "&otimes;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊗"
+    },
+    {
+      "html": "&ouml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ö"
+    },
+    {
+      "html": "&para;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¶"
+    },
+    {
+      "html": "&part;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∂"
+    },
+    {
+      "html": "&permil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‰"
+    },
+    {
+      "html": "&perp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊥"
+    },
+    {
+      "html": "&phi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "φ"
+    },
+    {
+      "html": "&pi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "π"
+    },
+    {
+      "html": "&piv;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ϖ"
+    },
+    {
+      "html": "&plusmn;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "±"
+    },
+    {
+      "html": "&pound;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "£"
+    },
+    {
+      "html": "&prime;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "′"
+    },
+    {
+      "html": "&prod;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∏"
+    },
+    {
+      "html": "&prop;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∝"
+    },
+    {
+      "html": "&psi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ψ"
+    },
+    {
+      "html": "&quot;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "\""
+    },
+    {
+      "html": "&rArr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⇒"
+    },
+    {
+      "html": "&radic;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "√"
+    },
+    {
+      "html": "&rang;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "〉"
+    },
+    {
+      "html": "&raquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "»"
+    },
+    {
+      "html": "&rarr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "→"
+    },
+    {
+      "html": "&rceil;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⌉"
+    },
+    {
+      "html": "&rdquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "”"
+    },
+    {
+      "html": "&real;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ℜ"
+    },
+    {
+      "html": "&reg;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "®"
+    },
+    {
+      "html": "&rfloor;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⌋"
+    },
+    {
+      "html": "&rho;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ρ"
+    },
+    {
+      "html": "&rlm;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‏"
+    },
+    {
+      "html": "&rsaquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "›"
+    },
+    {
+      "html": "&rsquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "’"
+    },
+    {
+      "html": "&sbquo;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "‚"
+    },
+    {
+      "html": "&scaron;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "š"
+    },
+    {
+      "html": "&sdot;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⋅"
+    },
+    {
+      "html": "&sect;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "§"
+    },
+    {
+      "html": "&shy;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "­"
+    },
+    {
+      "html": "&sigma;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "σ"
+    },
+    {
+      "html": "&sigmaf;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ς"
+    },
+    {
+      "html": "&sim;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∼"
+    },
+    {
+      "html": "&spades;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "♠"
+    },
+    {
+      "html": "&sub;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊂"
+    },
+    {
+      "html": "&sube;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊆"
+    },
+    {
+      "html": "&sum;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∑"
+    },
+    {
+      "html": "&sup;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊃"
+    },
+    {
+      "html": "&sup1;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¹"
+    },
+    {
+      "html": "&sup2;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "²"
+    },
+    {
+      "html": "&sup3;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "³"
+    },
+    {
+      "html": "&supe;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⊇"
+    },
+    {
+      "html": "&szlig;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ß"
+    },
+    {
+      "html": "&tau;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "τ"
+    },
+    {
+      "html": "&there4;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "∴"
+    },
+    {
+      "html": "&theta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "θ"
+    },
+    {
+      "html": "&thetasym;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ϑ"
+    },
+    {
+      "html": "&thinsp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": ""
+    },
+    {
+      "html": "&thorn;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "þ"
+    },
+    {
+      "html": "&tilde;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "˜"
+    },
+    {
+      "html": "&times;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "×"
+    },
+    {
+      "html": "&trade;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "™"
+    },
+    {
+      "html": "&uArr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "⇑"
+    },
+    {
+      "html": "&uacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ú"
+    },
+    {
+      "html": "&uarr;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "↑"
+    },
+    {
+      "html": "&ucirc;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "û"
+    },
+    {
+      "html": "&ugrave;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ù"
+    },
+    {
+      "html": "&uml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¨"
+    },
+    {
+      "html": "&upsih;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ϒ"
+    },
+    {
+      "html": "&upsilon;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "υ"
+    },
+    {
+      "html": "&uuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ü"
+    },
+    {
+      "html": "&weierp;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "℘"
+    },
+    {
+      "html": "&xi;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ξ"
+    },
+    {
+      "html": "&yacute;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ý"
+    },
+    {
+      "html": "&yen;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "¥"
+    },
+    {
+      "html": "&yuml;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ÿ"
+    },
+    {
+      "html": "&zeta;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": "ζ"
+    },
+    {
+      "html": "&zwj;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": ""
+    },
+    {
+      "html": "&zwnj;",
+      "mode": "web",
+      "baseUrl": "",
+      "value": ""
+    },
+    {
+      "html": "<img src=\"a b.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/a b.jpg\">"
+    },
+    {
+      "html": "<img src=\"./a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/./a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/../a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/../../a.jpg\">"
+    },
+    {
+      "html": "<img src=\"?q=1\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/?q=1\">"
+    },
+    {
+      "html": "<img src=\"#frag\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443#frag\">"
+    },
+    {
+      "html": "<img src=\"\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443\">"
+    },
+    {
+      "html": "<img src=\"/a/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/a/../b\">"
+    },
+    {
+      "html": "<img src=\"//CDN.Example:443/a\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://CDN.Example:443/a\">"
+    },
+    {
+      "html": "<img src=\"https://CDN.Example:443/中 文.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://CDN.Example:443/中 文.jpg\">"
+    },
+    {
+      "html": "<img src=\"javascript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"\">"
+    },
+    {
+      "html": "<img src=\"JavaScript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"JavaScript:bad()\">"
+    },
+    {
+      "html": "<img src=\"data:image/svg+xml,AAA\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"data:image/svg+xml,AAA\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"data:image/png;base64,AAAA\">"
+    },
+    {
+      "html": "<img src=\"　a.jpg　\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/　a.jpg　\">"
+    },
+    {
+      "html": "<img src=\"﻿a.jpg﻿\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/﻿a.jpg﻿\">"
+    },
+    {
+      "html": "<img src=\"..\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/..\">"
+    },
+    {
+      "html": "<img src=\"a//b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/a//b\">"
+    },
+    {
+      "html": "<img src=\"/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443",
+      "value": "<img src=\"https://Books.Example:443/../b\">"
+    },
+    {
+      "html": "<img src=\"a b.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/a b.jpg\">"
+    },
+    {
+      "html": "<img src=\"./a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/../a.jpg\">"
+    },
+    {
+      "html": "<img src=\"?q=1\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/?q=1\">"
+    },
+    {
+      "html": "<img src=\"#frag\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/chapter.html?old=1#frag\">"
+    },
+    {
+      "html": "<img src=\"\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/chapter.html?old=1#old\">"
+    },
+    {
+      "html": "<img src=\"/a/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/a/../b\">"
+    },
+    {
+      "html": "<img src=\"//CDN.Example:443/a\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://CDN.Example:443/a\">"
+    },
+    {
+      "html": "<img src=\"https://CDN.Example:443/中 文.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://CDN.Example:443/中 文.jpg\">"
+    },
+    {
+      "html": "<img src=\"javascript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"\">"
+    },
+    {
+      "html": "<img src=\"JavaScript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"JavaScript:bad()\">"
+    },
+    {
+      "html": "<img src=\"data:image/svg+xml,AAA\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"data:image/svg+xml,AAA\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"data:image/png;base64,AAAA\">"
+    },
+    {
+      "html": "<img src=\"　a.jpg　\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/　a.jpg　\">"
+    },
+    {
+      "html": "<img src=\"﻿a.jpg﻿\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/﻿a.jpg﻿\">"
+    },
+    {
+      "html": "<img src=\"..\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/\">"
+    },
+    {
+      "html": "<img src=\"a//b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/dir/a//b\">"
+    },
+    {
+      "html": "<img src=\"/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "https://Books.Example:443/dir/chapter.html?old=1#old",
+      "value": "<img src=\"https://Books.Example:443/../b\">"
+    },
+    {
+      "html": "<img src=\"a b.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"a b.jpg\">"
+    },
+    {
+      "html": "<img src=\"./a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"./a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"../a.jpg\">"
+    },
+    {
+      "html": "<img src=\"../../a.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"../../a.jpg\">"
+    },
+    {
+      "html": "<img src=\"?q=1\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"?q=1\">"
+    },
+    {
+      "html": "<img src=\"#frag\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"#frag\">"
+    },
+    {
+      "html": "<img src=\"\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"\">"
+    },
+    {
+      "html": "<img src=\"/a/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"/a/../b\">"
+    },
+    {
+      "html": "<img src=\"//CDN.Example:443/a\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"//CDN.Example:443/a\">"
+    },
+    {
+      "html": "<img src=\"https://CDN.Example:443/中 文.jpg\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"https://CDN.Example:443/中 文.jpg\">"
+    },
+    {
+      "html": "<img src=\"javascript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"javascript:bad()\">"
+    },
+    {
+      "html": "<img src=\"JavaScript:bad()\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"JavaScript:bad()\">"
+    },
+    {
+      "html": "<img src=\"data:image/svg+xml,AAA\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"data:image/svg+xml,AAA\">"
+    },
+    {
+      "html": "<img src=\"data:image/png;base64,AAAA\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"data:image/png;base64,AAAA\">"
+    },
+    {
+      "html": "<img src=\"　a.jpg　\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"a.jpg\">"
+    },
+    {
+      "html": "<img src=\"﻿a.jpg﻿\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"﻿a.jpg﻿\">"
+    },
+    {
+      "html": "<img src=\"..\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"..\">"
+    },
+    {
+      "html": "<img src=\"a//b\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"a//b\">"
+    },
+    {
+      "html": "<img src=\"/../b\">",
+      "mode": "keepImg",
+      "baseUrl": "",
+      "value": "<img src=\"/../b\">"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n"
+    },
+    {
+      "html": "A\n",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\r\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r\n"
+    },
+    {
+      "html": "A\r\n",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r\n"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\r"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r"
+    },
+    {
+      "html": "A\r",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\r"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A ",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B "
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\nB"
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\nB"
+    },
+    {
+      "html": "A\nB",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\nB"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\n"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\n"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n\n"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\n"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n\n"
+    },
+    {
+      "html": "A\n\n",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\n"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A$"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A$"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "BB"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A$"
+    },
+    {
+      "html": "A$",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A$"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "$B"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "$B"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "BB"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "$A"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "$B"
+    },
+    {
+      "html": "$A",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "$A"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\nB"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "(A)$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\nB"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "[A$]",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n\nB"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "A\\$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\nA"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "(?m)A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "B\n\nB"
+    },
+    {
+      "html": "A\n\nA",
+      "mode": "replace",
+      "pattern": "^A$",
+      "replacement": "B",
+      "baseUrl": "",
+      "value": "A\n\nA"
+    }
+  ]
+}

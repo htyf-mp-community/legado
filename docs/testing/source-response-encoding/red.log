@@ -1,0 +1,44 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent __tests__/sourceResponseEncoding.test.ts
+
+FAIL __tests__/sourceResponseEncoding.test.ts
+  ● decodes a headerless GBK source page from its HTML head declaration
+
+    expect(received).resolves.toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "data": "<html><head><meta charset=\"GBK\"></head><body>书名：西游记，作者：吴承恩。</body></html>",
+    +   "data": "<html><head><meta charset=\"GBK\"></head><body>���������μǣ����ߣ���ж���</body></html>",
+      }
+
+      14 |     text: async () => iconv.decode(bytes, 'UTF-8'),
+      15 |   } as unknown as Response));
+    > 16 |   try { await expect(executeSourceRequest(buildSourceRequest(source, '/book'))).resolves.toMatchObject({ data: html }); }
+         |                                                                                          ^
+      17 |   finally { globalThis.fetch = previous; }
+      18 | });
+      19 |
+
+      at Object.toMatchObject (node_modules/@jest/expect/node_modules/expect/build/index.js:2140:20)
+      at Object.toMatchObject (__tests__/sourceResponseEncoding.test.ts:16:90)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.547 s

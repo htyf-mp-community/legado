@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-29",
+  "scope": "Source HTML formatter, reader paragraphs, and source dollar anchors; full 1:1 goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "reference": {
+    "sources": {
+      "utils/HtmlFormatter.kt": "5375043333e6490bae3804891ea37b035330e57662b60fdf5644e7eb1842b63e",
+      "utils/NetworkUtils.kt": "6d0a69c1408ba10223afef06181d96421d2542d0fd7e36e8b5a8213ba3f64d48",
+      "utils/StringExtensions.kt": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51",
+      "constant/AppPattern.kt": "2f8bf8ea556feb59ff9cbe22db028d6eebc96e6255969d6199a08cbdd15f97fa",
+      "model/analyzeRule/AnalyzeUrl.kt": "f523dbaed6fbf03bf005e3ed7692669e9d0bde033a1f80711e823dd5680411d4",
+      "model/webBook/BookContent.kt": "127b502b020c9a89aba022ede5e2b6ce364cd9d70b6aa559ab1b269fb01dc892",
+      "help/book/ContentProcessor.kt": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666"
+    },
+    "commonsTextVersion": "1.13.1",
+    "commonsTextJarSha256": "76434bd2dd778ab140d84b3c6ffa40c40fe6219909f5ed1d8b8977c5ae8e50c8",
+    "caseCount": 639,
+    "caseModes": {
+      "format": 43,
+      "intro": 43,
+      "keepImg": 100,
+      "web": 295,
+      "webSpecial": 43,
+      "paragraphs": 43,
+      "replace": 72
+    },
+    "commonsLangJarSha256": "69e5c9fa35da7a51a5fd2099dfe56a2d8d32cf233e2f6d770e796146440263f4"
+  },
+  "nativeFixtureMatches": "pass",
+  "realResponseComparison": {
+    "inputUtf16Units": 9281,
+    "inputSha256": "6065a2860043abd380ff61cfa88745f93f50993329dddaaa1bfa59932d1f2dcb",
+    "nativeUtf16Units": 7636,
+    "targetUtf16Units": 7636,
+    "nativeSha256": "aed23df07e4e3e5a93f7677fabf2a340ea4b617c0f1f9e6e7491430e52fd9390",
+    "targetSha256": "aed23df07e4e3e5a93f7677fabf2a340ea4b617c0f1f9e6e7491430e52fd9390",
+    "equal": true,
+    "normalizedParagraphs": 61,
+    "referenceSource": "temporary 59,052-byte real response previously compared through native AnalyzeByJSoup",
+    "paragraphPass": {
+      "equal": true,
+      "utf16Units": 7631,
+      "paragraphs": 61,
+      "sha256": "e0884f1a05b104dafbfa83a2970ccbee3f4f54238091d29f3d52b1d48012225f"
+    },
+    "afterOriginalSourceReplacement": {
+      "equal": true,
+      "nativeUtf16Units": 7510,
+      "targetUtf16Units": 7510,
+      "nativeSha256": "cd53f507c26e9c54872e6ea5dd282d2d7c66d39348bf69df3dc6505cfab28579",
+      "targetSha256": "cd53f507c26e9c54872e6ea5dd282d2d7c66d39348bf69df3dc6505cfab28579",
+      "scope": "same source leading ## regex rule; Kotlin BookContent line trim, Regex replacement and HTML4 unescape statements"
+    }
+  },
+  "ios": {
+    "controlledSource": {
+      "searchCount": 1,
+      "tocCount": 2,
+      "independentParagraphNodes": true,
+      "configuredIndentOnce": true,
+      "literalTagsPreserved": true,
+      "screenshot": "paragraphs.png",
+      "requestCounts": {
+        "/fixture.json": 1,
+        "/__state": 2,
+        "/search": 1,
+        "/book": 1,
+        "/toc": 1,
+        "/chapter/1": 2,
+        "/chapter/2": 1
+      }
+    },
+    "coldResume": {
+      "result": "pass",
+      "seekMethod": "normal accessibility progress increment in scroll reader; physical drag/scroll automation unavailable",
+      "chapter": "第一章 段落与字面标签",
+      "nativeUtf16Cursor": 352,
+      "beforeAndAfterCursorEqual": true,
+      "page": 2,
+      "pages": 10,
+      "beforeScreenshot": "before-cold.png",
+      "afterScreenshot": "cold-resume.png",
+      "matchingFirstVisibleParagraph": "第6段"
+    },
+    "realSource": {
+      "base": "📂阅读书屋",
+      "searchCount": 1,
+      "info": "pass",
+      "tocCount": 2,
+      "selectedOriginalChapterIndexes": [
+        2,
+        3
+      ],
+      "contentChars": 7510,
+      "contentAndReplacementRulesUnchanged": true,
+      "screenshot": "real-source-debug.png"
+    },
+    "temporaryBookRemoved": true,
+    "temporarySourcesRemoved": 2,
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68"
+      }
+    },
+    "preservationHashEncoding": "SHA-256 of UTF-8 compact JSON, sorted record keys and sorted records by id/source URL",
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "finalScreen": "书架",
+    "fixtureServiceStopped": true
+  },
+  "verification": {
+    "suites": 200,
+    "tests": 990,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "dependenciesAndLocksUnchangedThisIteration": true,
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass",
+    "finalVerification": "final-verification.json"
+  },
+  "package": {
+    "version": "0.0.33",
+    "bytes": 1683134,
+    "sha256": "4bfd7e90a0ca29169ba4dea487a3608e6102a10f0c4e2cbe5686d5f02f956caf",
+    "zipIntegrity": "pass",
+    "productionInputCount": 318,
+    "productionInputSha256": "8cb5ff6bb23b5208c93ecee93aedce488c81e305c9905f4e529c851b2c619db0",
+    "productionInputsUnchanged": true,
+    "licensesRetained": true,
+    "fixtureDataEmbedded": false,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "workletAudit": {
+    "compiledArrayClosures": 460,
+    "unexpectedClosureAssignments": 0,
+    "libraryJestHelpers": [
+      "fn.__closure={}",
+      "w.__closure={...original.__closure}"
+    ],
+    "syntaxErrors": 0
+  },
+  "remoteAvailability": {
+    "checkedAt": "2026-10-29T07:41:31.506049+00:00",
+    "localVersion": "0.0.33",
+    "qrPixelsMatchConfig": true,
+    "config": {
+      "status": 200,
+      "version": "0.0.27"
+    },
+    "package": {
+      "status": 200
+    }
+  },
+  "remainingGaps": [
+    "Complete ContentProcessor title removal/resegmentation/conversion/replacement and display matrix",
+    "Complete Java regex grammar and URL handler matrix",
+    "Intro/EPUB formatter and rich/media/image request-option rendering matrices",
+    "Physical gesture and complex media/annotation position acceptance",
+    "General JS sandbox and remaining migration inventory",
+    "Real HTYF-host/device acceptance"
+  ]
+}

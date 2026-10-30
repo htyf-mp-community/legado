@@ -1,0 +1,29 @@
+{
+  "productionInputsUnchanged": 320,
+  "productionInputSha256": "f7716f603c0616be6d96ff76575f45cd6f10044e457375a95263c75a4cf3f226",
+  "packageSha256": "c5ca20873fc08a8f52ef85876e72d99ee14e7fa8fab375cee62c3880531ecfb7",
+  "dependenciesAndLocksUnchangedThisIteration": true,
+  "nativeDirsUnchanged": true,
+  "sourceKotlinUnchanged": true,
+  "sourceGitStatusMatchesInitialUserChanges": true,
+  "diffCheck": "pass",
+  "localMarkdownLinks": "pass",
+  "qrPixelsMatchFinalConfig": true,
+  "oldReportDirectoryNotRecreated": true,
+  "tests": {
+    "suites": 202,
+    "passed": 998,
+    "typescript": "pass",
+    "changedCodeEslint": "pass"
+  },
+  "finalColdLaunchPid": 95894,
+  "realSourceLiveDebug": "pass: search 1, details, 105 TOC items, first non-volume content 119 UTF-16 units",
+  "finalShelfCount": 9,
+  "servicesAtEnd": {
+    "web": false,
+    "mcp": false,
+    "scheduledTasks": false,
+    "fixture18206": false,
+    "repack8097": true
+  }
+}

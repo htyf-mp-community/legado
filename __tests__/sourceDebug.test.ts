@@ -56,7 +56,7 @@ test('runs search, detail, toc and content stages in order', async () => {
   const result = await runSourceDebug(source, '测试', event =>
     events.push(`${event.stage}:${event.status}`),
   );
-  expect(result.content).toBe('正文');
+  expect(result.content).toBe('　　　　正文\n　　');
   expect(events).toEqual([
     'search:running',
     'search:success',

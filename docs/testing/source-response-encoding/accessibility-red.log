@@ -1,0 +1,37 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand --silent __tests__/readRecordsAccessibility.test.tsx
+
+FAIL __tests__/readRecordsAccessibility.test.tsx
+  ● accessible per-record deletion confirms its target, can cancel and retains other records
+
+    expect(received).toContainEqual(expected) // deep equality
+
+    Matcher error: received value must not be null nor undefined
+
+    Received has value: undefined
+
+      25 |     await act(async () => node.parent!.props.onPress());
+      26 |   };
+    > 27 |   expect(row().props.accessibilityActions).toContainEqual({ name: 'delete', label: 'deleteNamed:First' });
+         |                                            ^
+      28 |   await act(async () => row().props.onAccessibilityAction({ nativeEvent: { actionName: 'delete' } }));
+      29 |   expect(tree.root.findAllByType(Text).some(item => item.props.children === 'deleteReadRecordTitle:First')).toBe(true);
+      30 |   expect(loadReadRecords()).toEqual([first, second]);
+
+      at Object.toContainEqual (__tests__/readRecordsAccessibility.test.tsx:27:44)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        0.654 s

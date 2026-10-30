@@ -47,7 +47,7 @@ export type ReaderPositionHandle = {
 type Line = { start: number; end: number; top: number; height: number };
 const paragraphs = (text: string) => {
   let start = 0;
-  return text.split(/(\n{2,})/).flatMap((value, index) => {
+  return text.split(/(\n+)/).flatMap((value, index) => {
     const result = index % 2 ? [] : [{ text: value, start }];
     start += value.length;
     return result;

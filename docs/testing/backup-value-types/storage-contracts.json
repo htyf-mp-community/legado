@@ -1,0 +1,62 @@
+{
+  "nativeSourceContract": "SharedPreferences snapshot preserves typed map via preferences.all and Editor; complete XML configuration migration remains pending",
+  "originalSources": [
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/PreferenceSnapshot.kt",
+      "sha256": "130e51499cda0d811e220a4c6ac0caea1854925d47e9be7953662205ceeafb1b"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/Backup.kt",
+      "sha256": "b5855c4278f2e894157714c528c979d3ff4addfbf7e322b8d80de521dcfad99a"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+      "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+    }
+  ],
+  "targetScalarContracts": {
+    "booleans": {
+      "bookshelf.manage.open-title.v1": "src/data/bookshelfManagePreferences.ts",
+      "bookshelf.manage.delete-original.v1": "src/data/bookshelfManagePreferences.ts"
+    },
+    "numbers": {
+      "bookshelf.sort.v1": "src/data/bookshelf.ts",
+      "bookshelf.group-sort.v1.*": "src/data/bookshelf.ts",
+      "book-source.batch-delay-seconds.v1": "src/data/batchSourcePreferences.ts",
+      "keyboard-assists.lines.v1": "src/data/keyboardAssists.ts",
+      "audio.sleep.deadline.v1": "src/data/audioPreferences.ts",
+      "storage.schema.version": "src/data/migrations.ts"
+    }
+  },
+  "installedDependency": {
+    "name": "react-native-mmkv",
+    "version": "4.3.2",
+    "files": [
+      {
+        "path": "node_modules/react-native-mmkv/cpp/HybridMMKV.cpp",
+        "sha256": "de23305972a0c8b8d3277c8f9cc53003dab7c23fae869079bd05bcfe0c3afc3a"
+      },
+      {
+        "path": "node_modules/react-native-mmkv/src/createMMKV/createMockMMKV.ts",
+        "sha256": "ff9f212ed2b99aed6e6079972339f4c3afd398d54b6817a23ec7cc90d22ab25b"
+      },
+      {
+        "path": "node_modules/react-native-mmkv/src/specs/MMKV.nitro.ts",
+        "sha256": "24477b90e045548ad5ec69566b1539575de4ea56e7203ad34898a690915c9084"
+      }
+    ]
+  },
+  "observedNativeCounterexample": {
+    "key": "bookshelf.manage.delete-original.v1",
+    "uiUnchecked": true,
+    "oldExport": {
+      "type": "string",
+      "value": ""
+    },
+    "fixedExport": {
+      "type": "boolean",
+      "value": false
+    }
+  },
+  "historicalBoundary": "two declared numeric keys currently return undefined from numeric getters and empty string from string getters; preserve these strings without inferring their former number; origin not established"
+}

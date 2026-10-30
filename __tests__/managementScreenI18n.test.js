@@ -50,7 +50,7 @@ test.each(screens)('%s keeps user-facing copy in the translator', screen => {
   expect(source).not.toMatch(/[\u3400-\u9fff]/);
 });
 
-test.each(['BookCover', 'ContentSearchSheet', 'InTreeSheet', 'MangaImage'])(
+test.each(['BookCover', 'InTreeSheet', 'MangaImage'])(
   '%s keeps shared overlay copy in the translator',
   component => {
     const source = readFileSync(

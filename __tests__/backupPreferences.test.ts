@@ -88,3 +88,13 @@ test('latest-only automatic backups use the stable ZIP name', () => {
   saveBackupPreferences({ ...defaultBackupPreferences, onlyLatest: true });
   expect(automaticBackupFileName('phone')).toBe('backup-htyf.zip');
 });
+
+test('reading history exclusion uses the actual records key and device-local sorting stays unexported', () => {
+  expect(backupCategoryForKey('reading.records.v1')).toBe('history');
+  const preferences = {
+    ...defaultBackupPreferences,
+    categories: { ...defaultBackupPreferences.categories, history: false },
+  };
+  expect(shouldIncludeBackupKey('reading.records.v1', preferences)).toBe(false);
+  expect(shouldIncludeBackupKey('reading.record-sort.v1')).toBe(false);
+});

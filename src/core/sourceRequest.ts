@@ -6,6 +6,9 @@ import { addHttpLog } from '../data/httpLog';
 import { addAppLog } from '../data/appLog';
 import iconv from 'iconv-lite';
 import { checkCancelled } from './cancellation';
+import { resolveNativeSourceUrl, trimSourceWhitespace } from './nativeSourceUrl';
+import { encodeSourceParams } from './sourceUrlEncoding';
+import { decodeSourceResponse } from './sourceResponse';
 export type SourceRequest = {
   url: string;
   method: 'GET' | 'POST' | 'HEAD';
@@ -16,30 +19,24 @@ export type SourceRequest = {
   charset?: string;
 };
 export function preferredSourceTransportUrl(value: string) {
-  try {
-    const target = new URL(value);
-    return target.protocol === 'http:'
-      ? target.toString().replace(/^http:/i, 'https:')
-      : target.toString();
-  } catch {
-    return value;
-  }
+  return value.replace(/^http:/i, 'https:');
 }
-const absolute = (value: string, base: string) => {
-  try {
-    return new URL(value, base).toString();
-  } catch {
-    throw new SourceRuleError(`无效地址: ${value}`);
-  }
-};
 const cacheBypassUrl = (value: string) => {
-  try {
-    const target = new URL(value);
-    target.searchParams.set('_htyf_retry', String(Date.now()));
-    return target.toString();
-  } catch {
-    return value;
-  }
+  const hash = value.indexOf('#'), fragment = hash < 0 ? '' : value.slice(hash), target = hash < 0 ? value : value.slice(0, hash);
+  const question = target.indexOf('?'), path = question < 0 ? target : target.slice(0, question);
+  const fields = question < 0 ? [] : target.slice(question + 1).split('&');
+  let found = false;
+  const updated = fields.flatMap(field => {
+    try {
+      if (decodeURIComponent(field.split('=')[0].replace(/\+/g, ' ')) === '_htyf_retry') {
+        if (found) return [];
+        found = true; return [`_htyf_retry=${Date.now()}`];
+      }
+    } catch { /* Preserve malformed legacy query fields. */ }
+    return [field];
+  });
+  if (!found) updated.push(`_htyf_retry=${Date.now()}`);
+  return `${path}?${updated.join('&')}${fragment}`;
 };
 const replaceVars = (value: string, key: string, page: number) =>
   value
@@ -70,7 +67,7 @@ function unwrapSafeUrlScript(
   key: string,
   page: number,
 ) {
-  const compact = rule.trim();
+  const compact = trimSourceWhitespace(rule);
   if (compact.startsWith('<js>')) {
     const close = compact.indexOf('</js>');
     if (close < 0) return compact;
@@ -136,32 +133,6 @@ function parseRequestOptions(value: string): Record<string, unknown> {
     return JSON.parse(converted) as Record<string, unknown>;
   }
 }
-const percentEncode = (value: string, charset: string) =>
-  [...iconv.encode(value, charset)]
-    .map(byte =>
-      (byte >= 0x41 && byte <= 0x5a) ||
-      (byte >= 0x61 && byte <= 0x7a) ||
-      (byte >= 0x30 && byte <= 0x39) ||
-      byte === 0x2d ||
-      byte === 0x2e ||
-      byte === 0x5f ||
-      byte === 0x7e
-        ? String.fromCharCode(byte)
-        : `%${byte.toString(16).toUpperCase().padStart(2, '0')}`,
-    )
-    .join('');
-const encodeFormBody = (value: string, charset: string) =>
-  value
-    .split('&')
-    .map(field => {
-      const separator = field.indexOf('='),
-        name = separator < 0 ? field : field.slice(0, separator),
-        content = separator < 0 ? '' : field.slice(separator + 1);
-      return separator < 0
-        ? percentEncode(name, charset)
-        : `${percentEncode(name, charset)}=${percentEncode(content, charset)}`;
-    })
-    .join('&');
 /** Build a declarative source request; non-search consumers can disable search-token substitution. */
 export function buildSourceRequest(
   source: BookSource,
@@ -170,16 +141,16 @@ export function buildSourceRequest(
   page = 1,
   interpolateSearch = true,
 ): SourceRequest {
-  if (!rule.trim())
+  if (!trimSourceWhitespace(rule))
     throw new SourceRuleError('请求地址为空', source.bookSourceName);
   const safeRule = unwrapSafeUrlScript(rule, source.bookSourceUrl, key, page);
   if (safeRule.includes('@js') || safeRule.includes('<js>'))
     throw new UnsupportedRuleError('JavaScript URL', source.bookSourceName);
-  const [urlPart, optionPart] = splitRule(safeRule),
-    url = absolute(
+  const [urlPart, optionPart] = splitRule(safeRule);
+  let url = resolveNativeSourceUrl(
       interpolateSearch
-        ? replaceVars(urlPart.trim(), key, page)
-        : urlPart.trim(),
+        ? replaceVars(trimSourceWhitespace(urlPart), key, page)
+        : trimSourceWhitespace(urlPart),
       source.bookSourceUrl,
     );
   let option: Record<string, unknown> = {};
@@ -238,24 +209,30 @@ export function buildSourceRequest(
       : typeof option.body === 'string'
         ? option.body
         : JSON.stringify(option.body);
-  const charset = String(option.charset ?? '').trim();
-  if (charset && !iconv.encodingExists(charset))
+  const charset = String(option.charset ?? '');
+  if (charset && charset !== 'escape' && !iconv.encodingExists(charset))
     throw new SourceRuleError(
       `不支持的字符集: ${charset}`,
       source.bookSourceName,
     );
-  const body =
-    rawBody && charset && typeof option.body === 'string'
-      ? encodeFormBody(rawBody, charset)
-      : rawBody;
+  const contentType = Object.keys(headers).find(name => name.toLowerCase() === 'content-type');
+  const trimmedBody = trimSourceWhitespace(rawBody ?? '');
+  const jsonBody = (trimmedBody.startsWith('{') && trimmedBody.endsWith('}')) || (trimmedBody.startsWith('[') && trimmedBody.endsWith(']'));
+  const xmlBody = trimmedBody.startsWith('<') && trimmedBody.endsWith('>');
+  const formBody = method === 'POST' && typeof option.body === 'string' && !jsonBody && !xmlBody && (!contentType || !headers[contentType]);
+  const encodedBody = formBody ? encodeSourceParams(rawBody ?? '', charset, false) : rawBody;
+  const sendsForm = method === 'POST' && ((formBody && !!encodedBody) || !trimmedBody);
+  const body = sendsForm ? encodedBody ?? '' : formBody && !encodedBody ? rawBody : encodedBody;
+  if (method !== 'POST') {
+    const question = url.indexOf('?');
+    if (question >= 0) url = `${url.slice(0, question)}?${encodeSourceParams(url.slice(question + 1), charset, true)}`;
+  }
   if (
-    body &&
+    method === 'POST' && body !== undefined &&
     !Object.keys(headers).some(x => x.toLowerCase() === 'content-type')
   )
     headers['Content-Type'] =
-      typeof option.body === 'string'
-        ? `application/x-www-form-urlencoded; charset=${charset || 'UTF-8'}`
-        : 'application/json';
+      sendsForm ? 'application/x-www-form-urlencoded; charset=UTF-8' : 'application/json; charset=UTF-8';
   return {
     url,
     method: method as SourceRequest['method'],
@@ -265,6 +242,12 @@ export function buildSourceRequest(
     cookieJar,
     charset: charset || undefined,
   };
+}
+
+/** Navigation evaluates the bounded page placeholders without rewriting literal searchKey/searchPage words. */
+export function buildSourcePageRequest(source: BookSource, rule: string, page = 1): SourceRequest {
+  const value = rule.replace(/\{\{\s*(?:searchPage|page)\s*\}\}/g, String(page));
+  return buildSourceRequest(source, value, '', page, false);
 }
 export async function executeSourceRequest(
   request: SourceRequest,
@@ -348,11 +331,10 @@ export async function executeSourceRequest(
           : responseHeaders['set-cookie'];
       if (setCookie) saveResponseCookies(request.sourceId, setCookie);
     }
-    const text = request.charset
-      ? iconv.decode(
-          new Uint8Array(await response.arrayBuffer()),
-          request.charset,
-        )
+    const contentType = response.headers?.get?.('content-type')
+      ?? Object.entries(responseHeaders).find(([name]) => name.toLowerCase() === 'content-type')?.[1];
+    const text = typeof response.arrayBuffer === 'function'
+      ? decodeSourceResponse(new Uint8Array(await response.arrayBuffer()), contentType)
       : await response.text();
     checkCancelled(controller.signal);
     addHttpLog({

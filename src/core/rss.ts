@@ -1,8 +1,9 @@
 import type { RssArticle, RssSource } from '../types';
 import { SourceRuleError } from './errors';
 import { sourceRuleText, sourceRuleValues } from './sourceRule';
-import { buildSourceRequest } from './sourceRequest';
+import { buildSourceRequest, buildSourcePageRequest } from './sourceRequest';
 import type { BookSource } from '../types';
+import { resolveNativeSourceUrl } from './nativeSourceUrl';
 
 const decode = (value: string) =>
   value
@@ -28,13 +29,7 @@ const attribute = (block: string, element: string, name: string) => {
   );
   return match ? decode(match[1]) : '';
 };
-const absolute = (value: string, base: string) => {
-  try {
-    return new URL(value, base).toString();
-  } catch {
-    return value;
-  }
-};
+const absolute = resolveNativeSourceUrl;
 const imageFrom = (value: string) =>
   value.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
 
@@ -95,10 +90,10 @@ export function parseRssByRules(
   const articles = items
     .map((item, index) => {
       const title = sourceRuleText(item, source.ruleTitle);
-      const rawLink = sourceRuleText(item, source.ruleLink);
+      const rawLink = sourceRuleText(item, source.ruleLink, true);
       const link = absolute(rawLink, baseUrl);
       const description = sourceRuleText(item, source.ruleDescription);
-      const image = sourceRuleText(item, source.ruleImage);
+      const image = sourceRuleText(item, source.ruleImage, true);
       return {
         id: `${source.sourceUrl}::${link || title || index}`,
         origin: source.sourceUrl,
@@ -184,18 +179,16 @@ export async function fetchRssFeedPage(
   const sortName = options.sortName || source.sourceName,
     url = options.url || source.sourceUrl,
     page = options.page ?? 1;
-  const request = buildSourceRequest(
-    {
+  const definition = {
       ...source,
       bookSourceUrl: source.sourceUrl,
       bookSourceName: source.sourceName,
       bookSourceType: 0,
       enabledExplore: false,
-    } as BookSource,
-    url,
-    options.key ?? '',
-    page,
-  );
+    } as BookSource;
+  const request = options.key === undefined
+    ? buildSourcePageRequest(definition, url, page)
+    : buildSourceRequest(definition, url, options.key, page);
   const response = await fetcher(request.url, {
     method: request.method,
     headers: {
@@ -228,7 +221,7 @@ export async function fetchRssFeedPage(
     articleRule =
       typeof source.ruleArticles === 'string' ? source.ruleArticles.trim() : '';
   if (nextRule && articleRule) {
-    const next = sourceRuleText(ruleData, nextRule);
+    const next = sourceRuleText(ruleData, nextRule, true);
     nextUrl =
       nextRule.toUpperCase() === 'PAGE'
         ? url
@@ -274,7 +267,7 @@ async function fetchText(
   source: RssSource,
   fetcher: typeof fetch,
 ) {
-  const request = buildSourceRequest(
+  const request = buildSourcePageRequest(
     {
       ...source,
       bookSourceUrl: source.sourceUrl,

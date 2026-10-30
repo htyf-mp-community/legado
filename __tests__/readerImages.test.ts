@@ -1,13 +1,21 @@
 import {
-  applyReaderSpecialStylePreference,
-  protectReaderHtmlMarkers,
   applyReaderTagPreferences,
   readerContentSegments,
   readerHtmlToText,
 } from '../src/core/readerImages';
+import { decodeReaderContent, protectNativeReaderHtml, renderNativeReaderContent } from '../src/core/readerNativeContent';
+import { formatReaderParagraphs } from '../src/core/htmlFormatter';
 import { paginateText } from '../src/core/pagination';
 
 describe('reader inline images', () => {
+  test('does not turn native serializer indentation into extra reader lines', () => {
+    expect(readerHtmlToText('<div>\n 第一段\n <br>\n 第二段\n</div>')).toBe(
+      '第一段\n第二段',
+    );
+    expect(readerHtmlToText('<div>\n <p>A</p>\n <p>B</p>\n</div>')).toBe(
+      readerHtmlToText('<div><p>A</p><p>B</p></div>'),
+    );
+  });
   test('preserves plain and linked images with absolute URLs', () => {
     const text = readerHtmlToText(
       '<p>前文</p><img data-src="/a.jpg"><a href="/open"><img src="b.png"></a><p>后文</p>',
@@ -114,35 +122,38 @@ describe('reader inline images', () => {
       ),
     ).toBe(true);
   });
-  test('falls usehtml back to normal parsed text when adaptation is disabled', () => {
+  test('renders cached usehtml literally when native adaptation is disabled', () => {
     const marked = readerHtmlToText(
       '<usehtml><p><b>普通正文</b></p><img src="/a.jpg"></usehtml>',
       'https://books.example/chapter/1',
     );
-    const plain = applyReaderSpecialStylePreference(marked, false);
-    expect(plain).toContain('普通正文');
+    const context = decodeReaderContent(marked);
+    const plain = renderNativeReaderContent(formatReaderParagraphs(context.content, ''), context, false);
+    expect(plain).toContain('<b>普通正文</b>');
     expect(plain).not.toContain('HTYF_HTML');
     expect(readerContentSegments(plain)).toContainEqual({
       type: 'image',
-      image: { src: 'https://books.example/a.jpg' },
+      image: { src: '/a.jpg' },
     });
-    expect(applyReaderSpecialStylePreference(marked, true)).toBe(marked);
+    expect(readerContentSegments(renderNativeReaderContent(formatReaderParagraphs(context.content, ''), context, true)).some(segment => segment.type === 'html')).toBe(true);
   });
   test('protects rich HTML from chapter replacement and restores it exactly', () => {
     const marked = readerHtmlToText(
       '<p>替换正文</p><usehtml><b>替换不应进入这里</b></usehtml>',
       'https://books.example/chapter',
     );
-    const protectedValue = protectReaderHtmlMarkers(marked);
+    const context = decodeReaderContent(marked);
+    const protectedValue = protectNativeReaderHtml(context.content, true);
     expect(protectedValue.text).not.toContain('替换不应进入这里');
     const replaced = protectedValue.text.replace(/替换/g, '净化');
-    const restored = protectedValue.restore(replaced);
+    const restored = renderNativeReaderContent(formatReaderParagraphs(protectedValue.restore(replaced), ''), context, true);
     expect(restored).toContain('净化正文');
     expect(readerContentSegments(restored)).toContainEqual({
       type: 'html',
       html: {
         html: '<b>替换不应进入这里</b>',
         baseUrl: 'https://books.example/chapter',
+        sourceFormatted: true,
       },
     });
   });

@@ -28,6 +28,9 @@ jest.mock('../src/data/backup', () => ({
 jest.mock('../src/data/backupPreferences', () => ({
   loadBackupPreferences: () => ({ onlyLatest: true }),
 }));
+jest.mock('../src/data/localPassword', () => ({
+  loadLocalPassword: () => 'fixture-password',
+}));
 jest.mock('../src/core/backupMedia', () => ({
   prepareBackupMedia: jest.fn(async value => value),
   restoreBackupMediaPaths: jest.fn(async value => value),
@@ -150,6 +153,16 @@ test('native Android ZIPs use the legacy converter and retain warnings and stage
   expect(inspectLegacyBackupDirectory).toHaveBeenCalledWith(
     expect.any(String),
     'password',
+  );
+  expect(result.legacyFiles).toEqual(['bookshelf.json']);
+});
+
+test('ordinary native ZIP inspection uses the current local password by default', async () => {
+  (readDir as jest.Mock).mockResolvedValue([item('bookshelf.json')]);
+  const result = await inspectLocalBackupArchive('/cache/native.zip');
+  expect(inspectLegacyBackupDirectory).toHaveBeenCalledWith(
+    expect.any(String),
+    'fixture-password',
   );
   expect(result.legacyFiles).toEqual(['bookshelf.json']);
 });

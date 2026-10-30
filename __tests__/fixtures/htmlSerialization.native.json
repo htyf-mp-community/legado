@@ -1,0 +1,773 @@
+{
+  "sources": {
+    "AnalyzeByJSoup.kt": "d4e87034a0e7db3ab94148b45ec8e0aa257e222924723cfb2adda41e20a97cd8",
+    "RuleAnalyzer.kt": "74ab0152bce9d5e014cc69d9c6974cbb093d8353200f1452066f7d05102265a7"
+  },
+  "jsoupVersion": "1.16.2",
+  "xpathVersion": "2.5.3",
+  "jsoupJarSha256": "a73a1eb5d02b51490547c46485e30f4f14e68af3624840b57abe8c4580a00b83",
+  "xpathJarSha256": "1bcd0643910663a6eb0e506803011b9145b5192b8905b1522ab07d0702ce394a",
+  "caseCount": 109,
+  "cases": [
+    {
+      "html": "<div id=\"x\"> 第一段 <b>跳过注释</b> 第二段\n  续行 <script>不要混入</script> 第三段 </div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n 第一段 <b>跳过注释</b> 第二段 续行  第三段\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> 第一段 <b>跳过注释</b> 第二段\n  续行 <script>不要混入</script> 第三段 </div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n 第一段 <b>跳过注释</b> 第二段 续行 \n <script>不要混入</script> 第三段\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><p>甲</p><p>乙<br>丙</p>尾<script>bad()</script><style>.ad{}</style>末</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <p>甲</p>\n <p>乙<br>\n  丙</p>尾末\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><p>甲</p><p>乙<br>丙</p>尾<script>bad()</script><style>.ad{}</style>末</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <p>甲</p>\n <p>乙<br>\n  丙</p>尾\n <script>bad()</script>\n <style>.ad{}</style>末\n</div>"
+      ]
+    },
+    {
+      "html": "<p id=\"x\">A <b>skip</b>  B\n C <i>skip</i>\n D</p>",
+      "rule": "#x@html",
+      "values": [
+        "<p id=\"x\">A <b>skip</b> B C <i>skip</i> D</p>"
+      ]
+    },
+    {
+      "html": "<p id=\"x\">A <b>skip</b>  B\n C <i>skip</i>\n D</p>",
+      "rule": "#x@all",
+      "values": [
+        "<p id=\"x\">A <b>skip</b> B C <i>skip</i> D</p>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> A​B­C‍D </div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n  A​B­C‍D \n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> A​B­C‍D </div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n  A​B­C‍D \n</div>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\">\n A \n B </pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"> A \n B </pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\">\n A \n B </pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"> A \n B </pre>"
+      ]
+    },
+    {
+      "html": "<textarea id=\"x\"> A \n B </textarea>",
+      "rule": "#x@html",
+      "values": [
+        "<textarea id=\"x\"> A \n B </textarea>"
+      ]
+    },
+    {
+      "html": "<textarea id=\"x\"> A \n B </textarea>",
+      "rule": "#x@all",
+      "values": [
+        "<textarea id=\"x\"> A \n B </textarea>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<span>B</span>C</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A<span>B</span>C\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<span>B</span>C</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A<span>B</span>C\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<div>B</div>C<span>D</span></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A\n <div>\n  B\n </div>C<span>D</span>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<div>B</div>C<span>D</span></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A\n <div>\n  B\n </div>C<span>D</span>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<p>B</p><!-- gap -->C</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A\n <p>B</p><!-- gap -->C\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<p>B</p><!-- gap -->C</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A\n <p>B</p><!-- gap -->C\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<p>B</p><custom>C</custom>D</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A\n <p>B</p><custom>\n  C\n </custom>D\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<p>B</p><custom>C</custom>D</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A\n <p>B</p><custom>\n  C\n </custom>D\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<wbr>B<br>C<hr>D</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A<wbr>B\n <br>\n C\n <hr>D\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<wbr>B<br>C<hr>D</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A<wbr>B\n <br>\n C\n <hr>D\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<script>secret</script>B<style>secret</style>C</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n ABC\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A<script>secret</script>B<style>secret</style>C</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A\n <script>secret</script>B\n <style>secret</style>C\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><script>secret</script><style>secret</style></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\"></div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><script>secret</script><style>secret</style></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <script>secret</script>\n <style>secret</style>\n</div>"
+      ]
+    },
+    {
+      "html": "<table id=\"x\"><tbody><tr><td>A</td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>",
+      "rule": "#x@html",
+      "values": [
+        "<table id=\"x\">\n <tbody>\n  <tr>\n   <td>A</td>\n   <td>B</td>\n  </tr>\n  <tr>\n   <td>C</td>\n   <td>D</td>\n  </tr>\n </tbody>\n</table>"
+      ]
+    },
+    {
+      "html": "<table id=\"x\"><tbody><tr><td>A</td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>",
+      "rule": "#x@all",
+      "values": [
+        "<table id=\"x\">\n <tbody>\n  <tr>\n   <td>A</td>\n   <td>B</td>\n  </tr>\n  <tr>\n   <td>C</td>\n   <td>D</td>\n  </tr>\n </tbody>\n</table>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A\t \n\r\f&nbsp; B</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n A &nbsp; B\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">A\t \n\r\f&nbsp; B</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n A &nbsp; B\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">\u000bA\u000bB\u000b</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n &#xb;A&#xb;B&#xb;\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">\u000bA\u000bB\u000b</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n &#xb;A&#xb;B&#xb;\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">&#x1680;A&#x202f;B&#xfeff;C&#x3000;</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n  A B﻿C　\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">&#x1680;A&#x202f;B&#xfeff;C&#x3000;</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n  A B﻿C　\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><span>A</span><span>B</span><p>C</p><p>D</p></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <span>A</span><span>B</span>\n <p>C</p>\n <p>D</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><span>A</span><span>B</span><p>C</p><p>D</p></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <span>A</span><span>B</span>\n <p>C</p>\n <p>D</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\"></div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\"></div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> \t\n &nbsp; </div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n &nbsp;\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> \t\n &nbsp; </div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n &nbsp;\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><br> A <br> B <br></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <br>\n  A \n <br>\n  B \n <br>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><br> A <br> B <br></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <br>\n  A \n <br>\n  B \n <br>\n</div>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"> A \n B </pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"> A \n B </pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"> A \n B </pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"> A \n B </pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span> A \n B </span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span> A \n B </span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span> A \n B </span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span> A \n B </span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span> A \n B </span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span> A \n B </span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span> A \n B </span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span> A \n B </span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span> A \n B </span></span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span><span> A \n B </span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span> A \n B </span></span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span><span> A \n B </span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span> A \n B </span></span></span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span> A \n B </span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span> A \n B </span></span></span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span> A \n B </span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span> A \n B </span></span></span></span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span> A \n B </span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span> A \n B </span></span></span></span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span> A \n B </span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span><span> A \n B </span></span></span></span></span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span><span> A B </span></span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span><span> A \n B </span></span></span></span></span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span><span> A B </span></span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span><span><span> A \n B </span></span></span></span></span></span></span></pre>",
+      "rule": "#x@html",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span><span><span> A B </span></span></span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<pre id=\"x\"><span><span><span><span><span><span><span> A \n B </span></span></span></span></span></span></span></pre>",
+      "rule": "#x@all",
+      "values": [
+        "<pre id=\"x\"><span><span><span><span><span><span><span> A B </span></span></span></span></span></span></span></pre>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><b>A</b></div><div class=\"item\"><b>B</b></div></main>",
+      "rule": "#x@html",
+      "values": []
+    },
+    {
+      "html": "<main><div class=\"item\"><b>A</b></div><div class=\"item\"><b>B</b></div></main>",
+      "rule": "#x@all",
+      "values": []
+    },
+    {
+      "html": "<div id=\"x\">Hello<br>World<p>A</p><p>B</p></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n Hello\n <br>\n World\n <p>A</p>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\">Hello<br>World<p>A</p><p>B</p></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n Hello\n <br>\n World\n <p>A</p>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><!--first--><p>A</p><!--later-->B</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <!--first-->\n <p>A</p><!--later-->B\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><!--first--><p>A</p><!--later-->B</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <!--first-->\n <p>A</p><!--later-->B\n</div>"
+      ]
+    },
+    {
+      "html": "<p id=\"x\" data-value=\"a&amp;&quot;&lt;\" hidden=\"hidden\">A&nbsp;&amp;&lt;&gt;😀</p>",
+      "rule": "#x@html",
+      "values": [
+        "<p id=\"x\" data-value=\"a&amp;&quot;<\" hidden>A&nbsp;&amp;&lt;&gt;😀</p>"
+      ]
+    },
+    {
+      "html": "<p id=\"x\" data-value=\"a&amp;&quot;&lt;\" hidden=\"hidden\">A&nbsp;&amp;&lt;&gt;😀</p>",
+      "rule": "#x@all",
+      "values": [
+        "<p id=\"x\" data-value=\"a&amp;&quot;<\" hidden>A&nbsp;&amp;&lt;&gt;😀</p>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><input checked disabled=\"\" value=\"a&b\"><img src=\"/x\"><br><custom /></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <input checked disabled value=\"a&amp;b\"><img src=\"/x\">\n <br><custom />\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><input checked disabled=\"\" value=\"a&b\"><img src=\"/x\"><br><custom /></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <input checked disabled value=\"a&amp;b\"><img src=\"/x\">\n <br><custom />\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><custom />tail<p>Next</p></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <custom />tail\n <p>Next</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><custom />tail<p>Next</p></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <custom />tail\n <p>Next</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><dialog />tail<p>Next</p></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <dialog />tail\n <p>Next</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><dialog />tail<p>Next</p></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <dialog />tail\n <p>Next</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><x:item />tail<x:item>Next</x:item></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <x:item />tail<x:item>\n  Next\n </x:item>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><x:item />tail<x:item>Next</x:item></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <x:item />tail<x:item>\n  Next\n </x:item>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\" custom empty=\"\" checked=\"checked\" disabled=\"false\">A</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\" custom empty=\"\" checked disabled=\"false\">\n A\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\" custom empty=\"\" checked=\"checked\" disabled=\"false\">A</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\" custom empty=\"\" checked disabled=\"false\">\n A\n</div>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><root id=\"x\"><![CDATA[A < B & C]]></root>",
+      "rule": "#x@html",
+      "values": [
+        "<root id=\"x\"><![CDATA[A < B & C]]></root>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><root id=\"x\"><![CDATA[A < B & C]]></root>",
+      "rule": "#x@all",
+      "values": [
+        "<root id=\"x\"><![CDATA[A < B & C]]></root>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><script id=\"x\"> A &amp; B </script>",
+      "rule": "#x@html",
+      "values": [
+        "<script id=\"x\">\n A &amp; B\n</script>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><script id=\"x\"> A &amp; B </script>",
+      "rule": "#x@all",
+      "values": [
+        "<script id=\"x\"> A &amp; B </script>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><style id=\"x\"> A &amp; B </style>",
+      "rule": "#x@html",
+      "values": [
+        "<style id=\"x\">\n A &amp; B\n</style>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><style id=\"x\"> A &amp; B </style>",
+      "rule": "#x@all",
+      "values": [
+        "<style id=\"x\"> A &amp; B </style>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> <span>A</span> <span>B</span> </div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <span>A</span> <span>B</span>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"> <span>A</span> <span>B</span> </div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <span>A</span> <span>B</span>\n</div>"
+      ]
+    },
+    {
+      "html": "<template id=\"x\"><p>A</p><p>B</p></template>",
+      "rule": "#x@html",
+      "values": [
+        "<template id=\"x\">\n <p>A</p>\n <p>B</p>\n</template>"
+      ]
+    },
+    {
+      "html": "<template id=\"x\"><p>A</p><p>B</p></template>",
+      "rule": "#x@all",
+      "values": [
+        "<template id=\"x\">\n <p>A</p>\n <p>B</p>\n</template>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><table><tr><td>A</td><td>B</td></tr></table></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <table>\n  <tbody>\n   <tr>\n    <td>A</td>\n    <td>B</td>\n   </tr>\n  </tbody>\n </table>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><table><tr><td>A</td><td>B</td></tr></table></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <table>\n  <tbody>\n   <tr>\n    <td>A</td>\n    <td>B</td>\n   </tr>\n  </tbody>\n </table>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><p>A<p>B</div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <p>A</p>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><p>A<p>B</div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <p>A</p>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<script id=\"x\">secret()</script>",
+      "rule": "#x@html",
+      "values": [
+        "<script id=\"x\">secret()</script>"
+      ]
+    },
+    {
+      "html": "<script id=\"x\">secret()</script>",
+      "rule": "#x@all",
+      "values": [
+        "<script id=\"x\">secret()</script>"
+      ]
+    },
+    {
+      "html": "<style id=\"x\">.x{}</style>",
+      "rule": "#x@html",
+      "values": [
+        "<style id=\"x\">.x{}</style>"
+      ]
+    },
+    {
+      "html": "<style id=\"x\">.x{}</style>",
+      "rule": "#x@all",
+      "values": [
+        "<style id=\"x\">.x{}</style>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><root id=\"x\"><child a=\"&lt;\">A &amp; B</child><empty /></root>",
+      "rule": "#x@html",
+      "values": [
+        "<root id=\"x\"><child a=\"&lt;\">A &amp; B</child><empty /></root>"
+      ]
+    },
+    {
+      "html": "<?xml version=\"1.0\"?><root id=\"x\"><child a=\"&lt;\">A &amp; B</child><empty /></root>",
+      "rule": "#x@all",
+      "values": [
+        "<root id=\"x\"><child a=\"&lt;\">A &amp; B</child><empty /></root>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div>A</div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
+      "rule": "#x@html",
+      "values": [
+        "<div id=\"x\">\n <div>\n  <div>\n   <div>\n    <div>\n     <div>\n      <div>\n       <div>\n        <div>\n         <div>\n          <div>\n           <div>\n            <div>\n             <div>\n              <div>\n               <div>\n                <div>\n                 <div>\n                  <div>\n                   <div>\n                    <div>\n                     <div>\n                      <div>\n                       <div>\n                        <div>\n                         <div>\n                          <div>\n                           <div>\n                            <div>\n                             <div>\n                              <div>\n                              <div>\n                              <div>\n                              <div>\n                              <div>\n                              A\n                              </div>\n                              </div>\n                              </div>\n                              </div>\n                              </div>\n                             </div>\n                            </div>\n                           </div>\n                          </div>\n                         </div>\n                        </div>\n                       </div>\n                      </div>\n                     </div>\n                    </div>\n                   </div>\n                  </div>\n                 </div>\n                </div>\n               </div>\n              </div>\n             </div>\n            </div>\n           </div>\n          </div>\n         </div>\n        </div>\n       </div>\n      </div>\n     </div>\n    </div>\n   </div>\n  </div>\n </div>\n</div>"
+      ]
+    },
+    {
+      "html": "<div id=\"x\"><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div>A</div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
+      "rule": "#x@all",
+      "values": [
+        "<div id=\"x\">\n <div>\n  <div>\n   <div>\n    <div>\n     <div>\n      <div>\n       <div>\n        <div>\n         <div>\n          <div>\n           <div>\n            <div>\n             <div>\n              <div>\n               <div>\n                <div>\n                 <div>\n                  <div>\n                   <div>\n                    <div>\n                     <div>\n                      <div>\n                       <div>\n                        <div>\n                         <div>\n                          <div>\n                           <div>\n                            <div>\n                             <div>\n                              <div>\n                              <div>\n                              <div>\n                              <div>\n                              <div>\n                              A\n                              </div>\n                              </div>\n                              </div>\n                              </div>\n                              </div>\n                             </div>\n                            </div>\n                           </div>\n                          </div>\n                         </div>\n                        </div>\n                       </div>\n                      </div>\n                     </div>\n                    </div>\n                   </div>\n                  </div>\n                 </div>\n                </div>\n               </div>\n              </div>\n             </div>\n            </div>\n           </div>\n          </div>\n         </div>\n        </div>\n       </div>\n      </div>\n     </div>\n    </div>\n   </div>\n  </div>\n </div>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": ".item@html",
+      "values": [
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": ".item@all",
+      "values": [
+        "<div class=\"item\">\n <script>secret</script>\n <p>A</p>\n</div>\n<div class=\"item\">\n <style>.x{}</style>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "div@html",
+      "values": [
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "div@all",
+      "values": [
+        "<div class=\"item\">\n <script>secret</script>\n <p>A</p>\n</div>\n<div class=\"item\">\n <style>.x{}</style>\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "@CSS:div@html",
+      "values": [
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "@CSS:.missing@all",
+      "values": [
+        ""
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": ".missing@all",
+      "values": []
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "div@all&&p@all",
+      "values": [
+        "<div class=\"item\">\n <script>secret</script>\n <p>A</p>\n</div>\n<div class=\"item\">\n <style>.x{}</style>\n <p>B</p>\n</div>",
+        "<p>A</p>\n<p>B</p>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "div@html&&div@all",
+      "values": [
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>",
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "div@html%%div@all",
+      "values": [
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>",
+        "<div class=\"item\">\n <p>A</p>\n</div>\n<div class=\"item\">\n <p>B</p>\n</div>"
+      ]
+    },
+    {
+      "html": "<main><div class=\"item\"><script>secret</script><p>A</p></div><div class=\"item\"><style>.x{}</style><p>B</p></div></main>",
+      "rule": "@CSS:.missing@all||div@all",
+      "values": [
+        ""
+      ]
+    }
+  ]
+}

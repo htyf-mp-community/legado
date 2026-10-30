@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-29",
+  "scope": "legacy selector indexes; overall 1:1 goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "canonicalReference": {
+    "sourcePath": "app/src/main/java/io/legado/app/model/analyzeRule/AnalyzeByJSoup.kt",
+    "sourceSha256": "d4e87034a0e7db3ab94148b45ec8e0aa257e222924723cfb2adda41e20a97cd8",
+    "extractedClassSha256": "0eeb4d59d90e44d6ebce9a48ca58f105cc971f2d3cd81d676f71f039b0afe440",
+    "jsoupVersion": "1.16.2",
+    "jsoupJarSha256": "a73a1eb5d02b51490547c46485e30f4f14e68af3624840b57abe8c4580a00b83",
+    "caseCount": 2456
+  },
+  "nativeExpectedErrors": 303,
+  "nativeFixtureMatches": "pass",
+  "ios": {
+    "site": "https://www.vikbook.com/",
+    "temporaryRule": "#content@.page[2:6:2]",
+    "selectedChapters": [
+      "第一回",
+      "第三回",
+      "第五回"
+    ],
+    "selectedCount": 3,
+    "debugSearchCount": 1,
+    "debugInfo": "pass",
+    "debugToc": "pass",
+    "debugContentChars": 6991,
+    "temporarySourceRemoved": true,
+    "libraryBookAdded": false,
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "6434393e1e4496c3418d7697f08a35397faefa1b9942743ef988165faa4ff762"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "cfcaefd8c9223d11c7f4f6fc9df2d4a1db286e4f69c5a0c728d73f0ab18fa95b"
+      }
+    },
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "coldResume": {
+      "result": "pass",
+      "chapter": "第二回",
+      "page": "2/24",
+      "bookCount": 9,
+      "screenshot": "cold-resume.png",
+      "debugBundlePort": 8097
+    }
+  },
+  "verification": {
+    "suites": 196,
+    "tests": 959,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "runtimeDependencyPinsUnchanged": true,
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass"
+  },
+  "package": {
+    "version": "0.0.30",
+    "bytes": 1612975,
+    "sha256": "8ddaa3dd4ef07a38735dfd7b713d73768ed22b30ba0c1116eebc00c8b145a4bb",
+    "zipIntegrity": "pass",
+    "productionInputCount": 308,
+    "productionInputSha256": "6c09d2c97cd202809ca524d5372f5a332ea9961a2ea7ceb25686c7aba3f91e77",
+    "sourceDataEmbedded": false,
+    "qrPixelPayloadMatchesConfig": true,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "remainingGaps": [
+    "Arbitrary JavaScript sandbox and source login callbacks",
+    "Complete visual and interaction parity across the migration inventory",
+    "Actual HTYF host/device acceptance of the production archive"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "method": "Normal in-app ZIP export; no MMKV files were read or edited",
+  "removedFixtureOrigins": [
+    "http://127.0.0.1:18212",
+    "http://127.0.0.1:18212/form"
+  ],
+  "temporaryBooksAdded": false,
+  "books": {
+    "count": 9,
+    "beforeSha256": "4cfe4f8027eada00c5e38c0d065b409dc91d576da71fba12e843402789be71b0",
+    "afterSha256": "4cfe4f8027eada00c5e38c0d065b409dc91d576da71fba12e843402789be71b0",
+    "equal": true
+  },
+  "sources": {
+    "count": 8,
+    "beforeSha256": "75b3791a91dfd69876de922ed1a388e7fadef6d1586c3debb1c4bcc5573072d9",
+    "afterSha256": "75b3791a91dfd69876de922ed1a388e7fadef6d1586c3debb1c4bcc5573072d9",
+    "equal": true
+  },
+  "rules": {
+    "count": 0,
+    "beforeSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "afterSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "equal": true
+  },
+  "originalRecordsUnchanged": true
+}

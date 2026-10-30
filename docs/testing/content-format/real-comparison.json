@@ -1,0 +1,25 @@
+{
+  "inputUtf16Units": 9281,
+  "inputSha256": "6065a2860043abd380ff61cfa88745f93f50993329dddaaa1bfa59932d1f2dcb",
+  "nativeUtf16Units": 7636,
+  "targetUtf16Units": 7636,
+  "nativeSha256": "aed23df07e4e3e5a93f7677fabf2a340ea4b617c0f1f9e6e7491430e52fd9390",
+  "targetSha256": "aed23df07e4e3e5a93f7677fabf2a340ea4b617c0f1f9e6e7491430e52fd9390",
+  "equal": true,
+  "normalizedParagraphs": 61,
+  "referenceSource": "temporary 59,052-byte real response previously compared through native AnalyzeByJSoup",
+  "paragraphPass": {
+    "equal": true,
+    "utf16Units": 7631,
+    "paragraphs": 61,
+    "sha256": "e0884f1a05b104dafbfa83a2970ccbee3f4f54238091d29f3d52b1d48012225f"
+  },
+  "afterOriginalSourceReplacement": {
+    "equal": true,
+    "nativeUtf16Units": 7510,
+    "targetUtf16Units": 7510,
+    "nativeSha256": "cd53f507c26e9c54872e6ea5dd282d2d7c66d39348bf69df3dc6505cfab28579",
+    "targetSha256": "cd53f507c26e9c54872e6ea5dd282d2d7c66d39348bf69df3dc6505cfab28579",
+    "scope": "same source leading ## regex rule; Kotlin BookContent line trim, Regex replacement and HTML4 unescape statements"
+  }
+}

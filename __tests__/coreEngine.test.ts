@@ -185,16 +185,19 @@ getUrl(key)`,
   });
   test('retries a cached GET 404 once with cache bypass headers', async () => {
     const originalUrl = 'https://www.sudugu.cc/41/27285.html',
-      fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(async url => {
-        const cacheBusted = String(url).includes('_htyf_retry=');
-        return {
-          ok: cacheBusted,
-          status: cacheBusted ? 200 : 404,
-          url: String(url),
-          headers: { forEach: () => undefined, get: () => null },
-          text: async () => cacheBusted ? '<div class="con">正文</div>' : 'cached not found',
-        } as unknown as Response;
-      });
+      fetchMock = jest
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async url => {
+          const cacheBusted = String(url).includes('_htyf_retry=');
+          return {
+            ok: cacheBusted,
+            status: cacheBusted ? 200 : 404,
+            url: String(url),
+            headers: { forEach: () => undefined, get: () => null },
+            text: async () =>
+              cacheBusted ? '<div class="con">正文</div>' : 'cached not found',
+          } as unknown as Response;
+        });
 
     await expect(
       executeSourceRequest({
@@ -207,7 +210,9 @@ getUrl(key)`,
     ).resolves.toMatchObject({ data: '<div class="con">正文</div>' });
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      expect.stringMatching(/^https:\/\/www\.sudugu\.cc\/41\/27285\.html\?_htyf_retry=\d+$/),
+      expect.stringMatching(
+        /^https:\/\/www\.sudugu\.cc\/41\/27285\.html\?_htyf_retry=\d+$/,
+      ),
       expect.objectContaining({
         headers: expect.objectContaining({
           'Cache-Control': 'no-cache',
@@ -228,7 +233,7 @@ getUrl(key)`,
     ).toMatchObject({
       url: 'https://example.com/search/',
       method: 'POST',
-      body: 'keyword=三体&page=2',
+      body: 'keyword=%E4%B8%89%E4%BD%93&page=2',
       headers: {
         Referer: 'https://example.com/',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -255,7 +260,8 @@ getUrl(key)`,
         '三体',
       ),
     ).toMatchObject({
-      url: 'https://example.com/so/%E4%B8%89%E4%BD%93.html',
+      // AnalyzeUrl/NetworkUtils retain raw path spelling until the HTTP client.
+      url: 'https://example.com/so/三体.html',
       headers: { Referer: 'https://example.com/' },
     }));
   test('unwraps declarative request shells from the supplied source collection', () => {
@@ -271,7 +277,8 @@ getUrl(key)`,
       charset: 'gbk',
       body: 'searchkey=%C8%FD%CC%E5&searchtype=all',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=gbk',
+        // Native postForm sends the percent-encoded ASCII string as UTF-8.
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       },
     });
     expect(
@@ -290,7 +297,7 @@ getUrl(key)`,
     ).toMatchObject({
       url: 'https://example.com/search.php',
       method: 'POST',
-      body: 'keyword=三体',
+      body: 'keyword=%E4%B8%89%E4%BD%93',
     });
   });
   test('resolves safe baseUrl replacement chains used by 69shuba TOC rules', () => {
@@ -310,7 +317,7 @@ getUrl(key)`,
       ok: true,
       status: 200,
       url: 'https://example.com/search',
-      headers: { forEach: () => undefined, get: () => null },
+      headers: { forEach: () => undefined, get: (name: string) => name === 'content-type' ? 'text/plain; charset=GBK' : null },
       arrayBuffer: async () => new Uint8Array([0xc8, 0xfd, 0xcc, 0xe5]).buffer,
     } as unknown as Response);
     await expect(
@@ -434,6 +441,34 @@ getUrl(key)`,
       '公开正文内容',
     );
     fetchMock.mockRestore();
+  });
+  test('preserves native direct-text paragraph boundaries through the content loader', async () => {
+    const html =
+      '<div id="x"> 第一段 <b>跳过注释</b> 第二段\n  续行 <script>不要混入</script> 第三段 </div>';
+    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(html, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      }),
+    );
+    try {
+      const result = await loadChapterContent(
+        { ...source, ruleContent: { content: '#x@textNodes' } },
+        {
+          url: 'https://example.com/native-text',
+          title: '第一章',
+          index: 0,
+          bookUrl: 'https://example.com/book',
+          baseUrl: 'https://example.com/book',
+          isVolume: false,
+          isVip: false,
+          isPay: false,
+        },
+      );
+      expect(result).toBe('第一段\n　　第二段 续行\n　　第三段');
+    } finally {
+      fetchMock.mockRestore();
+    }
   });
   test('follows challenge-wrapped 69shuba rules after Cookie verification', async () => {
     const challenge = `<js>if(result.match(/^<!DOCTYPE html><html lang="en-US"><head><title>Just a moment.../)){java.longToast('verify');result=java.startBrowserAwait(baseUrl,'verify').body();};result;</js>`,
@@ -726,7 +761,7 @@ getUrl(key)`,
         content: '$.content',
         subContent: '$.note',
         nextContentUrl: '$.next',
-        replaceRegex: '广告##',
+        replaceRegex: '##广告##',
       },
     };
     const responses = [
@@ -752,7 +787,7 @@ getUrl(key)`,
         isVip: false,
         isPay: false,
       }),
-    ).resolves.toEqual({ content: '正文一\n\n正文二', subContent: '副文' });
+    ).resolves.toEqual({ content: '正文一\n\n正文二\n', subContent: '副文' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
     fetchMock.mockRestore();
   });
@@ -762,23 +797,23 @@ getUrl(key)`,
       bookSourceUrl: 'https://www.sudugu.co',
       ruleContent: {
         content: 'class.con.0@html',
-        nextContentUrl:
-          "//div[@class='prenext']/span/a[text()='下一页']/@href",
+        nextContentUrl: "//div[@class='prenext']/span/a[text()='下一页']/@href",
       },
     };
     const firstUrl = 'https://www.sudugu.cc/41/27285.html',
       secondUrl = 'https://www.sudugu.cc/41/27285_2.html',
       fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(
-        async input => ({
-          ok: true,
-          status: 200,
-          headers: { forEach: () => undefined, get: () => null },
-          text: async () =>
-            String(input) === firstUrl
-              ? '<div class="con">第一页</div><div class="prenext"><span><a href="/41/27285_2.html">下一页</a></span></div>'
-              : '<div class="con">第二页</div>',
-          url: String(input),
-        }) as unknown as Response,
+        async input =>
+          ({
+            ok: true,
+            status: 200,
+            headers: { forEach: () => undefined, get: () => null },
+            text: async () =>
+              String(input) === firstUrl
+                ? '<div class="con">第一页</div><div class="prenext"><span><a href="/41/27285_2.html">下一页</a></span></div>'
+                : '<div class="con">第二页</div>',
+            url: String(input),
+          }) as unknown as Response,
       );
 
     await expect(
@@ -792,7 +827,7 @@ getUrl(key)`,
         isVip: false,
         isPay: false,
       }),
-    ).resolves.toBe('第一页\n第二页');
+    ).resolves.toBe('　　　　第一页\n　　\n　　　　第二页\n　　');
     expect(fetchMock).toHaveBeenCalledWith(secondUrl, expect.any(Object));
     fetchMock.mockRestore();
   });
@@ -820,7 +855,7 @@ getUrl(key)`,
         isVip: false,
         isPay: false,
       }),
-    ).resolves.toBe('第一段\n第二段\n第三段');
+    ).resolves.toBe('第一段\n　　第二段\n　　第三段');
     fetchMock.mockRestore();
   });
   test('normalizes double-encoded HTML book introductions', async () => {
@@ -878,7 +913,7 @@ getUrl(key)`,
         isVip: false,
         isPay: false,
       }),
-    ).resolves.toBe('第一段\n第二段');
+    ).resolves.toBe('第一段\n第二段\n');
     fetchMock.mockRestore();
   });
   test('preserves video HTML and inline DASH manifests', async () => {
@@ -909,4 +944,45 @@ getUrl(key)`,
     ).resolves.toBe('<video src="https://cdn.test/a.m3u8"></video>');
     fetchMock.mockRestore();
   });
+});
+
+test('real imported metadata rules resolve headings, nested tags and numeric cover extraction through book-info loading', async () => {
+  const vikbook = {
+    ...source,
+    ...require('../docs/testing/real-source-1321/vikbook.json'),
+  } as BookSource;
+  const [book] = parseSearchBooks(
+    vikbook,
+    '<div id="page"><div itemscope><a href="https://www.vikbook.com/?id=642932592530">西游记-吴承恩</a></div></div>',
+    'https://www.vikbook.com/search.php?s=test',
+  );
+  expect(book.coverUrl).toBe(
+    'https://www.vikbook.com/contents/642932592530/cover.jpeg',
+  );
+  const html =
+    '<h1 class="title" itemprop="name">西游记</h1><p>作者：<span itemprop="author"><a>吴承恩</a></span></p><div itemprop="description">原书简介</div><p id="tags"><span class="tag">#四大名著</span><span class="tag">#中国古典</span></p><a href="?id=642932592530&display=menu">在线阅读</a>';
+  const fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(
+    async (input: Parameters<typeof fetch>[0]) =>
+      ({
+        ok: true,
+        status: 200,
+        url: String(input),
+        headers: { forEach: () => undefined, get: () => null },
+        text: async () => html,
+      }) as unknown as Response,
+  );
+  try {
+    const info = await loadBookInfo(vikbook, book);
+    expect(info.intro).toContain('📖 书名：西游记');
+    expect(info.intro).toContain('#四大名著#中国古典');
+    expect(info.intro).not.toContain('{{');
+    expect(info.intro).not.toContain('原书简介'); // The unchanged collection still targets an absent .description class.
+    expect(info.author).toBe(''); // No invented fallback for the outdated .author selector.
+    expect(info.tocUrl).toBe(
+      'https://www.vikbook.com/?id=642932592530&display=menu',
+    );
+    expect(info.coverUrl).toBe(book.coverUrl);
+  } finally {
+    fetchMock.mockRestore();
+  }
 });

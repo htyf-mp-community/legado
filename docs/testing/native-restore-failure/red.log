@@ -1,0 +1,77 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/nativeRestoreFailure.test.ts
+
+FAIL __tests__/nativeRestoreFailure.test.ts
+  ● native ZIP restore retains the source/record prefix committed before an invalid record, and does not reach later categories
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 4
+    Received: 9
+
+      31 |   });
+      32 |   await expect(restoreBackupPreview({ raw: JSON.stringify(preview.payload), payload: preview.payload, legacyFiles: preview.importedFiles })).rejects.toThrow();
+    > 33 |   expect(JSON.parse(String(mockValues.get('sources.v1')))[0].customOrder).toBe(4);
+         |                                                                           ^
+      34 |   expect(JSON.parse(String(mockValues.get('reading.records.v1')))).toEqual([{ deviceId: 'remote', bookName: 'Same', author: '甲', readTime: 2000, lastRead: 2 }]);
+      35 |   expect(mockValues.has('legacy.servers.v1')).toBe(false);
+      36 | });
+
+      at Object.toBe (__tests__/nativeRestoreFailure.test.ts:33:75)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● native preview state after each failed/successful record sequence matches the unchanged source loop and DAO
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+    @@ -23,15 +23,15 @@
+            "readTime": 100,
+          },
+        ],
+        "records": Array [
+          Object {
+    -       "author": "authors:[\"乙\",\"甲\"]",
+    +       "author": "甲",
+            "bookName": "Same",
+            "deviceId": "",
+    -       "lastRead": 51,
+    -       "readTime": 50,
+    +       "lastRead": 101,
+    +       "readTime": 100,
+          },
+          Object {
+            "author": "甲",
+            "bookName": "Same",
+            "deviceId": "own",
+
+      48 |       failed = true;
+      49 |     }
+    > 50 |     expect({ input: row.incoming, failed, records: JSON.parse(String(mockValues.get('reading.records.v1'))) }).toEqual({ input: row.incoming, failed: row.expected.failed, records: row.expected.rows });
+         |                                                                                                                ^
+      51 |   }
+      52 | });
+      53 |
+
+      at Object.toEqual (__tests__/nativeRestoreFailure.test.ts:50:112)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        0.721 s
+Ran all test suites matching __tests__/nativeRestoreFailure.test.ts.

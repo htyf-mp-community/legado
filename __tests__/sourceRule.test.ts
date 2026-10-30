@@ -1,4 +1,8 @@
-import { sourceRuleText, sourceRuleValues } from '../src/core/sourceRule';
+import {
+  sourceRuleText,
+  sourceRuleTexts,
+  sourceRuleValues,
+} from '../src/core/sourceRule';
 
 const html = `
   <main>
@@ -20,8 +24,8 @@ test('selects HTML nodes and reads text and attributes', () => {
 });
 
 test('supports Legado selector aliases and replacement suffixes', () => {
-  expect(sourceRuleText(html, 'class.author@text##作者##')).toBe('甲');
-  expect(sourceRuleText(html, 'tag.a@href')).toBe('/book/1');
+  expect(sourceRuleText(html, 'class.author@text##作者##')).toBe('甲\n乙');
+  expect(sourceRuleText(html, 'tag.a@href', true)).toBe('/book/1');
 });
 
 test('combines legacy ampersand rules before applying cleanup', () => {
@@ -81,7 +85,7 @@ test('supports legacy text selectors, bracket slices and direct own text', () =>
   const page =
     '<div><p><b>Prefix</b>Direct</p><span>A</span><span>B</span><a href="/next">下一页</a></div>';
   expect(sourceRuleText(page, 'text.下一页.0@href')).toBe('/next');
-  expect(sourceRuleText(page, 'tag.span[0:1]@text')).toBe('A');
+  expect(sourceRuleText(page, 'tag.span[0:1]@text')).toBe('A\nB');
   expect(
     sourceRuleValues(page, 'tag.span[-1:0]').map(item =>
       sourceRuleText(item, 'text'),
@@ -113,7 +117,7 @@ test('returns direct children and direct text nodes for legacy extraction modes'
   const children = sourceRuleValues(tree, 'id.list.0@children');
   expect(children).toHaveLength(2);
   expect(sourceRuleText(children[0], 'text')).toBe('Volume');
-  expect(sourceRuleText(tree, 'id.list.0@textNodes')).toBe('headbetween');
+  expect(sourceRuleText(tree, 'id.list.0@textNodes')).toBe('head\nbetween');
 });
 
 test('supports common XPath element, text and attribute forms', () => {
@@ -121,7 +125,7 @@ test('supports common XPath element, text and attribute forms', () => {
   expect(
     sourceRuleText(html, "//article[contains(@class,'featured')]/a/text()"),
   ).toBe('第一本');
-  expect(sourceRuleText(html, '//article/a/@href')).toBe('/book/1');
+  expect(sourceRuleText(html, '//article/a/@href')).toBe('/book/1\n/book/2');
 });
 
 test('supports common XPath predicates without JavaScript', () => {
@@ -281,7 +285,7 @@ test('supports remaining XPath relationship axes and node tests', () => {
     ),
   ).toBe('two');
   expect(sourceRuleText(tree, '//title/ancestor-or-self::section[1]/@id')).toBe(
-    'one',
+    'one\ntwo',
   );
   expect(
     sourceRuleValues(tree, "//section[@id='one']/descendant::node()"),
@@ -299,7 +303,7 @@ test('supports remaining XPath relationship axes and node tests', () => {
     'one',
   );
   const nodes =
-    '<root xmlns:x="urn:x"><!--note--><?reader ok?><x:item/></root>';
+    '<?xml version="1.0"?><root xmlns:x="urn:x"><!--note--><?reader ok?><x:item/></root>';
   expect(sourceRuleValues(nodes, '//root/descendant::comment()')).toHaveLength(
     1,
   );
@@ -348,4 +352,113 @@ test('safely unwraps challenge pass-through and URL extraction rules from import
       nextRule,
     ),
   ).toBe('');
+});
+
+test('selects chained CSS nodes used by the real vikbook source instead of treating the final selector as an attribute', () => {
+  const response =
+    '<div id="page"><div itemscope itemtype="http://schema.org/Book"><a href="/?id=642932592530">西游记-吴承恩</a></div></div>';
+  const books = sourceRuleValues(response, '#page@div[itemscope]');
+  expect(books).toHaveLength(1);
+  expect(sourceRuleText(books[0], 'a.0@text')).toBe('西游记-吴承恩');
+  expect(sourceRuleText(books[0], 'a.0@href')).toBe('/?id=642932592530');
+  expect(sourceRuleValues(response, '@CSS:#page@div[itemscope]')).toHaveLength(
+    1,
+  );
+  const toc =
+    '<div id="content"><div class="page"><a href="/read/1">第一回</a></div><div class="page"><a href="/read/2">第二回</a></div></div>';
+  expect(
+    sourceRuleValues(toc, '#content@.page').map(node =>
+      sourceRuleText(node, 'a@href'),
+    ),
+  ).toEqual(['/read/1', '/read/2']);
+  expect(
+    sourceRuleText('<a data-custom="kept">Text</a>', 'a@data-custom'),
+  ).toBe('kept');
+});
+
+test('preserves digits in HTML tag/id/class names and only parses delimited legacy indexes', () => {
+  const page =
+    '<h1>Main</h1><h2>Sub</h2><div id="content2" class="book2">Body</div><h1>Second</h1><div class="item">A</div><div class="item">B</div>';
+  expect(sourceRuleText(page, 'h1.0@text')).toBe('Main');
+  expect(sourceRuleText(page, 'h2@text')).toBe('Sub');
+  expect(sourceRuleText(page, '#content2@text')).toBe('Body');
+  expect(sourceRuleText(page, 'class.book2@text')).toBe('Body');
+  expect(sourceRuleText(page, 'tag.h1.1@text')).toBe('Second');
+  expect(sourceRuleText(page, 'class.item!0@text')).toBe('B');
+});
+
+test('renders nested metadata templates before separating outer replacement rules', () => {
+  const page =
+    '<h1>Book</h1><div class="author"><a>Writer</a></div><div id="tags"><span class="tag">A</span><span class="tag">B</span></div><p class="description">Summary</p>';
+  const template =
+    'Name: {{@@h1@text}}\nAuthor: {{@@.author@a@text}}\nTags: {{@@#tags@.tag@text##\\n## / }}\nIntro: {{@@.description@text}}##^Name:##Title:';
+  expect(sourceRuleText(page, template)).toBe(
+    'Title: Book\nAuthor: Writer\nTags: A / B\nIntro: Summary',
+  );
+  expect(
+    sourceRuleText({ tags: ['A', 'B'] }, 'Tags={{@Json:$.tags[*]##\\n##,}}'),
+  ).toBe('Tags=A,B');
+});
+
+test('uses native text-list joining and explicitly selects the first URL result', () => {
+  const page = '<a href="/one">First</a><a href="/two">Second</a>';
+  expect(sourceRuleText(page, 'a@text')).toBe('First\nSecond');
+  expect(sourceRuleText(page, 'a@href', true)).toBe('/one');
+});
+
+test('native first-match replacement returns the transformed match rather than the surrounding URL', () => {
+  expect(
+    sourceRuleText(
+      '<a href="https://site.test/?id=123&ref=456">Book</a>',
+      'a@href##(\\d+)##https://site.test/contents/$1/cover.jpeg###',
+      true,
+    ),
+  ).toBe('https://site.test/contents/123/cover.jpeg');
+  expect(
+    sourceRuleText(
+      '<a href="/no-id">Book</a>',
+      'a@href##(\\d+)##/$1.jpg###',
+      true,
+    ),
+  ).toBe('');
+});
+
+test('does not silently truncate unsupported JavaScript expressions inside metadata templates', () => {
+  expect(() =>
+    sourceRuleText(
+      '<h1>Book</h1>',
+      'Name={{"prefix" + java.getString("h1@text")}}',
+    ),
+  ).toThrow('JavaScript');
+});
+
+test('decodes static template string escapes without evaluating code', () => {
+  expect(sourceRuleText('', '{{"\\u4e2d\\u{1F600}\\x21" + "\\tend"}}')).toBe(
+    '中😀!\tend',
+  );
+  expect(() => sourceRuleText('', '{{"\\u12"}}')).toThrow('JavaScript');
+});
+test('keeps replacement-only rules and non-HTML URL lists consistent with the native analyzers', () => {
+  expect(sourceRuleText('first\nsecond', '##\\n##,')).toBe('first,second');
+  expect(
+    sourceRuleText(
+      '<a href="/1">One</a><a href="/2">Two</a>',
+      '//a/@href',
+      true,
+    ),
+  ).toBe('/1\n/2');
+  expect(sourceRuleText({ links: ['/1', '/2'] }, '$.links[*]', true)).toBe(
+    '/1\n/2',
+  );
+  expect(sourceRuleTexts('a[b', '##[##-')).toEqual(['a-b']);
+});
+
+test('trims native template result boundaries while preserving replacement text inside a placeholder', () => {
+  expect(sourceRuleText('', '{{"  Keep  "}}')).toBe('Keep');
+  expect(
+    sourceRuleText(
+      '<p class="tag">A</p><p class="tag">B</p>',
+      '{{@@.tag@text##\\n## / }}',
+    ),
+  ).toBe('A / B');
 });

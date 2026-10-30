@@ -1,0 +1,17 @@
+{
+  "productionInputCount": 348,
+  "productionInputSha256": "c91bf9b928006bef93ee6a1d887eb402f3930f56c66ea7212a0900559f2b7011",
+  "productionInputsUnchanged": true,
+  "archiveMatchesPackage": true,
+  "beforeEqualsPrevious044FinalExport": true,
+  "all27ExportedEntriesUnchanged": true,
+  "dependencyHashesUnchanged": true,
+  "nativeProjectsUnchanged": true,
+  "sourceRepositoryStatusUnchanged": true,
+  "removedMigrationDirectoryStillAbsent": true,
+  "privateExportsExcludedFromRepo": true,
+  "generatedCachedExportZipsRetained": 3,
+  "cleanupPending": true,
+  "allNewReportLinksExist": true,
+  "visibleNullAndFractionErrorScreenshotsVerified": true
+}

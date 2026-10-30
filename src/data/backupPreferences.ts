@@ -106,6 +106,7 @@ const groups: Partial<Record<BackupCategory, RegExp[]>> = {
   ],
   history: [
     /^read\.records\./,
+    /^reading\.records\./,
     /^rss\.articles\./,
     /^browser\.history\./,
     /^download\./,
@@ -125,6 +126,7 @@ export function shouldIncludeBackupKey(
   key: string,
   preferences = loadBackupPreferences(),
 ) {
-  if (key === 'backup.restore-ignore.v1') return false;
+  if (key === 'backup.restore-ignore.v1' || key === 'reading.record-sort.v1')
+    return false;
   return preferences.categories[backupCategoryForKey(key)];
 }

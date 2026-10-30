@@ -1,0 +1,13 @@
+{
+  "version": "0.0.43",
+  "bytes": 2593050,
+  "sha256": "b94a4879eafeb93da1c03b0df312c75467da5720500faee2547740a5e5601692",
+  "bundleSha256": "383734848f763368b8416ebbc4d56d736d7edfda5199a961da80377536dd2d96",
+  "bundle": "plugin_legado_v0_0_43.bundle",
+  "productionInputCount": 343,
+  "productionInputSha256": "029ce34e617db29a6b6fedc266ee2f9e585437c9a5e32a710c557f5991a7fd9c",
+  "zipTest": "pass",
+  "licensesRetained": true,
+  "testFixtureStringsAbsent": true,
+  "published": false
+}

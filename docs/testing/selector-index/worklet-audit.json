@@ -1,0 +1,9 @@
+{
+  "compiledArrayClosures": 460,
+  "legacyCompiledClosures": 0,
+  "libraryJestHelpers": [
+    "fn.__closure={}",
+    "w.__closure={...original.__closure}"
+  ],
+  "syntaxErrors": 0
+}

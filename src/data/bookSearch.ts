@@ -1,5 +1,6 @@
 import type { Book, BookSource, SearchBook } from '../types';
 import type { ReadRecord } from './readRecords';
+import { hasReadRecord } from '../core/readRecordAuthors';
 import { appStorage } from './storage';
 
 const KEY = 'book-search.preferences.v1';
@@ -178,13 +179,7 @@ export function searchBookIndicator(
     return !book.author || !item.author || item.author === book.author;
   });
   if (inBookshelf) return 'bookshelf' as const;
-  if (
-    showReadRecord &&
-    records.some(record => {
-      if (record.bookName !== book.name) return false;
-      return !book.author || !record.author || record.author === book.author;
-    })
-  )
+  if (showReadRecord && hasReadRecord(records, book.name, book.author))
     return 'read' as const;
   return 'none' as const;
 }

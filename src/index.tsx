@@ -2,10 +2,12 @@ import { ReaderProgressSlider } from './components/ReaderProgressSlider';
 import { CoverThumbnailRenderer } from './components/CoverThumbnailRenderer';
 import { inspectWebDavBackupEntry } from './core/remoteBackupArchive';
 import { restoreBackupPreview } from './core/restoreBackupPreview';
+import { LegacyRestoreError } from './data/legacyRestore';
 import { displayBookIntro } from './core/bookMetadata';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type MutableRefObject,
@@ -73,7 +75,8 @@ import {
 import type { Book, Bookmark, Highlight, RootTab, SearchBook } from './types';
 import { SourceManager } from './screens/SourceManager';
 import { SourceEditor } from './screens/SourceEditor';
-import { ContentSearchSheet } from './components/ContentSearchSheet';
+import { ContentSearch } from './screens/ContentSearch';
+import { locateContentSearchResult, type ContentMatch, type ContentSearchRequest, type ContentSearchSession } from './core/contentSearch';
 import { ReaderMenuConfigSheet } from './components/ReaderMenuConfigSheet';
 import { BookshelfView } from './components/BookshelfView';
 import { useBookshelfPreferences } from './hooks/useBookshelfPreferences';
@@ -102,14 +105,12 @@ import { RuleHighlightedText } from './components/RuleHighlightedText';
 import { ReaderRichContent } from './components/ReaderRichContent';
 import {
   applyReaderTagPreferences,
-  applyReaderSpecialStylePreference,
-  protectReaderHtmlMarkers,
   type ReaderImage,
 } from './core/readerImages';
-import {
-  previewReplacementRules,
-  shouldCancelTwoFingerPreview,
-} from './core/readerReplacePreview';
+import { decodeReaderContent, protectNativeReaderHtml, renderNativeReaderContent } from './core/readerNativeContent';
+import { formatReaderParagraphs } from './core/htmlFormatter';
+import { shouldCancelTwoFingerPreview } from './core/readerReplacePreview';
+import { automaticBookReplacementEnabled, readerReplacementPolicy, runReaderContentRules } from './core/readerReplacement';
 import { shouldBlockReaderHardwareBack } from './core/readerBack';
 import { loadHighlightRules, saveHighlightRules } from './data/highlightRules';
 import {
@@ -117,7 +118,9 @@ import {
   saveReaderMenuConfig,
   type ReaderMenuKey,
 } from './data/readerMenu';
-import { reSegmentText } from './core/txtEncoding';
+import { prepareReaderText } from './core/readerText';
+import { displayChapterTitle } from './core/chineseConversion';
+import { ChineseConverter } from './components/ChineseConverter';
 import { HighlightRuleManager } from './screens/HighlightRuleManager';
 import { RssSourceManager } from './screens/RssSourceManager';
 import { RssSourceDebug } from './screens/RssSourceDebug';
@@ -245,8 +248,8 @@ import {
 } from './core/readerSpread';
 import {
   applyReplaceRules,
-  effectiveReplaceRuleHits,
   loadReplaceRules,
+  replacementContextForBook,
 } from './data/replaceRules';
 import { loadSources } from './data/sources';
 import { addAppLog } from './data/appLog';
@@ -263,10 +266,11 @@ import { buildSourceRequest } from './core/sourceRequest';
 import { startAutoTaskScheduler } from './services/autoTaskScheduler';
 import {
   normalizeSimulatedReading,
-  removeDuplicateChapterTitle,
   reverseContentLines,
   simulatedChapterCount,
 } from './core/readerAdvanced';
+import { processChapterTitle } from './core/chapterTitle';
+import { chapterTitleRemovalKey, setChapterTitleRemoval } from './core/chapterTitlePolicy';
 import {
   downloadWebDavBookProgress,
   loadWebDavConfig,
@@ -279,7 +283,8 @@ type RootStackParamList = {
   Home: undefined;
   Book: { bookId: string };
   BookEditor: { bookId: string };
-  Reader: { bookId: string; chapterIndex?: number };
+  Reader: { bookId: string; chapterIndex?: number; contentSearchRequest?: ContentSearchRequest };
+  ContentSearch: { bookId: string; session?: ContentSearchSession };
   Search: { query?: string; sourceUrl?: string } | undefined;
   Settings: undefined;
   Sources: undefined;
@@ -729,6 +734,8 @@ function Shell() {
           <Reader
             book={books.find(x => x.id === route.params.bookId)}
             initialChapterIndex={route.params.chapterIndex}
+            contentSearchRequest={route.params.contentSearchRequest}
+            openContentSearch={session => navigation.navigate('ContentSearch', { bookId: route.params.bookId, session })}
             back={() => navigation.goBack()}
             update={update}
             openReviews={(chapterIndex, paragraphIndex) =>
@@ -762,6 +769,13 @@ function Shell() {
             openSpeechEngines={() => navigation.navigate('HttpTts')}
           />
         )}
+      </Stack.Screen>
+      <Stack.Screen name="ContentSearch">
+        {({ navigation, route }) => <ContentSearch
+          book={books.find(item => item.id === route.params.bookId)} initialSession={route.params.session}
+          back={() => navigation.goBack()}
+          select={session => navigation.popTo('Reader', { bookId: route.params.bookId, contentSearchRequest: { ...session, requestId: Date.now() } }, { merge: true })}
+        />}
       </Stack.Screen>
       <Stack.Screen name="BookSourceSwitch">
         {({ navigation, route }) => (
@@ -1152,8 +1166,8 @@ function Shell() {
           <ReadRecords
             back={() => navigation.goBack()}
             open={record => {
-              const book = books.find(item => item.id === record.bookId);
-              if (book) navigation.navigate('Book', { bookId: book.id });
+              const book = books.find(item => item.name === record.bookName);
+              if (book) navigation.navigate(bookReadingScreen(book), { bookId: book.id });
               else navigation.navigate('Search', { query: record.bookName });
             }}
           />
@@ -1703,6 +1717,8 @@ function BookDetail({
 function Reader({
   book,
   initialChapterIndex,
+  contentSearchRequest,
+  openContentSearch,
   back,
   update: commitBook,
   openReviews,
@@ -1719,6 +1735,8 @@ function Reader({
 }: {
   book?: Book;
   initialChapterIndex?: number;
+  contentSearchRequest?: ContentSearchRequest;
+  openContentSearch: (session?: ContentSearchSession) => void;
   back: () => void;
   update: (b: Book, before?: Book) => void;
   openReviews: (chapterIndex: number, paragraphIndex?: number) => void;
@@ -1762,7 +1780,8 @@ function Reader({
         book?.reverseToc === true,
       ),
     ),
-    [contentSearch, setContentSearch] = useState(false),
+    [contentSearchSession, setContentSearchSession] = useState<ContentSearchSession>(),
+    [pendingContentSearch, setPendingContentSearch] = useState<ContentMatch>(),
     [advanced, setAdvanced] = useState(false),
     [effectiveReplaces, setEffectiveReplaces] = useState(false),
     [readerMenuConfigOpen, setReaderMenuConfigOpen] = useState(false),
@@ -1875,6 +1894,14 @@ function Reader({
       book?.sourceType === 2 && loadGeneralPreferences().showMangaUi,
     mangaHorizontal = mangaSpecialUi ? prefs.mangaHorizontal : true;
   const progressSyncRef = useRef({ book, index });
+  const handledContentSearchRequest = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!focused || !contentSearchRequest || handledContentSearchRequest.current === contentSearchRequest.requestId) return;
+    handledContentSearchRequest.current = contentSearchRequest.requestId;
+    setContentSearchSession(contentSearchRequest);
+    setPendingContentSearch(contentSearchRequest.results[contentSearchRequest.selected]);
+    setControls(false);
+  }, [contentSearchRequest, focused]);
   progressSyncRef.current = { book, index };
   useEffect(() => {
     if (focused) setReplaceRules(loadReplaceRules());
@@ -1973,8 +2000,9 @@ function Reader({
     };
   }, [book?.id, book?.origin, index]);
   useEffect(() => {
+    if (!focused) return;
     void loadReaderPreferences().then(setPrefs);
-  }, []);
+  }, [focused]);
   useEffect(() => {
     if (!focused) return;
     const subscription = BackHandler.addEventListener('hardwareBackPress', () =>
@@ -2289,62 +2317,52 @@ function Reader({
           : prefs.theme === 'paper'
             ? prefs.paperBackgroundImage
             : '',
-    automaticReplaceEnabled =
-      book.useReplaceRules ??
-      (book.sourceType !== 2 &&
-        !/\.epub$/i.test(book.localUri?.split(/[?#]/)[0] ?? '') &&
-        loadGeneralPreferences().replaceEnableDefault),
-    configuredReplaceRules = book.manualReplaceRuleIds
-      ? replaceRules
-          .filter(rule => book.manualReplaceRuleIds?.includes(rule.id))
-          .map(rule => ({
-            ...rule,
-            isEnabled: true,
-            scope: undefined,
-            excludeScope: undefined,
-          }))
-      : automaticReplaceEnabled
-        ? replaceRules
-        : [],
-    effectiveReplaceRules = previewReplacementRules(
-      configuredReplaceRules,
+    automaticReplaceEnabled = automaticBookReplacementEnabled(book, loadGeneralPreferences().replaceEnableDefault),
+    replacementPolicy = readerReplacementPolicy(
       replaceRules,
+      book.manualReplaceRuleIds,
+      automaticReplaceEnabled,
       replacePreviewActive,
     ),
-    replaceContext = { name: book.name, origin: book.id },
-    contentBeforeSegment =
-      book.removeDuplicateTitle ||
-      book.removeDuplicateTitleChapterIds?.includes(chapter.id)
-        ? removeDuplicateChapterTitle(chapter.content, chapter.title)
-        : chapter.content,
-    contentBeforeSpecialStyle = book.reSegment
-      ? reSegmentText(contentBeforeSegment, chapter.title)
-      : contentBeforeSegment,
-    contentBeforeReplace = applyReaderSpecialStylePreference(
-      contentBeforeSpecialStyle,
-      prefs.adaptSpecialStyle,
-    ),
-    protectedReplaceContent = protectReaderHtmlMarkers(contentBeforeReplace),
-    effectiveTitleRules = effectiveReplaceRuleHits(
-      chapter.title,
+    effectiveReplaceRules = replacementPolicy.rules,
+    replaceContext = replacementContextForBook(book),
+    titleReplacements = (title: string) => applyReplaceRules(
+      title,
       effectiveReplaceRules,
       'title',
       replaceContext,
     ),
-    effectiveContentRules = effectiveReplaceRuleHits(
+    replacedTitle = displayChapterTitle(chapter.title, prefs.chineseConverterType, titleReplacements),
+    unconvertedDisplayTitle = displayChapterTitle(chapter.title, 0, titleReplacements),
+    titleRemovalKey = useMemo(() => chapterTitleRemovalKey(index, chapter.title), [index, chapter.title]),
+    skipTitleRemoval = book.keepDuplicateTitleKeys?.includes(titleRemovalKey) === true,
+    nativeContent = useMemo(() => decodeReaderContent(chapter.content, chapter.url ?? chapter.baseUrl ?? book.bookUrl ?? ''),
+      [chapter.content, chapter.url, chapter.baseUrl, book.bookUrl]),
+    titleRemoval = useMemo(() => processChapterTitle(nativeContent.content, {
+      bookName: book.name,
+      title: chapter.title,
+      displayTitle: unconvertedDisplayTitle,
+      replaceEnabled: replacementPolicy.enabled,
+      skipRemoval: skipTitleRemoval,
+    }), [nativeContent.content, book.name, chapter.title, unconvertedDisplayTitle, replacementPolicy.enabled, skipTitleRemoval]),
+    contentBeforeSegment = titleRemoval.content,
+    contentBeforeSpecialStyle = useMemo(() => prepareReaderText(contentBeforeSegment, chapter.title, book.reSegment === true, prefs.chineseConverterType),
+      [book.id, book.reSegment, chapter.id, contentBeforeSegment, chapter.title, prefs.chineseConverterType]),
+    protectedReplaceContent = protectNativeReaderHtml(contentBeforeSpecialStyle, prefs.adaptSpecialStyle),
+    contentReplacement = runReaderContentRules(
       protectedReplaceContent.text,
       effectiveReplaceRules,
-      'content',
       replaceContext,
+      replacementPolicy.contentEnabled,
     ),
     effectiveRuleRows = [
       ...new Map(
-        [...effectiveTitleRules, ...effectiveContentRules].map(rule => [
+        contentReplacement.hits.map(rule => [
           rule.id,
           {
             rule,
-            title: effectiveTitleRules.some(item => item.id === rule.id),
-            content: effectiveContentRules.some(item => item.id === rule.id),
+            title: false,
+            content: true,
           },
         ]),
       ).values(),
@@ -2353,14 +2371,7 @@ function Reader({
       chapters,
       tocQuery,
       item =>
-        tocUseReplace
-          ? applyReplaceRules(
-              item.title,
-              effectiveReplaceRules,
-              'title',
-              replaceContext,
-            )
-          : item.title,
+        displayChapterTitle(item.title, prefs.chineseConverterType, tocUseReplace ? titleReplacements : undefined),
       {
         collapsedVolumeIds: collapsedTocVolumes,
         reverseOrder: book.reverseToc === true,
@@ -2368,28 +2379,17 @@ function Reader({
     ),
     visibleBookmarks = filterReaderBookmarks(bookmarks, tocQuery),
     visibleHighlights = filterReaderHighlights(highlights, tocQuery),
-    replacedTitle = applyReplaceRules(
-      chapter.title,
-      effectiveReplaceRules,
-      'title',
-      replaceContext,
-    ),
     replacedContent = protectedReplaceContent.restore(
-      applyReplaceRules(
-        protectedReplaceContent.text,
-        effectiveReplaceRules,
-        'content',
-        replaceContext,
-      ),
+      contentReplacement.value,
     ),
-    displayContent = applyReaderTagPreferences(
-      replacedContent,
-      book.deleteRubyTag,
-      book.deleteHeadingTag,
-    )
-      .split(/\n{2,}/)
-      .map(paragraph => `${prefs.paragraphIndent}${paragraph}`)
-      .join('\n\n'),
+    displayContent = renderNativeReaderContent(formatReaderParagraphs(
+      applyReaderTagPreferences(
+        replacedContent,
+        book.deleteRubyTag,
+        book.deleteHeadingTag,
+      ),
+      prefs.paragraphIndent,
+    ), nativeContent, prefs.adaptSpecialStyle),
     scrollDisplayContent = prefs.adaptSpecialStyle
       ? stripSpecialPageBreaks(displayContent)
       : displayContent,
@@ -2501,10 +2501,7 @@ function Reader({
                   Math.max(
                     0,
                     paginateText(
-                      applyReplaceRules(content, replaceRules, 'content', {
-                        name: book.name,
-                        origin: book.id,
-                      }),
+                      runReaderContentRules(content, effectiveReplaceRules, replaceContext, replacementPolicy.contentEnabled).value,
                       pageCapacity,
                       prefs.adaptSpecialStyle,
                     ).length - 1,
@@ -2826,6 +2823,15 @@ function Reader({
           ? /\.epub$/i.test(book.localUri?.split(/[?#]/)[0] ?? '') ||
             book.sourceType === 2
           : true,
+    changeTitleRemoval = (enabled: boolean) => {
+      if (enabled && !titleRemoval.removed && !book.keepDuplicateTitleKeys?.includes(titleRemovalKey)) {
+        const message = t('noDuplicateChapterTitle');
+        setAdvancedMessage(message);
+        void jssdk.showToast({ type: 'info', title: message });
+        return;
+      }
+      update({ ...setChapterTitleRemoval(book, titleRemovalKey, enabled), updatedAt: Date.now() });
+    },
     runReaderMenuAction = (key: ReaderMenuKey) => {
       if (key === 'bookmark') toggleBookmark();
       else if (key === 'highlightRule') leaveFor(openHighlightRules);
@@ -2856,16 +2862,8 @@ function Reader({
           manualReplaceRuleIds: undefined,
           updatedAt: Date.now(),
         });
-      else if (key === 'sameTitleRemoved') {
-        const ids = new Set(book.removeDuplicateTitleChapterIds ?? []);
-        if (ids.has(chapter.id)) ids.delete(chapter.id);
-        else ids.add(chapter.id);
-        update({
-          ...book,
-          removeDuplicateTitleChapterIds: [...ids],
-          updatedAt: Date.now(),
-        });
-      } else if (key === 'reSegment')
+      else if (key === 'sameTitleRemoved') changeTitleRemoval(!titleRemoval.removed);
+      else if (key === 'reSegment')
         update({ ...book, reSegment: !book.reSegment, updatedAt: Date.now() });
       else if (key === 'delRubyTag')
         update({
@@ -2911,6 +2909,20 @@ function Reader({
       else setPendingChapterJump(target);
     }
   };
+  useEffect(() => {
+    if (!focused || !pendingContentSearch) return;
+    if (pendingContentSearch.chapterIndex < 0 || pendingContentSearch.chapterIndex >= chapters.length) {
+      setPendingContentSearch(undefined);
+      return;
+    }
+    if (pendingContentSearch.chapterIndex !== index) {
+      persistChapter(pendingContentSearch.chapterIndex);
+      return;
+    }
+    const position = locateContentSearchResult(replacedTitle, displayContent, pendingContentSearch, prefs.paragraphIndent, prefs.adaptSpecialStyle);
+    persistChapter(index, 'start', position);
+    setPendingContentSearch(undefined);
+  }, [focused, pendingContentSearch, index, replacedTitle, displayContent, prefs.paragraphIndent, prefs.adaptSpecialStyle]);
   return (
     <View
       style={[
@@ -3263,7 +3275,7 @@ function Reader({
               style={[s.chapter, { color: palette.foreground }]}
             />
             {scrollDisplayContent
-              .split(/\n{2,}/)
+              .split(/\n+/)
               .map((paragraph, paragraphIndex) => (
                 // TODO(htyf-native): React Native can expose normal selection but cannot programmatically expand the native selection range to this whole paragraph; see docs/htyf-migration-gaps.md.
                 <View
@@ -3854,6 +3866,7 @@ function Reader({
         >
           {t('readerSettings')}
         </Text>
+        <ChineseConverter value={prefs.chineseConverterType} change={chineseConverterType => change({ chineseConverterType })} />
         <SettingStepper
           label={t('fontSize')}
           value={prefs.fontSize}
@@ -3919,7 +3932,7 @@ function Reader({
           style={s.readerToolAction}
           onPress={() => {
             setReaderToolsVisible(false);
-            setContentSearch(true);
+            leaveFor(() => openContentSearch(contentSearchSession));
           }}
         >
           <Text style={{ color: colors.text }}>{t('contentSearch')}</Text>
@@ -3955,13 +3968,17 @@ function Reader({
           <Text style={{ color: colors.text }}>{t('advanced')}</Text>
         </Pressable>
       </InTreeSheet>
-      <ContentSearchSheet
-        visible={contentSearch}
-        book={book}
-        chapters={chapters}
-        onDismiss={() => setContentSearch(false)}
-        onSelect={persistChapter}
-      />
+      {contentSearchSession ? <View style={{ position: 'absolute', bottom: controls ? safeLayout.bottom + 150 : safeLayout.bottom + 8, left: safeLayout.left + 12, right: safeLayout.right + 12, flexDirection: 'row', alignItems: 'center', backgroundColor: readerChrome.background, borderRadius: 8 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('contentSearchClose')} style={s.contentSearchAction} onPress={() => setContentSearchSession(undefined)}><Text style={{ color: readerChrome.foreground }}>×</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('contentSearchResults')} style={{ flex: 1, minHeight: 44, justifyContent: 'center' }} onPress={() => leaveFor(() => openContentSearch(contentSearchSession))}><Text numberOfLines={1} style={{ color: readerChrome.foreground }}>{contentSearchSession.query}　{contentSearchSession.selected + 1}/{contentSearchSession.results.length}</Text></Pressable>
+        {([-1, 1] as const).map(direction => {
+          const selected = contentSearchSession.selected + direction;
+          const unavailable = selected < 0 || selected >= contentSearchSession.results.length;
+          return <Pressable key={direction} accessibilityRole="button" accessibilityLabel={t(direction < 0 ? 'contentSearchPrevious' : 'contentSearchNext')} disabled={unavailable} style={[s.contentSearchAction, unavailable && { opacity: 0.35 }]} onPress={() => {
+            setContentSearchSession({ ...contentSearchSession, selected }); setPendingContentSearch(contentSearchSession.results[selected]);
+          }}><Text style={{ color: readerChrome.foreground }}>{direction < 0 ? '‹' : '›'}</Text></Pressable>;
+        })}
+      </View> : null}
       <InTreeSheet
         visible={!!previewReaderImage}
         onDismiss={() => setPreviewReaderImage(undefined)}
@@ -4527,6 +4544,7 @@ function Reader({
       <InTreeSheet visible={config} onDismiss={() => setConfig(false)}>
         <ScrollView contentContainerStyle={s.readerSettings}>
           <Text style={s.sectionTitle}>{t('readerSettings')}</Text>
+          <ChineseConverter value={prefs.chineseConverterType} change={chineseConverterType => change({ chineseConverterType })} />
           <SettingStepper
             label={t('fontSize')}
             value={prefs.fontSize}
@@ -5050,17 +5068,24 @@ function Reader({
           <View style={s.wrapRow}>
             {readerMenuConfig[readerMenuTier]
               .filter(readerMenuAvailable)
-              .map(key => (
+              .map(key => {
+                const checked = key === 'reSegment' ? book.reSegment === true
+                  : key === 'sameTitleRemoved' ? titleRemoval.removed
+                    : key === 'delRubyTag' ? book.deleteRubyTag === true
+                      : key === 'delHTag' ? book.deleteHeadingTag === true : undefined;
+                return (
                 <Pressable
-                  accessibilityRole="button"
+                  accessibilityRole={checked === undefined ? 'button' : 'checkbox'}
                   accessibilityLabel={readerMenuLabel(key)}
+                  accessibilityState={checked === undefined ? undefined : { checked }}
                   key={key}
                   style={s.settingAction}
                   onPress={() => runReaderMenuAction(key)}
                 >
-                  <Text>{readerMenuLabel(key)}</Text>
+                  <Text>{checked === undefined ? '' : checked ? '☑︎ ' : '☐ '}{readerMenuLabel(key)}</Text>
                 </Pressable>
-              ))}
+                );
+              })}
           </View>
           {!readerMenuConfig[readerMenuTier].some(readerMenuAvailable) ? (
             <Text style={s.muted}>{t('readerMenuSectionEmpty')}</Text>
@@ -5179,20 +5204,8 @@ function Reader({
             <Text>{t('removeDuplicateChapterTitle')}</Text>
             <Switch
               accessibilityLabel={t('removeDuplicateChapterTitle')}
-              value={
-                book.removeDuplicateTitleChapterIds?.includes(chapter.id) ===
-                true
-              }
-              onValueChange={enabled => {
-                const ids = new Set(book.removeDuplicateTitleChapterIds ?? []);
-                if (enabled) ids.add(chapter.id);
-                else ids.delete(chapter.id);
-                update({
-                  ...book,
-                  removeDuplicateTitleChapterIds: [...ids],
-                  updatedAt: Date.now(),
-                });
-              }}
+              value={titleRemoval.removed}
+              onValueChange={changeTitleRemoval}
             />
           </View>
           <View style={s.readerSwitch}>
@@ -5423,6 +5436,11 @@ function Reader({
             chapter: replacedTitle,
           })}
         </Text>
+        {contentReplacement.issues.map(issue => (
+          <Text key={issue.rule.id} style={s.muted}>
+            {t('replaceRuleFailed', { name: issue.rule.name })}: {issue.message}
+          </Text>
+        ))}
         {effectiveRuleRows.length ? (
           <ScrollView contentContainerStyle={s.effectiveRuleList}>
             {effectiveRuleRows.map(item => (
@@ -5450,11 +5468,15 @@ function Reader({
               </Pressable>
             ))}
           </ScrollView>
-        ) : (
+        ) : prefs.chineseConverterType === 0 ? (
           <Text style={[s.muted, s.effectiveRuleEmpty]}>
             {t('noEffectiveReplaceRules')}
           </Text>
-        )}
+        ) : null}
+        {prefs.chineseConverterType > 0 ? <View style={s.readerSwitch}>
+          <ChineseConverter value={prefs.chineseConverterType} change={chineseConverterType => change({ chineseConverterType })} label={t('chineseConversionRule')} />
+          <Pressable accessibilityRole="button" accessibilityLabel={t('disableChineseConversion')} style={s.settingAction} onPress={() => change({ chineseConverterType: 0 })}><Text>×</Text></Pressable>
+        </View> : null}
       </InTreeSheet>
       <InTreeSheet
         visible={!!refreshScopeConfirm}
@@ -5956,6 +5978,8 @@ function AppNavigation() {
         setNewRemoteBackup(null);
         setAppRevision(value => value + 1);
       } catch (error) {
+        if (error instanceof LegacyRestoreError && error.committedKeys.length)
+          setAppRevision(value => value + 1);
         setRemoteRestoreError(
           error instanceof Error ? error.message : String(error),
         );
@@ -6508,6 +6532,12 @@ const s = StyleSheet.create({
     minWidth: 72,
     minHeight: 68,
     flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentSearchAction: {
+    minWidth: 44,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,0 +1,233 @@
+{
+  "date": "2026-10-29",
+  "scope": "Pinned native Chinese conversion and reader/title/TOC integration; full 1:1 goal remains active",
+  "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+  "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+  "reference": {
+    "library": "com.github.liuyueyi.quick-chinese-transfer:quick-transfer-core:0.2.17",
+    "tagCommit": "810e881ce722e7919ad00f283551e897bf7aad77",
+    "jarSha256": "184bc394eca5a87320a1a2eb0b9e0ceb42b1295c21cd17efb4c5e6e73274bce0",
+    "wrapperSha256": "f346a544d0ec88d5537b08a1b27850de267aedeb7c1b5996826e4650da5c7a5d",
+    "contentHelpSha256": "3130fbf6bf4cbcba1ec6e0d8994f9fb7621334779897c80c2eca3c1302e547b0",
+    "dictionarySha256": {
+      "s2t": "b43d95dfaa76e266aecbe392ee5f08023b1832474e597feaaf0945ca0eb13f8b",
+      "t2s": "49fa0a27f53095cacbee9668d41cd05b9ce1a74d09931666faa04ebbacc7b2f0"
+    },
+    "assetSha256": "75b2678f4bf2031d7b162d9c6c902ffc17da3c29554db441299e51d85aa374a6",
+    "counts": {
+      "s2t": {
+        "chars": 2827,
+        "phrases": 49999,
+        "maxLen": 16
+      },
+      "t2s": {
+        "chars": 3904,
+        "phrases": 6074,
+        "maxLen": 20
+      }
+    },
+    "exclusionCount": 112,
+    "explicitCases": 1422,
+    "dictionaryBlocks": 491,
+    "dictionaryKeys": 62804,
+    "pipelineCases": 36,
+    "pipelineRandom": 0.5,
+    "allNativeOutputsMatch": true,
+    "dictionaryFilesEqualTaggedSource": true
+  },
+  "redRegression": "Mode 2 was discarded by normalizeReaderPreferences; red.log",
+  "realCachedComparison": {
+    "input": "Previously cached real second chapter, not a new network fetch",
+    "rows": [
+      {
+        "mode": 0,
+        "inputUtf16Units": 7152,
+        "outputUtf16Units": 7152,
+        "sha256": "e0c3d612dddc79586893f87db14b0723e790c76a43805cf01e6835daa3d8dd27",
+        "equal": true,
+        "nodeTimeMs": 0.42
+      },
+      {
+        "mode": 1,
+        "inputUtf16Units": 7152,
+        "outputUtf16Units": 7153,
+        "sha256": "3df08d0ed99d536094f548d78a66681ca2f1149efece70ca048fb99b5a98487c",
+        "equal": true,
+        "nodeTimeMs": 70.73
+      },
+      {
+        "mode": 2,
+        "inputUtf16Units": 7152,
+        "outputUtf16Units": 7152,
+        "sha256": "f05db3ecd069cbaeb43486f81ed447c3ff6a895f248c1e3ba80a819470209bc2",
+        "equal": true,
+        "nodeTimeMs": 40.59
+      }
+    ]
+  },
+  "controlledNativeResults": "controlled-native.json",
+  "ios": {
+    "source": "http://127.0.0.1:18208",
+    "searchCount": 1,
+    "tocCount": 2,
+    "normalApiAndUiImportAddRead": true,
+    "initialConversion": 0,
+    "modeSequence": [
+      0,
+      1,
+      2,
+      0
+    ],
+    "t2s": {
+      "postConversionTitleRule": "第一章 净化后标题",
+      "postConversionBodyRule": "已转换正文。",
+      "exclusionsRetained": "鳳梨機車介面規則純文字檔案",
+      "emojiAndNbspRetained": true,
+      "screenshot": "t2s-rules.png"
+    },
+    "toc": {
+      "conversionRemainsWhenTitleRulesDisabled": true,
+      "cleanupSwitchRestored": true,
+      "bothModesVerified": true
+    },
+    "checkedMenu": {
+      "sameTitleRemoved": true,
+      "reSegmentSequence": [
+        false,
+        true,
+        false
+      ],
+      "visualCheckboxAndAccessibilityState": true
+    },
+    "effectiveRules": {
+      "onlyContentHits": true,
+      "titleOnlyRuleExcluded": true,
+      "conversionLast": true,
+      "conversionCanBeDisabled": true,
+      "screenshot": "effective-rules.png"
+    },
+    "coldT2s": {
+      "pid": 18565,
+      "retained": true,
+      "screenshot": "cold-t2s.png"
+    },
+    "standaloneSettings": {
+      "persistedModeRead": 1,
+      "changedMode": 2,
+      "readerUpdatedOnReturn": true
+    },
+    "s2t": {
+      "displayTitle": "第二章 頭髮與發展",
+      "contextPhrase": "皇后的頭髮與乾燥的麪條",
+      "quotation": "「髮型與發表。」",
+      "screenshot": "s2t.png"
+    },
+    "finalOff": {
+      "immediateQuickSelectorOff": true,
+      "emptyEffectiveList": true,
+      "pid": 42314,
+      "standaloneSettingsOffAfterColdStart": true
+    },
+    "rawChapterCachesEqualInitial": true,
+    "preservation": {
+      "books": {
+        "count": 9,
+        "fullRecordsEqual": true,
+        "sha256": "9419ce82b9f7cf782560ae6b4ac8343d3b815b57d611da473d4f279bcd9cc37f"
+      },
+      "sources": {
+        "count": 8,
+        "fullRecordsEqual": true,
+        "sha256": "b18a789819ca8b64e4db12f720c1def7f756783a7fc3e91fd8471b218faf9e68"
+      },
+      "rules": {
+        "count": 0,
+        "fullRecordsEqual": true,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "preservationHashEncoding": "SHA-256 of UTF-8 compact JSON, sorted record keys and sorted records by id/source URL",
+    "temporaryBookRemoved": true,
+    "temporarySourcesRemoved": 1,
+    "temporaryRulesRemoved": 2,
+    "fixtureServiceStopped": true,
+    "fixtureExitCode": 143,
+    "requestCounts": {
+      "/fixture.json": 1,
+      "/search": 1,
+      "/book": 1,
+      "/toc": 1,
+      "/chapter/1": 2,
+      "/chapter/2": 1,
+      "/__state": 1
+    },
+    "servicesAtEnd": {
+      "web": false,
+      "mcp": false,
+      "scheduledTasks": false
+    },
+    "finalScreen": "书架",
+    "finalShelfCount": 9,
+    "limitations": [
+      "System ScreenCaptureKit and stale menu snapshots recovered by rebinding Simulator; not app-failure evidence",
+      "No new nonzero-position, physical-gesture, audio lifecycle or full visual parity claim",
+      "Existing target reader preference JSON now includes the normalized mode field; no byte-identity claim for that preference record"
+    ]
+  },
+  "verification": {
+    "suites": 205,
+    "tests": 1010,
+    "result": "pass",
+    "typescript": "pass",
+    "changedCodeEslint": "pass",
+    "nativeDirsUnchanged": true,
+    "dependenciesAndLocksUnchangedThisIteration": true,
+    "sourceReferenceUnchanged": true,
+    "diffCheck": "pass",
+    "finalVerification": "final-verification.json"
+  },
+  "package": {
+    "version": "0.0.37",
+    "bytes": 2219295,
+    "sha256": "a163bb2b822d334005aba6616cceb5eda5ef683e4f6bcc3eeb5cf8333d80714d",
+    "zipIntegrity": "pass",
+    "productionInputCount": 327,
+    "productionInputSha256": "de3f5f2932c9924ac2fc36bb71ae64ef9bfdff9b0039d5c78a2980e72b1d74af",
+    "productionInputsUnchanged": true,
+    "licensesRetained": true,
+    "fixtureDataEmbedded": false,
+    "published": false,
+    "realHostAcceptance": "pending"
+  },
+  "workletAudit": {
+    "bundleSha256": "a66f6cdf6c26e5ec79a0ebf5238e85c1ff2a028d6d8511aa779128253feef8fd",
+    "compiledArrayClosures": 460,
+    "unexpectedClosureAssignments": 0,
+    "libraryJestHelpers": [
+      "w.__closure={...original.__closure}",
+      "fn.__closure={}"
+    ],
+    "syntaxErrors": 0
+  },
+  "remoteAvailability": {
+    "checkedAt": "2026-10-29T10:06:55.596704+00:00",
+    "localVersion": "0.0.37",
+    "qrPixelsMatchConfig": true,
+    "config": {
+      "status": 200,
+      "version": "0.0.34"
+    },
+    "package": {
+      "status": 200
+    }
+  },
+  "remainingGaps": [
+    "Complete Java regex semantics, timeout and cancellation",
+    "Special HTML protection/replacement/invalidation pipeline",
+    "Converted text position/annotation mappings and full search/audio/export consumers",
+    "Original AppConfig XML restore and backup matrix",
+    "Asynchronous dictionary preload/unload and memory lifecycle",
+    "Extreme Unicode/invalid preferences and full visual/gesture/real-host acceptance",
+    "Other migration checklist items"
+  ]
+}

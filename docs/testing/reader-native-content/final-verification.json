@@ -1,0 +1,52 @@
+{
+  "fullGoalComplete": false,
+  "productionInputCount": 331,
+  "productionInputSha256": "8d4deed30a08bd6aaaee5d43cbfdbbf58362d519096b3b9242b185157a7763df",
+  "productionInputsUnchanged": true,
+  "packageSha256": "231b2a69dc8a2e4d96fe48b923ae3e708f860e40f1e36324b47f74bc84e09446",
+  "bundleSha256": "aefb7f2b23762b428ea9135207d7e2dcf97f9947e52fa93e62cb69ef8658c8d4",
+  "zipAndWorkletAudit": "pass",
+  "qrPixelSavedUrlReadmeDistAgreement": true,
+  "dependencyHashesUnchangedFrom0038": {
+    "package.json": "d21c755b602016dd9bf72b07bc6b14702f4e1c5c718eddf765deb15a78ac1042",
+    "package-lock.json": "8a8c75ffb48be5bfd299788e7c424696bad82864d0ddd9602d40826c51253ec8",
+    "yarn.lock": "fc291afbe3b5ced4c71cfc71a6c78b163605519f4d924a06ba09570f5730aa87"
+  },
+  "nativeDirsUnchanged": true,
+  "originalGitStatus": [
+    "M .gitignore",
+    "?? .cursor/"
+  ],
+  "nativeReferenceSourcesUnchanged": true,
+  "deletedMigrationDirectoryNotRecreated": true,
+  "tests": {
+    "suites": 207,
+    "tests": 1027,
+    "typecheck": "pass",
+    "lint": "pass"
+  },
+  "diffCheck": "pass",
+  "preservation": "preservation.json",
+  "finalUiChecks": {
+    "shelfBooks": 9,
+    "continueBook": "西游记-吴承恩",
+    "web": false,
+    "mcp": false,
+    "tasks": false,
+    "preferencesConfirmedBeforeFinalCold": {
+      "chineseConverterType": 0,
+      "adaptSpecialStyle": true
+    }
+  },
+  "published": false,
+  "realHostAcceptance": "pending",
+  "finalColdStartPid": 70258,
+  "listeners": {
+    "1122": false,
+    "1236": false,
+    "18210": false,
+    "8097": true
+  },
+  "remoteConfigVersion": "0.0.34",
+  "reportLocalLinks": "pass"
+}

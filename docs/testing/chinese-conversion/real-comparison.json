@@ -1,0 +1,29 @@
+{
+  "input": "Previously cached real second chapter, not a new network fetch",
+  "rows": [
+    {
+      "mode": 0,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7152,
+      "sha256": "e0c3d612dddc79586893f87db14b0723e790c76a43805cf01e6835daa3d8dd27",
+      "equal": true,
+      "nodeTimeMs": 0.42
+    },
+    {
+      "mode": 1,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7153,
+      "sha256": "3df08d0ed99d536094f548d78a66681ca2f1149efece70ca048fb99b5a98487c",
+      "equal": true,
+      "nodeTimeMs": 70.73
+    },
+    {
+      "mode": 2,
+      "inputUtf16Units": 7152,
+      "outputUtf16Units": 7152,
+      "sha256": "f05db3ecd069cbaeb43486f81ed447c3ff6a895f248c1e3ba80a819470209bc2",
+      "equal": true,
+      "nodeTimeMs": 40.59
+    }
+  ]
+}

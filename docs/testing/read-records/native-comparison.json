@@ -1,0 +1,49 @@
+{
+  "sourceRoot": "/Users/dgz/code/github/legado",
+  "sources": [
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecord.kt",
+      "sha256": "2ea5d212e5e9145f081856ee9923e0db4e0a3dfcf3654e0be997f9e290102161"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecordShow.kt",
+      "sha256": "89ebf2a4f5db939da6f90cb086bd78d8fe967e422a9eae7db7e57000eeca33ae"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReadRecordBook.kt",
+      "sha256": "7c3408125c9cf4fb4b35985728bbb8bd47ba3d4ee2aceabcf463ac4463b7e95e"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/book/ReadRecordIndex.kt",
+      "sha256": "25695f9f12e0e7d0d08b1257fa1a76a42ab4fc96e0be405d4b10310ca0169f00"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/GsonExtensions.kt",
+      "sha256": "b4fbe868051a2d20c4159059b56d172360ec0981b34d6d75b0ba01b20bf27eba"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/data/dao/ReadRecordDao.kt",
+      "sha256": "cf2bb39a8751238a0a6c233d5a591a4b2b9cdf32b2119f7797546434a1e5ccd5"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/ui/about/ReadRecordActivity.kt",
+      "sha256": "b261d81cb8738c6bde15c25b69b6a7e73b92de517bed68dca150a02b15091c93"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/utils/StringExtensions.kt",
+      "sha256": "2b9398875926b2746e63130f79358f55e1aafce74e72ac93a14b3f390de48a51"
+    },
+    {
+      "path": "app/src/main/java/io/legado/app/help/storage/Restore.kt",
+      "sha256": "ff5c4ce765b7236e92cdfdb063b109848020e077ea5cde42a1c75b259b938671"
+    }
+  ],
+  "gsonVersion": "2.14.0",
+  "gsonSha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f",
+  "icuProfile": "ICU4J 77.1 / cnCompare modern branch, localized en_US",
+  "icuSha256": "b3640b9f416a4411fd33c59abbeea8fd57d024c23e1819bf9673220a97499fe3",
+  "sqliteVersion": "3.53.3",
+  "sql": "\n        select bookName, sum(readTime) as readTime, max(lastRead) as lastRead,\n            group_concat(author, char(31)) as author\n        from readRecord \n        group by bookName \n        having bookName like '%' || :searchKey || '%'\n            or group_concat(author, char(31)) like '%' || :searchKey || '%'\n        order by bookName collate localized",
+  "deleteSql": "delete from readRecord where bookName = :bookName",
+  "boundary": "JVM/SQLite and frozen ICU comparison profile; no Android runtime tested; GROUP_CONCAT order is query-plan dependent"
+}

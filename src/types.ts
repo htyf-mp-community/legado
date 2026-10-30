@@ -67,6 +67,8 @@ export type Book = {
   imageStyle?: 'default' | 'full' | 'text' | 'single';
   removeDuplicateTitle?: boolean;
   removeDuplicateTitleChapterIds?: string[];
+  /** Native .nr filename identities that opt out of automatic title removal. */
+  keepDuplicateTitleKeys?: string[];
   manualReplaceRuleIds?: number[];
   useReplaceRules?: boolean;
   reverseToc?: boolean;

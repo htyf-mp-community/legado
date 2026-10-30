@@ -1,0 +1,23 @@
+{
+  "hostProject": "/Users/dgz/code/hty/apps/htyf-app",
+  "hostProjectPin": "1.0.1",
+  "installedPackageVersion": "1.0.1",
+  "deviceBinaryVersion": "not verified",
+  "files": {
+    "cpp/quickjs-sandbox-jsi.cpp": "ced9a3761efc2132a7852836dc8367ed409961a533d3fed61439fb40a8c173f0",
+    "lib/index.d.ts": "cc2ebf2e73074c7267de0b97dcf01b2c4ff773f7a4e6c22cabdeb5c0b73da63b"
+  },
+  "exposedMethods": [
+    "createContext",
+    "disposeContext",
+    "registerHostCallback",
+    "evalCode",
+    "executePendingJobs"
+  ],
+  "synchronousJsEval": true,
+  "wrapperInstallsInterruptHandler": false,
+  "wrapperSetsMemoryLimit": false,
+  "wrapperSetsStackLimit": false,
+  "targetPackagePin": null,
+  "arbitraryScriptsEnabled": false
+}

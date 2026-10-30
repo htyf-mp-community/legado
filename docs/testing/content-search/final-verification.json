@@ -1,0 +1,55 @@
+{
+  "fullGoalComplete": false,
+  "productionInputCount": 332,
+  "productionInputSha256": "8256c763a7d4b9df370e4601b6e366945dddb310c6bd313af6213d3e04954611",
+  "productionInputsUnchangedAcrossFrozenBuild": true,
+  "packageSha256": "2e2025d261df2fc9b7208da87654b81a2792bde266d3686dac3fa01ebd1dc3f8",
+  "bundleSha256": "c8b6c9f218e02c0d74faad5a6b9c25d21d473b2b5f24bb2dc6a851cbca896812",
+  "zipAndWorkletAudit": "pass",
+  "licensesAndNoFixtureData": "pass",
+  "qrPixelSavedUrlReadmeDistAgreement": true,
+  "dependencyHashesUnchangedFrom0039": {
+    "package.json": "d21c755b602016dd9bf72b07bc6b14702f4e1c5c718eddf765deb15a78ac1042",
+    "package-lock.json": "8a8c75ffb48be5bfd299788e7c424696bad82864d0ddd9602d40826c51253ec8",
+    "yarn.lock": "fc291afbe3b5ced4c71cfc71a6c78b163605519f4d924a06ba09570f5730aa87"
+  },
+  "nativeDirsUnchanged": true,
+  "originalGitStatus": [
+    "M .gitignore",
+    "?? .cursor/"
+  ],
+  "nativeReferenceSourcesUnchanged": true,
+  "deletedMigrationDirectoryNotRecreated": true,
+  "tests": {
+    "suites": 209,
+    "tests": 1034,
+    "nativeSearchCases": 1738,
+    "nativeSearchResultRecords": 3934,
+    "typecheck": "pass",
+    "lint": "pass"
+  },
+  "diffCheck": "pass",
+  "preservation": "preservation.json",
+  "finalUiChecks": {
+    "shelfBooks": 9,
+    "continueBook": "西游记-吴承恩",
+    "web": false,
+    "mcp": false,
+    "tasks": false,
+    "preferencesConfirmedBeforeCold": {
+      "chineseConverterType": 0,
+      "adaptSpecialStyle": "unchanged true"
+    }
+  },
+  "published": false,
+  "realHostAcceptance": "pending",
+  "finalColdStartPid": 77423,
+  "listeners": {
+    "1122": false,
+    "1236": false,
+    "18211": false,
+    "8097": true
+  },
+  "remoteConfigVersion": "0.0.34",
+  "reportLocalLinks": "pass"
+}

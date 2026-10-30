@@ -1,8 +1,12 @@
 import { selectAll } from 'css-select';
 import type { AnyNode, Element } from 'domhandler';
-import { DomUtils, parseDocument } from 'htmlparser2';
+import { DomUtils } from 'htmlparser2';
 import { UnsupportedRuleError } from './errors';
 import { jsonPath } from './jsonPath';
+import { isBlankHtmlAttribute, sourceHtmlText } from './htmlText';
+import { parseSourceDocument } from './htmlDom';
+import { serializeSourceHtml } from './htmlSerialization';
+import { compileSourceRegex } from './sourceRegex';
 
 const isNode = (value: unknown): value is AnyNode =>
   !!value && typeof value === 'object' && 'type' in value;
@@ -344,20 +348,27 @@ function evaluateXPath(expression: string, context: XPathContext): XPathValue {
 }
 
 function regex(pattern: string) {
-  let flags = 'g';
-  const cleaned = pattern.replace(/^\(\?([ims]+)\)/, (_, value: string) => {
-    flags += value;
-    return '';
-  });
-  return new RegExp(cleaned, [...new Set(flags)].join(''));
+  return compileSourceRegex(pattern);
 }
 
 function applyReplacement(value: string, suffix: string[]) {
   if (!suffix.length || !suffix[0]) return value;
+  const replacement = suffix[1] ?? '';
   try {
-    return value.replace(regex(suffix[0]), suffix[1] ?? '');
+    const expression = regex(suffix[0]);
+    if (suffix.length > 2) {
+      const first = new RegExp(
+        expression.source,
+        expression.flags.replace('g', ''),
+      );
+      const match = value.match(first);
+      return match ? match[0].replace(first, replacement) : '';
+    }
+    return value.replace(expression, replacement);
   } catch {
-    return value;
+    return suffix.length > 2
+      ? replacement
+      : value.split(suffix[0]).join(replacement);
   }
 }
 
@@ -672,7 +683,7 @@ function xpathAxisValues(
 
 function selectorParts(rule: string) {
   if (/^(?:@XPath:|\/\/|\.\/\/)/i.test(rule))
-    return { ...xpathToCss(rule), legacyIndex: '' };
+    return { ...xpathToCss(rule), legacyIndex: undefined };
   const parts = splitOutside(
     rule.replace(/^@@/, '').replace(/^@CSS:/i, ''),
     '@',
@@ -693,19 +704,14 @@ function selectorParts(rule: string) {
 function extract(node: AnyNode, mode: string) {
   const key = mode.trim().toLowerCase();
   if (key === 'owntext' || key === 'textnodes')
-    return trimText(
-      'children' in node
-        ? node.children
-            .filter(child => child.type === 'text')
-            .map(child => DomUtils.textContent(child))
-            .join('')
-        : '',
-    );
-  if (!key || key === 'text') return trimText(DomUtils.textContent(node));
-  if (key === 'html') return DomUtils.getInnerHTML(node);
-  if (key === 'all') return DomUtils.getOuterHTML(node);
-  return node.type === 'tag'
-    ? ((node as Element).attribs[mode.trim()] ?? '')
+    return sourceHtmlText(node, key);
+  if (!key || key === 'text') return sourceHtmlText(node);
+  if (key === 'html' || key === 'all')
+    return serializeSourceHtml([node], key === 'html');
+  return ['tag', 'script', 'style'].includes(node.type)
+    ? (Object.entries((node as Element).attribs).find(
+        ([attribute]) => attribute.toLowerCase() === key,
+      )?.[1] ?? '')
     : '';
 }
 
@@ -736,21 +742,114 @@ function extractedValues(
     return 'children' in node
       ? node.children.filter(child => child.type === 'tag')
       : [];
-  return [applyReplacement(extract(node, extraction), replacement)];
+  return extractedNodeValues([node], extraction, replacement);
 }
 
-function legacySelectorPart(value: string) {
-  const match = value
-    .trim()
-    .match(/^(.*?)(?:\[(!?-?\d+(?::-?\d+)?)\]|(?:\.)?(!?-?\d+(?::-?\d+)?))$/);
-  if (!match || !match[1]) return { selector: value.trim(), index: '' };
-  return { selector: match[1], index: match[2] ?? match[3] };
+function extractedNodeValues(
+  nodes: AnyNode[],
+  extraction: string,
+  replacement: string[],
+): unknown[] {
+  const key = extraction.trim().toLowerCase();
+  if (key === 'children')
+    return nodes.flatMap(node =>
+      extractedValues(node, extraction, replacement),
+    );
+  if (key === 'html' || key === 'all') {
+    if (!nodes.length) return [];
+    const value = serializeSourceHtml(nodes, key === 'html');
+    return value || key === 'all' ? [applyReplacement(value, replacement)] : [];
+  }
+  const isAttribute = ![
+    '',
+    'text',
+    'textnodes',
+    'owntext',
+    'html',
+    'all',
+  ].includes(key);
+  const seen = new Set<string>();
+  return nodes.flatMap(node => {
+    const value = extract(node, extraction);
+    if (
+      !isAttribute &&
+      ['', 'text', 'textnodes', 'owntext'].includes(key) &&
+      !value
+    )
+      return [];
+    // Native attribute lists deduplicate before outer replacements, unlike text.
+    if (isAttribute && (isBlankHtmlAttribute(value) || seen.has(value)))
+      return [];
+    if (isAttribute) seen.add(value);
+    return [applyReplacement(value, replacement)];
+  });
+}
+
+type LegacyIndex = {
+  excluded: boolean;
+  items: Array<number | { start?: number; end?: number; step: number }>;
+};
+
+function legacyIndexInteger(value: string) {
+  const number = Number(value);
+  if (!Number.isInteger(number) || Math.abs(number) > 0x7fffffff)
+    throw new RangeError('Legacy selector index exceeds a Kotlin Int');
+  return number;
+}
+
+function legacySelectorPart(value: string): {
+  selector: string;
+  index?: LegacyIndex;
+} {
+  const selector = value.trim();
+  const bracket = selector.match(/^(.*?)\[([!\-\d,: ]+)\]$/);
+  if (bracket) {
+    const compact = bracket[2].replace(/ /g, ''),
+      excluded = compact.startsWith('!'),
+      parts = compact.slice(excluded ? 1 : 0).split(',');
+    if (
+      parts.every(part =>
+        /^(?:-?\d+|(?:-?\d+)?:(?:-?\d+)?(?::-?\d+)?)$/.test(part),
+      )
+    )
+      return {
+        selector: bracket[1],
+        index: {
+          excluded,
+          items: parts.map(part => {
+            if (!part.includes(':')) return legacyIndexInteger(part);
+            const [start, end, step] = part.split(':');
+            return {
+              start: start ? legacyIndexInteger(start) : undefined,
+              end: end ? legacyIndexInteger(end) : undefined,
+              step: step === undefined ? 1 : legacyIndexInteger(step),
+            };
+          }),
+        },
+      };
+  }
+  // In the original syntax ':' separates individual indexes, not a range.
+  const legacy = selector.match(/^(.*?)([.!])([\d :\-]+)$/);
+  const numbers = legacy?.[3].replace(/ /g, '');
+  if (legacy && numbers && /^-?\d+(?::-?\d+)*$/.test(numbers))
+    return {
+      selector: legacy[1],
+      index: {
+        excluded: legacy[2] === '!',
+        items: numbers.split(':').map(legacyIndexInteger),
+      },
+    };
+  return { selector };
 }
 
 function selectLegacyNodes(context: AnyNode, selector: string) {
+  if (!selector || selector.split('.')[0] === 'children')
+    return 'children' in context
+      ? context.children.filter(child => child.type === 'tag')
+      : [];
   if (selector.startsWith('text.')) {
-    const expected = selector.slice('text.'.length);
-    return selectAll('*', context).filter(node => {
+    const expected = selector.split('.')[1];
+    return selectAll('*', [context]).filter(node => {
       if (!('children' in node)) return false;
       const ownText = trimText(
         node.children
@@ -761,52 +860,83 @@ function selectLegacyNodes(context: AnyNode, selector: string) {
       return ownText.includes(expected);
     });
   }
-  return selectAll(normalizeSelector(selector), context);
+  const [kind, name] = selector.split('.');
+  const query =
+    kind === 'class'
+      ? `[class~=${JSON.stringify(name)}]`
+      : kind === 'id'
+        ? `[id=${JSON.stringify(name)}]`
+        : kind === 'tag'
+          ? name
+          : normalizeSelector(selector);
+  return selectAll(query, [context]);
 }
 
-function selectLegacyIndex(nodes: AnyNode[], expression: string) {
+function selectLegacyIndex(nodes: AnyNode[], expression?: LegacyIndex) {
   if (!expression) return nodes;
-  const excluded = expression.startsWith('!'),
-    range = expression.replace(/^!/, '').split(':');
-  const resolve = (raw: string) => {
-    const index = Number(raw);
-    return index < 0 ? nodes.length + index : index;
-  };
-  if (range.length > 1) {
-    const start = resolve(range[0]),
-      end = resolve(range[1]);
-    if (start > end) {
-      const reversed: AnyNode[] = [];
-      for (let index = start; index >= end; index -= 1)
-        if (nodes[index]) reversed.push(nodes[index]);
-      return reversed;
+  const length = nodes.length,
+    indexes = new Set<number>();
+  const resolve = (index: number) => (index < 0 ? length + index : index);
+  for (const item of expression.items) {
+    if (typeof item === 'number') {
+      const index = resolve(item);
+      if (index >= 0 && index < length) indexes.add(index);
+      continue;
     }
-    return nodes.filter((_node, index) => index >= start && index < end);
+    let start = resolve(item.start ?? 0),
+      end = resolve(item.end ?? length - 1);
+    if ((start < 0 && end < 0) || (start >= length && end >= length)) continue;
+    start = start >= length ? length - 1 : start < 0 ? 0 : start;
+    end = end >= length ? length - 1 : end < 0 ? 0 : end;
+    if (start === end || item.step >= length) {
+      indexes.add(start);
+      continue;
+    }
+    // Native negative steps wrap by the list length; zero becomes its length.
+    const step =
+      item.step > 0 ? item.step : -item.step < length ? item.step + length : 1;
+    const direction = end > start ? 1 : -1;
+    for (
+      let index = start;
+      direction > 0 ? index <= end : index >= end;
+      index += direction * step
+    )
+      indexes.add(index);
   }
-  const index = resolve(range[0]);
-  return excluded
-    ? nodes.filter((_node, position) => position !== index)
-    : nodes[index]
-      ? [nodes[index]]
-      : [];
+  if ([...indexes].some(index => index < 0 || index >= length))
+    throw new RangeError('Legacy selector index outside an empty list');
+  return expression.excluded
+    ? nodes.filter((_node, index) => !indexes.has(index))
+    : [...indexes].map(index => nodes[index]);
 }
 
 function legacyChainedValues(
   value: string | AnyNode,
   rule: string,
   replacement: string[],
+  stringMode = false,
 ) {
-  const segments = splitOutside(rule, '@').filter(Boolean);
+  if (/^(?:@XPath:|\/\/|\.\/\/)/i.test(rule)) return undefined;
+  const segments = splitOutside(
+    rule.replace(/^@@/, '').replace(/^@CSS:/i, ''),
+    '@',
+  ).filter(Boolean);
+  const second = segments[1] ?? '';
+  const chainedCss =
+    /^[.#\[]/.test(second) || /^[a-z][\w-]*[.#\[]/i.test(second);
   if (
     segments.length < 2 ||
     (segments.length === 2 &&
-      !/^(?:class|tag|id)\.|(?:\.)?!?-?\d+(?::-?\d+)?$/.test(segments[1]))
+      !chainedCss &&
+      !legacySelectorPart(second).index &&
+      !/^(?:class|tag|id)\./.test(second))
   )
     return undefined;
   const last = segments[segments.length - 1].toLowerCase();
-  const extraction = LEGACY_EXTRACTIONS.has(last) ? segments.pop()! : '';
+  const extraction =
+    stringMode || LEGACY_EXTRACTIONS.has(last) ? segments.pop()! : '';
   let contexts: AnyNode[] = [
-    typeof value === 'string' ? parseDocument(value) : value,
+    typeof value === 'string' ? parseSourceDocument(value) : value,
   ];
   for (const segment of segments) {
     const { selector, index } = legacySelectorPart(segment),
@@ -823,16 +953,19 @@ function legacyChainedValues(
     contexts = next;
     if (!contexts.length) break;
   }
-  return contexts
-    .flatMap(node =>
-      extraction || replacement.length
-        ? extractedValues(node, extraction, replacement)
-        : [node],
-    )
-    .filter(item => item !== '');
+  return (
+    extraction || replacement.length
+      ? extractedNodeValues(contexts, extraction, replacement)
+      : contexts
+  ).filter(item => item !== '');
 }
 
-function htmlValues(value: string | AnyNode, rule: string): unknown[] {
+function htmlValues(
+  value: string | AnyNode,
+  rule: string,
+  stringMode = false,
+  combine = true,
+): unknown[] {
   if (rule.startsWith(':')) {
     const expression = regex(rule.slice(1)),
       source = typeof value === 'string' ? value : DomUtils.textContent(value);
@@ -844,9 +977,42 @@ function htmlValues(value: string | AnyNode, rule: string): unknown[] {
   }
   const [main, ...replacement] = rule.split('##'),
     alternatives = splitOutside(main, '||');
+  if (combine) {
+    const groups = ['&&', '||', '%%']
+      .map(operator => ({ operator, parts: splitOutside(main, operator) }))
+      .filter(group => group.parts.length > 1)
+      .sort((left, right) => left.parts[0].length - right.parts[0].length);
+    const group = groups[0];
+    if (group) {
+      // Native branches share one parsed document, including html cleanup.
+      const context =
+        typeof value === 'string' ? parseSourceDocument(value) : value;
+      const results: unknown[][] = [];
+      for (const part of group.parts) {
+        const result = htmlValues(
+          context,
+          `${part}${replacement.length ? `##${replacement.join('##')}` : ''}`,
+          stringMode,
+          !stringMode,
+        );
+        if (result.length) {
+          results.push(result);
+          if (group.operator === '||') break;
+        }
+      }
+      // Native interleaving is bounded by the first nonempty result list.
+      return group.operator === '%%'
+        ? (results[0] ?? []).flatMap((_item, index) =>
+            results.flatMap(result =>
+              index < result.length ? [result[index]] : [],
+            ),
+          )
+        : results.flat();
+    }
+  }
   if (isNode(value) && LEGACY_EXTRACTIONS.has(main.toLowerCase()))
     return extractedValues(value, main, replacement);
-  const chained = legacyChainedValues(value, main, replacement);
+  const chained = legacyChainedValues(value, main, replacement, stringMode);
   if (chained) return chained;
   if (
     /^(?:@XPath:|\/\/|\.\/\/)/i.test(main) &&
@@ -874,41 +1040,144 @@ function htmlValues(value: string | AnyNode, rule: string): unknown[] {
       );
   }
   for (const alternative of alternatives) {
-    const {
-        selector,
-        extraction,
-        exactText,
-        nodeChecks,
-        legacyIndex = '',
-      } = selectorParts(alternative.trim()),
-      root = typeof value === 'string' ? parseDocument(value) : value,
+    const { selector, extraction, exactText, nodeChecks, legacyIndex } =
+        selectorParts(alternative.trim()),
+      root = typeof value === 'string' ? parseSourceDocument(value) : value,
       selected = selector
         ? selectLegacyNodes(root, selector)
-        : isNode(root)
-          ? [root]
-          : [],
+        : legacyIndex
+          ? selectLegacyNodes(root, '')
+          : isNode(root)
+            ? [root]
+            : [],
       nodes = selectLegacyIndex(selected, legacyIndex);
-    const output = nodes
-      .filter(
-        (node, index, allNodes) =>
-          (exactText === undefined ||
-            trimText(DomUtils.textContent(node)) === exactText) &&
-          nodeChecks.every(check => check(node, index, allNodes)),
-      )
-      .flatMap(node =>
-        extraction || replacement.length
-          ? extractedValues(node, extraction, replacement)
-          : [node],
-      )
-      .filter(item => item !== '');
+    const matching = nodes.filter(
+      (node, index, allNodes) =>
+        (exactText === undefined ||
+          trimText(DomUtils.textContent(node)) === exactText) &&
+        nodeChecks.every(check => check(node, index, allNodes)),
+    );
+    if (
+      stringMode &&
+      /^@CSS:/i.test(main) &&
+      !matching.length &&
+      extraction === 'all'
+    )
+      return [''];
+    const output = (
+      extraction || replacement.length
+        ? extractedNodeValues(matching, extraction, replacement)
+        : matching
+    ).filter(item => item !== '');
     if (output.length) return output;
   }
   return [];
 }
 
+function decodeTemplateLiteral(body: string) {
+  let text = '';
+  const escapes: Record<string, string> = {
+    n: '\n',
+    r: '\r',
+    t: '\t',
+    b: '\b',
+    f: '\f',
+    v: '\v',
+    '0': '\0',
+  };
+  for (let index = 0; index < body.length; index++) {
+    const char = body[index];
+    if (char !== '\\') {
+      if (char === '\r' || char === '\n')
+        throw new UnsupportedRuleError('JavaScript');
+      text += char;
+      continue;
+    }
+    const escaped = body[++index];
+    if (escaped === '\r' || escaped === '\n') {
+      if (escaped === '\r' && body[index + 1] === '\n') index++;
+    } else if (escaped === 'u' || escaped === 'x') {
+      const braced = escaped === 'u' && body[index + 1] === '{';
+      const end = braced
+        ? body.indexOf('}', index + 2)
+        : index + (escaped === 'u' ? 4 : 2) + 1;
+      const hex = body.slice(index + (braced ? 2 : 1), end);
+      if (
+        end < 0 ||
+        !/^[a-f0-9]+$/i.test(hex) ||
+        (!braced && hex.length !== (escaped === 'u' ? 4 : 2)) ||
+        Number.parseInt(hex, 16) > 0x10ffff
+      )
+        throw new UnsupportedRuleError('JavaScript');
+      text += String.fromCodePoint(Number.parseInt(hex, 16));
+      index = braced ? end : end - 1;
+    } else {
+      if (
+        escaped === undefined ||
+        /[1-9]/.test(escaped) ||
+        (escaped === '0' && /[0-9]/.test(body[index + 1] ?? ''))
+      )
+        throw new UnsupportedRuleError('JavaScript');
+      text += escapes[escaped] ?? escaped;
+    }
+  }
+  return text;
+}
+
+/** Resolve native {{ rule }} placeholders before the outer ## replacement is split. */
+function renderRuleTemplate(value: unknown, rule: string): string | undefined {
+  const token = /\{\{([\s\S]*?)\}\}/g;
+  if (!token.test(rule)) return undefined;
+  token.lastIndex = 0;
+  const syntax = rule.replace(token, '');
+  if (syntax.includes('@js:') || syntax.includes('<js>'))
+    throw new UnsupportedRuleError('JavaScript');
+  token.lastIndex = 0;
+  return rule.replace(token, (_whole, expression: string) => {
+    const nested = expression;
+    if (
+      nested.startsWith('@') ||
+      nested.startsWith('$.') ||
+      nested.startsWith('$[') ||
+      nested.startsWith('//')
+    )
+      return evaluateRuleText(
+        value,
+        nested.startsWith('@@') ? nested.slice(2) : nested,
+        false,
+        true,
+      );
+    // Only static string concatenation is supported without the native sandbox.
+    const literal = /(['"])((?:\\[\s\S]|(?!\1)[^\\])*?)\1/g;
+    let end = 0,
+      output = '';
+    for (const match of expression.matchAll(literal)) {
+      if (expression.slice(end, match.index).trim() !== (end ? '+' : ''))
+        throw new UnsupportedRuleError('JavaScript');
+      output += decodeTemplateLiteral(match[2]);
+      end = match.index! + match[0].length;
+    }
+    if (!end || expression.slice(end).trim())
+      throw new UnsupportedRuleError('JavaScript');
+    return output;
+  });
+}
+function renderedRuleText(rendered: string) {
+  const [text, ...replacement] = rendered.split('##');
+  return applyReplacement(
+    text.replace(/^[\u0000-\u0020]+|[\u0000-\u0020]+$/g, ''),
+    replacement,
+  );
+}
+
 export function sourceRuleValues(value: unknown, rawRule: unknown): unknown[] {
   if (typeof rawRule !== 'string' || !rawRule.trim()) return [];
   const rule = rawRule.trim();
+  const rendered = renderRuleTemplate(value, rule);
+  if (rendered !== undefined) {
+    const text = renderedRuleText(rendered);
+    return text ? [text] : [];
+  }
   const captures =
     value && typeof value === 'object' && '__legadoCaptures' in value
       ? (value as { __legadoCaptures: unknown[] }).__legadoCaptures
@@ -1019,28 +1288,11 @@ export function sourceRuleValues(value: unknown, rawRule: unknown): unknown[] {
   if (rule.includes('@js:') || rule.includes('<js>'))
     throw new UnsupportedRuleError('JavaScript');
   const [main, ...replacement] = rule.split('##');
-  if (main.includes('{{')) {
-    const rendered = main.replace(
-      /\{\{([\s\S]*?)\}\}/g,
-      (_whole, expression: string) => {
-        const nested = expression.trim();
-        if (nested.startsWith('@@'))
-          return sourceRuleText(value, nested.slice(2));
-        if (nested.startsWith('$') || nested.startsWith('@Json:'))
-          return sourceRuleText(value, nested);
-        return [...expression.matchAll(/(['"])([\s\S]*?)\1/g)]
-          .map(match =>
-            match[2]
-              .replace(/\\n/g, '\n')
-              .replace(/\\r/g, '\r')
-              .replace(/\\t/g, '\t')
-              .replace(/\\(['"\\])/g, '$1'),
-          )
-          .join('');
-      },
-    );
-    return rendered ? [applyReplacement(rendered, replacement)] : [];
-  }
+  if (
+    (typeof value === 'string' || isNode(value)) &&
+    !/^(?:@Json:|\$)/i.test(main)
+  )
+    return htmlValues(value, rule);
   const combined = splitOutside(main, '&&');
   if (combined.length > 1) {
     if (
@@ -1083,11 +1335,63 @@ export function sourceRuleValues(value: unknown, rawRule: unknown): unknown[] {
   return [];
 }
 
-export function sourceRuleText(value: unknown, rule: unknown) {
-  return sourceRuleTexts(value, rule)[0] ?? '';
+function evaluateRuleText(
+  value: unknown,
+  rule: unknown,
+  isUrl: boolean,
+  inline = false,
+) {
+  if (typeof rule !== 'string' || !rule.trim()) return '';
+  const normalized = inline ? rule : rule.trim();
+  const rendered = renderRuleTemplate(value, normalized);
+  if (rendered !== undefined) return renderedRuleText(rendered);
+  if (!normalized.includes('@js:') && !normalized.includes('<js>')) {
+    const [main, ...replacement] = normalized.split('##');
+    const values = main
+      ? sourceRuleTexts(value, main)
+      : [
+          value === undefined || value === null
+            ? ''
+            : isNode(value)
+              ? serializeSourceHtml([value], false)
+              : String(value),
+        ];
+    const firstUrl =
+      isUrl &&
+      (typeof value === 'string' || isNode(value)) &&
+      !/^(?:@XPath:|\/|\.\/|@Json:|\$|:)/i.test(main);
+    return applyReplacement(
+      firstUrl ? (values[0] ?? '') : values.join('\n'),
+      replacement,
+    );
+  }
+  const values = sourceRuleTexts(value, rule);
+  return isUrl ? (values[0] ?? '') : values.join('\n');
 }
 
+/** Native text rules join matches; only HTML URL extraction takes the first match. */
+export function sourceRuleText(value: unknown, rule: unknown, isUrl = false) {
+  return evaluateRuleText(value, rule, isUrl);
+}
+
+/**
+ * Returns source-rule strings, preserving duplicate text and native HTML
+ * whitespace. HTML attributes are filtered/deduplicated before replacement;
+ * unsupported scripts keep the existing UnsupportedRuleError behavior.
+ */
 export function sourceRuleTexts(value: unknown, rule: unknown) {
+  // String extraction has an arbitrary terminal attribute; element-list rules
+  // may instead end in another selector, so retain their separate path.
+  if (
+    (typeof value === 'string' || isNode(value)) &&
+    typeof rule === 'string' &&
+    rule.trim() &&
+    !/^(?:@XPath:|\/|\.\/|@Json:|\$|:)/i.test(rule.trim()) &&
+    !['@js:', '<js>', '{{'].some(token => rule.includes(token))
+  )
+    return htmlValues(value, rule.trim(), true).map(hit =>
+      isNode(hit) ? sourceHtmlText(hit) : String(hit),
+    );
   return sourceRuleValues(value, rule).map(hit =>
     hit === undefined || hit === null
       ? ''

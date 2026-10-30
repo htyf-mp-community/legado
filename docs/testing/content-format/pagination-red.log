@@ -1,0 +1,33 @@
+FAIL __tests__/pagination.test.ts
+  ● keeps configured paragraph indentation on the first page and in its UTF-16 range
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Array [
+        Object {
+          "end": 11,
+    -     "start": 0,
+    -     "text": "　　第一段
+    +     "start": 2,
+    +     "text": "第一段
+      　　第二段",
+        },
+      ]
+
+      21 | test('keeps configured paragraph indentation on the first page and in its UTF-16 range', () => {
+      22 |   const text = '　　第一段\n　　第二段';
+    > 23 |   expect(paginateTextRanges(text, 100)).toEqual([{ text, start: 0, end: text.length }]);
+         |                                         ^
+      24 | });
+      25 |
+      26 | test('handles empty text and invalid capacity safely', () => {
+
+      at Object.toEqual (__tests__/pagination.test.ts:23:41)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        0.538 s, estimated 1 s

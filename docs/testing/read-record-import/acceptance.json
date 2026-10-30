@@ -1,0 +1,59 @@
+{
+  "version": "0.0.45",
+  "overallParityComplete": false,
+  "iosOnly": true,
+  "androidAppBuilt": false,
+  "device": {
+    "name": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "model": "iPhone 17 Pro",
+    "ios": "26.5",
+    "reactNative": "0.86.2",
+    "storage": "io.legado.htyf.application-storage"
+  },
+  "tests": {
+    "suites": 218,
+    "tests": 1092,
+    "passed": true,
+    "typecheck": "pass",
+    "changedFileLint": "pass",
+    "nativeDecodeCases": 769,
+    "nativeDecoded": 607,
+    "nativeRejected": 162,
+    "previousRecordCasesStillPassing": 4717
+  },
+  "stages": {
+    "nullItem": "file rejected before merge preview",
+    "fraction": "file rejected before merge preview",
+    "nullAuthor": "merge reports error, confirmation retained then cancelled",
+    "validDuplicate": "confirmed merge returns to normal backup page; exact prior values retained"
+  },
+  "normalUiZipExportsEqual": true,
+  "entryCount": 27,
+  "fixtureServerStopped": true,
+  "services": {
+    "repack8097": "listening",
+    "fixture18201": "stopped",
+    "web1122": "off",
+    "mcp1236": "off",
+    "automaticTasks": "off"
+  },
+  "finalColdStartPid": 92932,
+  "finalShelf": {
+    "books": 10,
+    "reading": 9,
+    "sources": 9,
+    "rawReadRecords": 16,
+    "continuation": "iOS 记录计时验收"
+  },
+  "previousCleanupPendingUserConfirmation": true,
+  "noDeletionRetry": true,
+  "published": false,
+  "physicalHostAccepted": false,
+  "limits": [
+    "Finite unchanged-source Gson InputStream profile; no Room/Android execution",
+    "Native mid-restore partial-write parity remains unimplemented/unverified",
+    "Full Gson, deep/large/encoding/category/configuration and timing/media/layout/accessibility/gesture/physical-host matrices remain open"
+  ],
+  "visibleNullAndFractionErrorScreenshotsVerified": true
+}

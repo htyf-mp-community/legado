@@ -1,0 +1,105 @@
+{
+  "status": "partial-parity",
+  "fullGoal": "1:1还原htyf小程序",
+  "fullGoalComplete": false,
+  "platform": "ios-only",
+  "referenceCounts": {
+    "scopeCases": 1440,
+    "likeCases": 1600,
+    "replacementCases": 1904,
+    "trimCases": 371
+  },
+  "nativeReplacementErrors": 672,
+  "sources": {
+    "dao": {
+      "path": "app/src/main/java/io/legado/app/data/dao/ReplaceRuleDao.kt",
+      "sha256": "73fc95dedcab0ca2d4fa76b20ead221d6facc1222502ceb3f6143e6d30909ba2"
+    },
+    "entity": {
+      "path": "app/src/main/java/io/legado/app/data/entities/ReplaceRule.kt",
+      "sha256": "c68a6b9f7bf36e117da78cbc1b1f40cf3f3666fc49c5cb75d465a649b8a5dc08"
+    },
+    "content": {
+      "path": "app/src/main/java/io/legado/app/help/book/ContentProcessor.kt",
+      "sha256": "5e6441ef542f3a691965086ef9529a3329778b778c07fc8efc903432af658666"
+    },
+    "regex": {
+      "path": "app/src/main/java/io/legado/app/utils/RegexExtensions.kt",
+      "sha256": "9042b6456244cdff49b6ef3997633183dc132b0dfe93262571c83ed4597d493d"
+    },
+    "title": {
+      "path": "app/src/main/java/io/legado/app/data/entities/BookChapter.kt",
+      "sha256": "270974eef0f026143327534963ff06fa0a4621c0ecbf95b5fd9fc57665c99434"
+    },
+    "readBook": {
+      "path": "app/src/main/java/io/legado/app/model/ReadBook.kt",
+      "sha256": "551fe50f8f4592b144316f2e55ed57526dc6f0918d31999b90181e9607e22743"
+    }
+  },
+  "referenceLimits": [
+    "SQL extracted from native DAO, executed in desktop SQLite 3.53.3",
+    "JVM uses same Matcher APIs and Kotlin expressions, not full Android/Rhino/coroutine classes",
+    "Finite common-regex fixtures do not establish Java Pattern/ICU language equivalence"
+  ],
+  "tests": {
+    "suites": 206,
+    "tests": 1020,
+    "result": "pass",
+    "typecheck": "pass",
+    "lint": "pass"
+  },
+  "ios": {
+    "device": "Legado HTYF 调试 / iPhone 17 Pro / iOS 26.5",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "initialFinalCodePid": 6092,
+    "coldPersistencePid": 17352,
+    "title": "分组替换 · 第一章",
+    "body": [
+      "组<甲乙/甲0/乙>",
+      "$1/甲",
+      "间【空格】隔",
+      "尾部继续"
+    ],
+    "bodyHitIds": [
+      99203801,
+      99203802,
+      99203803,
+      99203805
+    ],
+    "failedRuleId": 99203804,
+    "scopedEditorPreview": "pass",
+    "invalidReplacementPreview": "explicit error",
+    "unsupportedScriptPreview": "explicit unsupported error",
+    "unsavedPreviewPersisted": false,
+    "rawCachedContentUnchanged": true,
+    "finalNullIdsGuard": "pure-function covered; final cold-start check after cleanup",
+    "finalColdStartPid": 36734
+  },
+  "cleanup": {
+    "book": true,
+    "source": true,
+    "ruleIds": [
+      99203801,
+      99203802,
+      99203803,
+      99203804,
+      99203805,
+      99203806
+    ],
+    "fixturePort": 18209,
+    "fixtureExitCode": 130,
+    "web": false,
+    "mcp": false,
+    "tasks": false
+  },
+  "pending": [
+    "complete Java Pattern/ICU semantics and supplementary zero-length progression",
+    "interruptible timeout/cancellation and Rhino contexts",
+    "special HTML/conversion/protection/invalidation order",
+    "native global manual config/XML restore and full import/field/default-order behavior",
+    "all output/error/position/annotation/export/audio consumers",
+    "single-page disabled progress slider AX NaN",
+    "physical two-finger gestures and full visual/real-host matrix"
+  ],
+  "published": false
+}

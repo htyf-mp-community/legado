@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-29T09:00:27.620933+00:00",
+  "localVersion": "0.0.35",
+  "qrPixelsMatchConfig": true,
+  "config": {
+    "status": 200,
+    "version": "0.0.34"
+  },
+  "package": {
+    "status": 200
+  }
+}

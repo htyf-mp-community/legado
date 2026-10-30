@@ -1,0 +1,102 @@
+FAIL __tests__/sourceRule.test.ts
+  ● preserves digits in HTML tag/id/class names and only parses delimited legacy indexes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Sub"
+    Received: ""
+
+      376 |   const page='<h1>Main</h1><h2>Sub</h2><div id="content2" class="book2">Body</div><h1>Second</h1><div class="item">A</div><div class="item">B</div>';
+      377 |   expect(sourceRuleText(page,'h1.0@text')).toBe('Main');
+    > 378 |   expect(sourceRuleText(page,'h2@text')).toBe('Sub');
+          |                                          ^
+      379 |   expect(sourceRuleText(page,'#content2@text')).toBe('Body');
+      380 |   expect(sourceRuleText(page,'class.book2@text')).toBe('Body');
+      381 |   expect(sourceRuleText(page,'tag.h1.1@text')).toBe('Second');
+
+      at Object.toBe (__tests__/sourceRule.test.ts:378:42)
+
+  ● renders nested metadata templates before separating outer replacement rules
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 4
+    + Received  + 3
+
+    - Title: Book
+    - Author: Writer
+    - Tags: A / B
+    - Intro: Summary
+    + Name:  / }}
+    + Intro: {{@@.description@text}}Author: Writer / }}
+    + Intro: {{@@.description@text}}Tags: {{@@#tags@.tag@text
+
+      386 |   const page='<h1>Book</h1><div class="author"><a>Writer</a></div><div id="tags"><span class="tag">A</span><span class="tag">B</span></div><p class="description">Summary</p>';
+      387 |   const template='Name: {{@@h1@text}}\nAuthor: {{@@.author@a@text}}\nTags: {{@@#tags@.tag@text##\\n## / }}\nIntro: {{@@.description@text}}##^Name: ##Title: ';
+    > 388 |   expect(sourceRuleText(page,template)).toBe('Title: Book\nAuthor: Writer\nTags: A / B\nIntro: Summary');
+          |                                         ^
+      389 |   expect(sourceRuleText({tags:['A','B']},'Tags={{@Json:$.tags[*]##\\n##,}}')).toBe('Tags=A,B');
+      390 | });
+      391 |
+
+      at Object.toBe (__tests__/sourceRule.test.ts:388:41)
+
+  ● uses native text-list joining and explicitly selects the first URL result
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 1
+    + Received  + 0
+
+      First
+    - Second
+
+      392 | test('uses native text-list joining and explicitly selects the first URL result', () => {
+      393 |   const page='<a href="/one">First</a><a href="/two">Second</a>';
+    > 394 |   expect(sourceRuleText(page,'a@text')).toBe('First\nSecond');
+          |                                         ^
+      395 |   expect(sourceRuleText(page,'a@href',true)).toBe('/one');
+      396 | });
+      397 |
+
+      at Object.toBe (__tests__/sourceRule.test.ts:394:41)
+
+  ● native first-match replacement returns the transformed match rather than the surrounding URL
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "https://site.test/contents/123/cover.jpeg"
+    Received: "https://site.test/?id=https://site.test/contents/123/cover.jpeg&ref=https://site.test/contents/456/cover.jpeg"
+
+      397 |
+      398 | test('native first-match replacement returns the transformed match rather than the surrounding URL', () => {
+    > 399 |   expect(sourceRuleText('<a href="https://site.test/?id=123&ref=456">Book</a>','a@href##(\\d+)##https://site.test/contents/$1/cover.jpeg###',true)).toBe('https://site.test/contents/123/cover.jpeg');
+          |                                                                                                                                                     ^
+      400 |   expect(sourceRuleText('<a href="/no-id">Book</a>','a@href##(\\d+)##/$1.jpg###',true)).toBe('');
+      401 | });
+      402 |
+
+      at Object.toBe (__tests__/sourceRule.test.ts:399:149)
+
+  ● does not silently truncate unsupported JavaScript expressions inside metadata templates
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "JavaScript"
+
+    Received function did not throw
+
+      402 |
+      403 | test('does not silently truncate unsupported JavaScript expressions inside metadata templates', () => {
+    > 404 |   expect(()=>sourceRuleText('<h1>Book</h1>','Name={{"prefix" + java.getString("h1@text")}}')).toThrow('JavaScript');
+          |                                                                                               ^
+      405 | });
+      406 |
+
+      at Object.toThrow (__tests__/sourceRule.test.ts:404:95)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 21 passed, 26 total
+Snapshots:   0 total
+Time:        0.631 s, estimated 1 s
+Ran all test suites matching __tests__/sourceRule.test.ts.

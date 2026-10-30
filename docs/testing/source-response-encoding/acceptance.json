@@ -1,0 +1,71 @@
+{
+  "version": "0.0.42",
+  "fullGoalComplete": false,
+  "device": {
+    "name": "Legado HTYF 调试",
+    "udid": "8338CC2C-E716-4B2B-BC30-CC5C777CB2FD",
+    "ios": "26.5",
+    "reactNative": "0.86.2",
+    "storageId": "io.legado.htyf.application-storage",
+    "finalColdStartPid": 21360
+  },
+  "normalFlow": {
+    "sourceImport": true,
+    "search": true,
+    "details": true,
+    "toc": true,
+    "addBook": true,
+    "reader": true,
+    "queryEncoding": "GBK",
+    "responseEncodings": {
+      "search": "headerless GB18030",
+      "details": "HTML meta GBK",
+      "toc": "headerless ISO-2022-JP",
+      "content": "header UTF-16LE overriding conflicting GBK meta"
+    },
+    "requestCountByStage": {
+      "search": 1,
+      "info": 1,
+      "toc": 1,
+      "content": 3
+    },
+    "allFixtureRequestsValid": true
+  },
+  "realSource": {
+    "name": "📂阅读书屋",
+    "userImportUrl": "https://www.yckceo.com/yuedu/shuyuans/json/id/1321.json",
+    "keyword": "西游记",
+    "searchResults": 1,
+    "details": "西游记-吴承恩 / 未知作者",
+    "tocEntries": 105,
+    "firstEntryCharacters": 119,
+    "firstEntryIsFrontMatter": true
+  },
+  "cleanup": {
+    "sourceBookReadRecordSearchHistoryRemovedThroughUi": true,
+    "originalExportedEntriesIdentical": 25,
+    "verifiedTaskGeneratedCacheZipsRemoved": 2,
+    "temporaryFixturePort18213Stopped": true
+  },
+  "coldStart": {
+    "versionCorrect": true,
+    "shelfBooks": 9,
+    "inProgress": 8,
+    "originalContinuationRetained": true,
+    "webOff": true,
+    "mcpOff": true,
+    "tasksOff": true
+  },
+  "archiveHostAcceptance": "pending",
+  "published": false,
+  "androidBuildOrDeviceWork": false,
+  "boundaries": [
+    "full visual/layout/pagination/selection/gesture parity",
+    "all Charset aliases and other OS ICU/runtime profiles",
+    "extreme/deep HTML and error/cancellation matrix",
+    "complete request-wire semantics and other consumers",
+    "native read-record name aggregation/delete semantics",
+    "boolean backup export/restore typing",
+    "full migration and physical HTYF host acceptance"
+  ]
+}

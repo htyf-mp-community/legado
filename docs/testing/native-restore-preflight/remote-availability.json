@@ -1,0 +1,13 @@
+{
+  "localVersion": "0.0.47",
+  "published": false,
+  "appUrlConfig": {
+    "status": 200,
+    "method": "GET",
+    "remoteVersion": "0.0.34"
+  },
+  "zipUrl": {
+    "status": 200,
+    "method": "HEAD"
+  }
+}

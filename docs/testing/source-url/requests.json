@@ -1,0 +1,91 @@
+{
+  "requests": [
+    {
+      "rawUrl": "/find/list?q=iOS%20%E5%9C%B0%E5%9D%80%E9%AA%8C%E6%94%B6",
+      "path": "/find/list",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:57.949Z",
+      "valid": true,
+      "status": 404
+    },
+    {
+      "rawUrl": "/find/list?q=iOS%20%E5%9C%B0%E5%9D%80%E9%AA%8C%E6%94%B6",
+      "path": "/find/list",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:57.961Z",
+      "valid": true,
+      "status": 404
+    },
+    {
+      "rawUrl": "/find/list?q=iOS%20%E5%9C%B0%E5%9D%80%E9%AA%8C%E6%94%B6&_htyf_retry=1793284437977",
+      "path": "/find/list",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:57.985Z",
+      "valid": true,
+      "status": 200
+    },
+    {
+      "rawUrl": "/book/get",
+      "path": "/book/get",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:58.011Z",
+      "status": 200
+    },
+    {
+      "rawUrl": "/toc/get",
+      "path": "/toc/get",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:58.045Z",
+      "status": 200
+    },
+    {
+      "rawUrl": "/text/%E7%AC%AC%E4%B8%80%20%E7%AB%A0?book=get&literal=searchKey",
+      "path": "/text/第一 章",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:33:58.085Z",
+      "valid": true,
+      "status": 200
+    },
+    {
+      "rawUrl": "/form/search",
+      "path": "/form/search",
+      "method": "POST",
+      "body": "q=iOS+%B1%ED%B5%A5%D1%E9%CA%D5&literal=%2520&raw=%2B",
+      "contentType": "application/x-www-form-urlencoded; charset=UTF-8",
+      "time": "2026-10-29T14:35:58.178Z",
+      "valid": true,
+      "status": 200
+    },
+    {
+      "rawUrl": "/book/form",
+      "path": "/book/form",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:35:58.209Z",
+      "status": 200
+    },
+    {
+      "rawUrl": "/toc/form",
+      "path": "/toc/form",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:35:58.242Z",
+      "status": 200
+    },
+    {
+      "rawUrl": "/text/%E7%AC%AC%E4%B8%80%20%E7%AB%A0?book=form&literal=searchKey",
+      "path": "/text/第一 章",
+      "method": "GET",
+      "body": "",
+      "time": "2026-10-29T14:35:58.276Z",
+      "valid": true,
+      "status": 200
+    }
+  ]
+}
