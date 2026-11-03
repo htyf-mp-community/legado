@@ -1,0 +1,49 @@
+import React,{useEffect,useState} from 'react';
+import {Text,View,TurboModuleRegistry} from 'react-native';
+import {createWorkletRuntime,runOnRuntimeAsync,scheduleOnRN} from 'react-native-worklets';
+
+export default function App(){
+  const [lines,setLines]=useState<string[]>(['QuickJS Worklet probe']);
+  useEffect(()=>{let live=true;const log=(s:string)=>{if(live)setLines(old=>[...old,s]);};
+    (async()=>{try{
+      const native=TurboModuleRegistry.get('QuickjsSandbox');
+      log('native module '+(native?'available':'missing'));
+      const sandbox=(globalThis as any).QuickJSSandbox;
+      if(!sandbox){log('main runtime QuickJS missing');return;}
+      log('main runtime QuickJS available');
+      const createContext=sandbox.createContext, evalCode=sandbox.evalCode, disposeContext=sandbox.disposeContext, registerHostCallback=sandbox.registerHostCallback;
+      const runtime=createWorkletRuntime('legado-qjs-probe');
+      const probe=runOnRuntimeAsync(runtime,()=>{
+        'worklet';
+        const id='legado-qjs-probe-20261103';
+        try{
+          const globalType=typeof (globalThis as any).QuickJSSandbox;
+          const created=createContext(id);
+          const value=evalCode(id,'6*7','probe.js');
+          registerHostCallback(id,(_id:string,action:string,args:string)=>action+':'+args);
+          const callback=evalCode(id,'__nativeCall("lookup", "hello")','callback.js');
+          disposeContext(id);
+          return 'global='+globalType+' created='+created+' result='+value+' callback='+callback;
+        }catch(error){try{disposeContext(id);}catch(_){}return 'error '+String(error);}
+      });
+      const result=await Promise.race([probe,new Promise<string>(resolve=>setTimeout(()=>resolve('timeout'),10000))]);
+      log('worklet '+result);
+      if(result==='timeout')return;
+      let timerFired=false;
+      const notifyStart=()=>{setTimeout(()=>{timerFired=true;},50);};
+      const busy=runOnRuntimeAsync(runtime,()=>{
+        'worklet';
+        const id='legado-qjs-probe-finite';
+        try{
+          createContext(id);
+          scheduleOnRN(notifyStart);
+          return evalCode(id,'var end=Date.now()+400; while(Date.now()<end){}; "finished"','finite.js');
+        }finally{disposeContext(id);}
+      });
+      const busyResult=await Promise.race([busy,new Promise<string>(resolve=>setTimeout(()=>resolve('timeout'),10000))]);
+      log('finite script '+busyResult+' RN timer='+timerFired);
+    }catch(error){log('probe error '+String(error));}})();
+    return()=>{live=false;};
+  },[]);
+  return <View style={{flex:1,paddingTop:100,paddingHorizontal:18,backgroundColor:'#fff'}}><Text>{lines.join('\n')}</Text></View>;
+}

@@ -1,6 +1,8 @@
 import type { BookSource } from '../types';
 import { appStorage } from './storage';
+import defaultBookSources from '../assets/defaultBookSources.json';
 const KEY = 'sources.v1';
+const DEFAULTS_KEY = 'sources.default-7663.v1';
 const text = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 export function parseBookSources(input: string): BookSource[] {
   let raw: unknown;
@@ -67,13 +69,23 @@ export function upsertBookSource(
 }
 export async function loadSources(): Promise<BookSource[]> {
   const raw = appStorage.getString(KEY);
-  if (!raw) return [];
+  let sources: BookSource[];
   try {
-    return parseBookSources(raw);
+    sources = !raw || raw.trim() === '[]' ? [] : parseBookSources(raw);
   } catch {
+    // Do not replace an unreadable existing collection with the defaults.
     return [];
   }
+  if (appStorage.getString(DEFAULTS_KEY)) return sources;
+  const defaults = parseBookSources(JSON.stringify(defaultBookSources));
+  const existing = new Set(sources.map(source => source.bookSourceUrl));
+  const merged = [...sources, ...defaults.filter(source => !existing.has(source.bookSourceUrl))];
+  if (merged.length !== sources.length) appStorage.set(KEY, JSON.stringify(merged));
+  appStorage.set(DEFAULTS_KEY, '1');
+  return merged;
 }
 export async function saveSources(value: BookSource[]) {
   appStorage.set(KEY, JSON.stringify(value));
+  // A user save (including removing all sources) takes precedence over seeding.
+  appStorage.set(DEFAULTS_KEY, '1');
 }

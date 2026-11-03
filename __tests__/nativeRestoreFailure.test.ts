@@ -62,6 +62,15 @@ const entry = (value: unknown) => ({
   value: JSON.stringify(value),
 });
 
+test('native archive restoration writes book variables to the library', async () => {
+  const variable = '{"token":"restore-value"}';
+  const preview = convertLegacyBackup({'bookshelf.json':JSON.stringify([
+    {bookUrl:'https://source.invalid/book',origin:'https://source.invalid',name:'书',variable},
+  ])});
+  await restoreLegacyBackup(JSON.stringify(preview.payload),appStorage,{});
+  expect(JSON.parse(String(mockValues.get('library.v1')))[0].variable).toBe(variable);
+});
+
 test('native ZIP restore retains the source/record prefix committed before an invalid record, and does not reach later categories', async () => {
   mockValues.set(
     'sources.v1',

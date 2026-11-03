@@ -21,6 +21,11 @@ const unsupported = (action: () => unknown) => {
   }
 };
 
+// Never execute imported scripts during list rendering or import. A script is
+// classified conservatively for manual verification by the debug workflow.
+const needsScriptCheck = (value: unknown) =>
+  typeof value === 'string' && /@js:|<js>/i.test(value);
+
 /** Static preflight only; network failures are handled by source check/debug. */
 export function inspectSourceCompatibility(
   source: BookSource,
@@ -29,11 +34,12 @@ export function inspectSourceCompatibility(
     contentRule = rule(source, 'ruleContent'),
     searchUnsupported =
       !!source.searchUrl &&
-      (unsupported(() => buildSourceRequest(source, source.searchUrl!, 'book')) ||
+      (needsScriptCheck(source.searchUrl) || needsScriptCheck(searchRule.bookList) ||
+        unsupported(() => buildSourceRequest(source, source.searchUrl!, 'book')) ||
         unsupported(() =>
           sourceRuleValues('', String(searchRule.bookList ?? '$[*]')),
         )),
-    contentUnsupported = unsupported(() =>
+    contentUnsupported = needsScriptCheck(contentRule.content) || unsupported(() =>
       sourceRuleValues('', contentRule.content),
     ),
     issues: string[] = [];

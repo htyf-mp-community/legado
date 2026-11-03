@@ -58,6 +58,7 @@ test('migrates native position, private configuration and latest concurrent edit
       groupIds: ['2'],
       order: 20,
       persistedCoverUrl: 'latest',
+      readingPosition: { chapterId: 'two', position: 456, titleVisible: false },
     },
     extra = { ...before, id: 'extra', name: 'Other', bookUrl: '/extra' };
   const result = applyBatchSourceChange(
@@ -75,6 +76,7 @@ test('migrates native position, private configuration and latest concurrent edit
     currentChapterIndex: 3,
     chapterTitle: '第四章 远行',
     progress: 0.8,
+    readingPosition: { chapterId: '/new/3', position: 456, titleVisible: false },
     groupIds: ['2'],
     order: 20,
     canUpdate: false,

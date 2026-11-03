@@ -1,0 +1,9 @@
+{
+  "bookSourceName": "📂二三中文",
+  "bookSourceUrl": "http://m.ersanwx.net",
+  "ruleToc": {
+    "chapterList": "\n<js>\nlist=[]\nlis=java.getElements('class.directoryArea@tag.p@tag.a')\nfor(var i=1;i<lis.length-1;i++){\n\tname=lis[i].text()\n\tsurl=lis[i].attr('href')\n\ttemp={\n\t\t\"name\":name,\n\t\t\"surl\":surl\n\t\t}\n\t\tlist.push(temp)\n\t}\nlist\n</js>",
+    "chapterName": "name",
+    "chapterUrl": "surl"
+  }
+}

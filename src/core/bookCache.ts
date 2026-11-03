@@ -1,4 +1,7 @@
 import type { Book, BookChapter, LocalChapter, SearchBook } from '../types';
+import { chapterIdentity, mapRemoteChapters } from './chapterIdentity';
+import type { ChapterLoadResult } from './chapterPrefetch';
+import { mergeSourceVariables } from './sourceVariables';
 
 export type CacheProgress = {
   completed: number;
@@ -20,6 +23,7 @@ export function mergeRefreshedChapters(
   if (!remote.length)
     return {
       ...book,
+      ...(info.variable ? {variable:info.variable} : {}),
       name: info.name,
       author: info.author,
       intro: info.intro ?? book.intro,
@@ -27,26 +31,10 @@ export function mergeRefreshedChapters(
       tocUrl: info.tocUrl ?? book.tocUrl,
       updatedAt: Date.now(),
     };
-  const cached = new Map(
-      (book.chapters ?? [])
-        .filter(chapter => !!chapter.url && !!chapter.content)
-        .map(chapter => [chapter.url!, chapter.content]),
-    ),
-    chapters: LocalChapter[] = remote.map(chapter => ({
-      id: chapter.url || `${book.id}:${chapter.index}`,
-      title: chapter.title,
-      content: cached.get(chapter.url) ?? '',
-      url: chapter.url,
-      baseUrl: chapter.baseUrl,
-      isVolume: chapter.isVolume,
-      isVip: chapter.isVip,
-      isPay: chapter.isPay,
-      tag: chapter.tag,
-      wordCount: chapter.wordCount,
-    })),
+  const chapters: LocalChapter[] = mapRemoteChapters(remote, book.id, book.chapters),
     oldCurrent = book.chapters?.[book.currentChapterIndex ?? 0],
-    matched = oldCurrent?.url
-      ? chapters.findIndex(chapter => chapter.url === oldCurrent.url)
+    matched = oldCurrent
+      ? chapters.findIndex(chapter => chapterIdentity(chapter) === chapterIdentity(oldCurrent) || chapter.id === oldCurrent.id)
       : chapters.findIndex(chapter => chapter.title === book.chapterTitle),
     currentIndex = Math.max(
       0,
@@ -58,6 +46,7 @@ export function mergeRefreshedChapters(
     current = chapters[currentIndex];
   return {
     ...book,
+    ...(info.variable ? {variable:info.variable} : {}),
     name: info.name,
     author: info.author,
     intro: info.intro ?? book.intro,
@@ -74,7 +63,7 @@ export function mergeRefreshedChapters(
 
 export async function cacheBookChapters(
   book: Book,
-  load: (chapter: LocalChapter, index: number) => Promise<string>,
+  load: (chapter: LocalChapter, index: number) => Promise<ChapterLoadResult>,
   options: {
     fromIndex?: number;
     concurrency?: number;
@@ -93,7 +82,8 @@ export async function cacheBookChapters(
           !item.chapter.isVolume &&
           !item.chapter.content,
       ),
-    failures: CacheFailure[] = [];
+    failures: CacheFailure[] = [],
+    bookVariables: Array<string | undefined> = new Array(chapters.length);
   let cursor = 0,
     completed = 0;
   const report = (chapterTitle: string) =>
@@ -108,8 +98,11 @@ export async function cacheBookChapters(
       const item = pending[cursor];
       cursor += 1;
       try {
-        const content = await load(item.chapter, item.index);
-        chapters[item.index] = { ...item.chapter, content };
+        const value = await load(item.chapter, item.index);
+        if (typeof value !== 'string') bookVariables[item.index] = value.bookVariable;
+        chapters[item.index] = typeof value === 'string'
+          ? { ...item.chapter, content: value }
+          : { ...item.chapter, content: value.content, ...(value.variable !== undefined ? {variable: value.variable} : {}) };
       } catch (reason) {
         failures.push({
           chapterId: item.chapter.id,
@@ -134,10 +127,12 @@ export async function cacheBookChapters(
       0,
       Math.min(chapters.length - 1, book.currentChapterIndex ?? 0),
     ),
-    current = chapters[currentIndex];
+    current = chapters[currentIndex],
+    variable = mergeSourceVariables(book.variable, book.variable, bookVariables);
   return {
     book: {
       ...book,
+      ...(variable !== book.variable ? {variable} : {}),
       chapters,
       content: current?.content ?? book.content,
       updatedAt: Date.now(),

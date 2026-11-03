@@ -136,8 +136,8 @@ test('web service accepts Android-compatible postData source management', async 
       headers: {},
     });
   expect(saved.statusCode).toBe(200);
-  expect(JSON.parse(String(listed.body)).data[0].bookSourceUrl).toBe(
-    source.bookSourceUrl,
+  expect(JSON.parse(String(listed.body)).data).toEqual(
+    expect.arrayContaining([expect.objectContaining({ bookSourceUrl: source.bookSourceUrl })]),
   );
 });
 test('web service imports a bounded binary local ebook upload', async () => {

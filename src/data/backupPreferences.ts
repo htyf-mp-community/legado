@@ -38,7 +38,10 @@ export type BackupPreferences = {
   lastCheckedRemote: number;
 };
 const all = Object.fromEntries(
-  backupCategories.map(key => [key, true]),
+  backupCategories.map(key => [
+    key,
+    key !== 'cookies' && key !== 'sourceVariables',
+  ]),
 ) as Record<BackupCategory, boolean>;
 export const defaultBackupPreferences: BackupPreferences = {
   categories: all,

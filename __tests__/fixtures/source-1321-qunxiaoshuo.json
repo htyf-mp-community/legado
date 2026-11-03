@@ -1,0 +1,4 @@
+{
+  "bookSourceName": "📂群小说",
+  "nextContentUrl": "@js:var result = [];\nvar pages = +String(java.getString('.bookname@text')).match(/\\(\\d+\\/(\\d+)\\)$/)[1];\nfor (let i = 2; i <= pages && !/_/.test(baseUrl); i++) {\n\tresult.push(baseUrl.replace(\".html\", `_${i}.html`));\n}\nresult;"
+}

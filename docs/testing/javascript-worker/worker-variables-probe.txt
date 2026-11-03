@@ -1,0 +1,41 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {searchSource} from './src/core/webBook';
+import {sourceRuntimeVariables} from './src/data/runtimeSourceCache';
+import fixture from './source-xiaoxiao.json';
+import quanben from './source-quanben.json';
+function App(){
+ const [lines,setLines]=useState(['iOS source variables flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_variables',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_variables');
+  const requests=[];global.fetch=async(address,options)=>{
+   const target=String(address);if(!/^https:\/\/(s\.chuangke\.tv|mirror\.example)(?:\/|$)/i.test(target))return originalFetch(address,options);requests.push(target);
+   return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>'<div class="item"><a href="/book">书名</a></div>'};
+  };
+  const runJavaScript=(script,bridge,input,signal)=>e.run(script,bridge,input,signal);
+  const source={...fixture,bookSourceType:0,customOrder:0,enabled:true,enabledExplore:true,concurrentRate:'0',loginCheckJs:'if(java.get("key") !== key) throw "missing search variable"; result;',ruleSearch:{bookList:'div.item',name:'@js:java.get("key") + ":" + result.text()',author:'@js:java.get("key")',bookUrl:'a@href'}};
+  const books=await searchSource(source,'深空彼岸',1,undefined,{runJavaScript});
+  log('1321 search + login variable',books.length===1&&books[0].name==='深空彼岸:书名'&&JSON.parse(books[0].variable).key==='深空彼岸'&&decodeURIComponent(requests[0]).includes('keyword=深空彼岸'));
+  const stored=sourceRuntimeVariables(quanben.bookSourceUrl);stored.setVariable('https://mirror.example/');
+  const other={...quanben,bookSourceType:0,customOrder:0,enabled:true,enabledExplore:true,concurrentRate:'0',ruleSearch:{bookList:'div.item',name:'a@text',bookUrl:'a@href'}};
+  const more=await searchSource(other,'西游记',1,undefined,{runJavaScript});
+  log('1321 restored source variable',more.length===1&&decodeURIComponent(requests[1]).startsWith('https://mirror.example/index.php?c=book&a=search&keywords=西游记'));
+  const isolated=sourceRuntimeVariables('https://worker-variable-probe.example');
+  const bridge={baseUrl:'https://worker-variable-probe.example',sourceUrl:'https://worker-variable-probe.example',key:null,page:1,ajax:async()=>'',removeCookie:()=>{},sourceVariables:isolated};
+  await e.run('source.put("id","42");source.setVariable("route");"ok"',bridge);
+  const roundtrip=await e.run('source.get("id")+":"+source.getVariable()',bridge);
+  log('persistent source variables',roundtrip==='42:route',String(roundtrip));
+  const primitive=await e.run('java.put(undefined,NaN);java.get(undefined)',{...bridge,variables:new Map()});
+  log('primitive conversion',primitive==='NaN',String(primitive));
+  stored.setVariable(null);isolated.put('id','');isolated.setVariable(null);
+ }catch(error){log('variables flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

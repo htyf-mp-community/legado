@@ -1,0 +1,13 @@
+import java.text.SimpleDateFormat;
+import java.util.*;
+class LegadoDateProbe {
+  public static void main(String[] args) {
+    for (int offset : new int[]{0,19800000,-12600000,8,1234567}) {
+      var zone=new SimpleTimeZone(offset,"UTC");
+      for(String pattern:new String[]{"D F Z X XX XXX","yyyy-MM-dd HH:mm:ss.SSS"}) {
+        var format=new SimpleDateFormat(pattern,Locale.CHINA); format.setTimeZone(zone);
+        System.out.println(offset+" "+pattern+" => "+format.format(new Date(1704067200000L)));
+      }
+    }
+  }
+}

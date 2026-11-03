@@ -1,0 +1,28 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {sourceRuleTextAsync} from './src/core/sourceRule';
+function App(){
+ const [lines,setLines]=useState(['iOS worker large page rules']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_large_page',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_large_page');
+  const runner=createSourceWorkerRuleRunner(e),html='<!--'+'x'.repeat(1000100)+'--><p>正文</p>';
+  const run=script=>sourceRuleTextAsync(html,'tag.p@text\n@js:'+script,false,undefined,runner);
+  log('selected content',await run('result+"!"')==='正文!');
+  let rejected=false;try{await run('src.length')}catch(error){rejected=/过长|限制/.test(String(error))}log('large src read rejected',rejected);
+  log('src assignment',await run('src="替换";src+result')==='替换正文');
+  log('global src assignment',await run('this.src="替换";this.src+result')==='替换正文');
+  log('var src assignment',await run('var src="替换";src+result')==='替换正文');
+  const short=await sourceRuleTextAsync('<p>内容</p>','tag.p@text\n@js:(src.indexOf("内容")>=0)+":"+result',false,undefined,runner);
+  log('ordinary src available',short==='true:内容');
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

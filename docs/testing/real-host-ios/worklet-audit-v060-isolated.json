@@ -1,0 +1,16 @@
+{
+  "version": "0.0.60",
+  "bundle": "plugin_legado_hostcheck_v0_0_60.bundle",
+  "bundleSha256": "e2bbd5c7f5f3efe30b325b2f0d33df5da2e922268ba23846ce3f4146f999c650",
+  "packageSha256": "fa40527e654c003eed74e74cac5c9630d4f3bc5cfdc3ee0b99e7a8276d626a4b",
+  "compiledArrayClosures": 460,
+  "unexpectedClosureAssignments": [],
+  "libraryJestHelpers": [
+    "fn.__closure={}",
+    "w.__closure={...original.__closure}"
+  ],
+  "compiledPluginVersions": {},
+  "hostCompilerSha256": "059cb16c0bede1b9a72315a105f788b2ae15d3f9cf0c0e27689a2050f7d847ce",
+  "hostWorkletsVersion": "0.13.0",
+  "hostReanimatedVersion": "4.7.1"
+}

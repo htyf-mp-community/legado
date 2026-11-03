@@ -32,17 +32,24 @@ import {
 
 const FORMAT = 'legado-htyf-backup';
 const VERSION = 1;
+const SOURCE_VARIABLES_VERSION = 2;
+const SOURCE_VARIABLES_KEY = 'legacy.runtime-source-cache.v1';
 
 export type BackupValue = StorageEntry;
 
 export type BackupPayload = {
   format: typeof FORMAT;
-  version: typeof VERSION;
+  version: typeof VERSION | typeof SOURCE_VARIABLES_VERSION;
   createdAt: number;
   storageId: typeof APP_STORAGE_ID;
   entries: Record<string, BackupValue>;
   media?: BackupMediaIndex;
   encryptedEntries?: {
+    algorithm: typeof SENSITIVE_BACKUP_ALGORITHM;
+    value: string;
+  };
+  /** Separately encrypted so restore-ignore can skip source variables without a password. */
+  encryptedSourceVariables?: {
     algorithm: typeof SENSITIVE_BACKUP_ALGORITHM;
     value: string;
   };
@@ -96,29 +103,60 @@ export function createBackup(
   password = loadLocalPassword(),
 ): string {
   const preferences = loadBackupPreferences();
+  // Backup.kt validates selected sensitive categories even if their tables are empty.
+  // Kotlin's isBlank includes Unicode space separators and excludes U+FEFF.
+  const blankPassword =
+    /^[\u0009-\u000d\u001c-\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/.test(
+      password,
+    );
+  if (blankPassword && preferences.categories.cookies)
+    throw new Error('备份或恢复持久 Cookie 前，请先设置非空的本地密码。');
+  if (blankPassword && preferences.categories.sourceVariables)
+    throw new Error('备份或恢复源变量前，请先设置非空的本地密码。');
   const encrypted = readStorageEntries(
     storage,
     key =>
       ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)) &&
       shouldIncludeBackupKey(key, preferences),
   );
+  const sourceVariables = readStorageEntries(
+    storage,
+    key =>
+      key === SOURCE_VARIABLES_KEY && shouldIncludeBackupKey(key, preferences),
+  );
   const payload: BackupPayload = {
     format: FORMAT,
-    version: VERSION,
+    // Older clients ignore unknown fields. Version 2 makes them reject rather than
+    // silently claiming a successful restore while dropping encrypted variables.
+    version: preferences.categories.sourceVariables
+      ? SOURCE_VARIABLES_VERSION
+      : VERSION,
     createdAt: Date.now(),
     storageId: APP_STORAGE_ID,
     entries: readStorageEntries(
       storage,
       key =>
         !SENSITIVE_STORAGE_KEYS.has(key) &&
+        key !== SOURCE_VARIABLES_KEY &&
         !ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)) &&
         shouldIncludeBackupKey(key, preferences),
     ),
-    ...(Object.keys(encrypted).length
+    ...(preferences.categories.cookies
       ? {
           encryptedEntries: {
             algorithm: SENSITIVE_BACKUP_ALGORITHM,
             value: encryptSensitiveBackup(JSON.stringify(encrypted), password),
+          },
+        }
+      : {}),
+    ...(preferences.categories.sourceVariables
+      ? {
+          encryptedSourceVariables: {
+            algorithm: SENSITIVE_BACKUP_ALGORITHM,
+            value: encryptSensitiveBackup(
+              JSON.stringify(sourceVariables),
+              password,
+            ),
           },
         }
       : {}),
@@ -139,8 +177,22 @@ export function parseBackup(input: string): BackupPayload {
   }
   if (!value || typeof value !== 'object') throw new Error('备份格式无效');
   const candidate = value as Partial<BackupPayload>;
-  if (candidate.format !== FORMAT || candidate.version !== VERSION)
+  if (
+    candidate.format !== FORMAT ||
+    (candidate.version !== VERSION &&
+      candidate.version !== SOURCE_VARIABLES_VERSION)
+  )
     throw new Error('不支持的备份格式或版本');
+  if (
+    candidate.version === VERSION &&
+    candidate.encryptedSourceVariables !== undefined
+  )
+    throw new Error('备份版本与敏感数据格式不匹配');
+  if (
+    candidate.version === SOURCE_VARIABLES_VERSION &&
+    candidate.encryptedSourceVariables === undefined
+  )
+    throw new Error('备份缺少源变量敏感数据');
   if (candidate.storageId !== APP_STORAGE_ID)
     throw new Error('备份不属于当前应用的存储空间');
   if (!Number.isFinite(candidate.createdAt)) throw new Error('备份时间无效');
@@ -148,12 +200,16 @@ export function parseBackup(input: string): BackupPayload {
     throw new Error('备份数据无效');
   validateEntries(candidate.entries as Record<string, BackupValue>);
   if (candidate.media !== undefined) validateBackupMedia(candidate.media);
-  if (candidate.encryptedEntries !== undefined) {
+  for (const encrypted of [
+    candidate.encryptedEntries,
+    candidate.encryptedSourceVariables,
+  ]) {
+    if (encrypted === undefined) continue;
     if (
-      !candidate.encryptedEntries ||
-      candidate.encryptedEntries.algorithm !== SENSITIVE_BACKUP_ALGORITHM ||
-      typeof candidate.encryptedEntries.value !== 'string' ||
-      !candidate.encryptedEntries.value
+      !encrypted ||
+      encrypted.algorithm !== SENSITIVE_BACKUP_ALGORITHM ||
+      typeof encrypted.value !== 'string' ||
+      !encrypted.value
     )
       throw new Error('敏感备份数据格式无效');
   }
@@ -185,11 +241,29 @@ export function restoreBackup(
       if (!ENCRYPTED_BACKUP_KEY_PREFIXES.some(prefix => key.startsWith(prefix)))
         throw new Error('敏感备份包含不允许的条目');
   }
+  let encryptedSourceVariables: Record<string, BackupValue> = {};
+  if (payload.encryptedSourceVariables && !ignore.ignoreSourceVariables) {
+    const decoded: unknown = JSON.parse(
+      decryptSensitiveBackup(payload.encryptedSourceVariables.value, password),
+    );
+    if (!decoded || typeof decoded !== 'object' || Array.isArray(decoded))
+      throw new Error('敏感备份数据无效');
+    encryptedSourceVariables = decoded as Record<string, BackupValue>;
+    validateEntries(encryptedSourceVariables);
+    if (
+      Object.keys(encryptedSourceVariables).some(
+        key => key !== SOURCE_VARIABLES_KEY,
+      )
+    )
+      throw new Error('敏感备份包含不允许的条目');
+  }
   const previous = readStorageEntries(storage);
   const incoming = Object.fromEntries(
-    Object.entries({ ...payload.entries, ...encryptedEntries }).filter(
-      ([key]) => !SENSITIVE_STORAGE_KEYS.has(key),
-    ),
+    Object.entries({
+      ...payload.entries,
+      ...encryptedEntries,
+      ...encryptedSourceVariables,
+    }).filter(([key]) => !SENSITIVE_STORAGE_KEYS.has(key)),
   );
   // The host exposes no Android ID. A private, per-install restore identity keeps other
   // devices' counters separate without exporting or overwriting device identity.

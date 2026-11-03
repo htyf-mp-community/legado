@@ -1,0 +1,14 @@
+[
+  {
+    "method": "GET",
+    "path": "/app.json"
+  },
+  {
+    "method": "GET",
+    "path": "/app.json"
+  },
+  {
+    "method": "GET",
+    "path": "/dist.dgz"
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "repository": "https://github.com/htyf-mp-community/demo",
+  "baseCommit": "cbcaf4af925a1302f98ffc54185ef7ae19c79e5b",
+  "currentRemoteVersion": "0.0.49",
+  "candidateVersion": "0.0.58",
+  "candidateDirectory": "/private/tmp/legado-release-review.Kxcb6v/demo/v2/plugin_legado/latest",
+  "files": [
+    {
+      "name": "app.json",
+      "bytes": 416,
+      "sha256": "62e6faa7407bb5b1dda4a4040b2e31b30dbedf08a1fd914e5d23779fb6b3165a",
+      "target": "v2/plugin_legado/latest/app.json"
+    },
+    {
+      "name": "dist.dgz",
+      "bytes": 2610520,
+      "sha256": "447e1bcc053aac61234f39618897589b707f36f43f6c4e867abf711486ac91fc",
+      "target": "v2/plugin_legado/latest/dist.dgz"
+    },
+    {
+      "name": "manifest.json",
+      "bytes": 19000,
+      "sha256": "f628302799f8ea55ba3b8ca876af47290f0a808ff38888b54f2c1444729c6f9c",
+      "target": "v2/plugin_legado/latest/manifest.json"
+    },
+    {
+      "name": "qrcode.png",
+      "bytes": 12910,
+      "sha256": "36048ecb253340b0a398070f38e79b5e6dd26bbeb3215ef17e60c0b6515ff38a",
+      "target": "v2/plugin_legado/latest/qrcode.png"
+    }
+  ],
+  "published": false
+}

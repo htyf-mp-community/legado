@@ -1,0 +1,26 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {sourceRuleTextAsync} from './src/core/sourceRule';
+function App(){
+ const [lines,setLines]=useState(['iOS worker Base64 source rules']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_base64',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_base64');
+  const runner=createSourceWorkerRuleRunner(e);
+  const rule="@js:var s=''+result;var re=/qsbs\\.bb\\('([^']+)'\\)/g;var m;var o='';while((m=re.exec(s))!==null){try{o+=java.base64Decode(m[1])}catch(e){}}o";
+  const result=await sourceRuleTextAsync("qsbs.bb('6KW/5ri46K6w');qsbs.bb('5q2j5paH');",rule,false,undefined,runner);
+  log('1321 chapter rule',result==='西游记正文',result);
+  const bridge={baseUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{}};
+  const scripts=[['UTF8 roundtrip','java.base64Decode(java.base64Encode("西游记𠮷"))','西游记𠮷'],['URL-safe flags','java.base64Encode("?",11)','Pw'],['GBK decode','java.base64Decode("zvc=","GBK")','西'],['invalid input caught','try{java.base64Decode("A")}catch(e){"caught"}','caught'],['after error','java.base64Encode("x",0)','eA==\n']];
+  for(const [name,script,expected] of scripts){const value=await e.run(script,bridge);log(name,value===expected);}
+ }catch(error){log('worker',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

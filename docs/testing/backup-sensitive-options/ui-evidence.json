@@ -1,0 +1,26 @@
+{
+  "device": "Legado HTYF 调试, iPhone 17 Pro, iOS 26.5",
+  "version": "0.0.51",
+  "bookshelf": {
+    "books": 10,
+    "reading": 9
+  },
+  "webService": false,
+  "mcpService": false,
+  "scheduledTasks": false,
+  "cookiesSelected": true,
+  "sourceVariablesSelected": true,
+  "passwordWasSet": false,
+  "action": "复制完整备份",
+  "visibleError": "备份或恢复持久 Cookie 前，请先设置非空的本地密码。",
+  "passwordOrBackupOptionsChanged": false,
+  "notes": "AX state observed; the toast disappeared before the screenshot. First-install defaults and source-only selection were not checked on device.",
+  "restoreTest": {
+    "formatVersion": 2,
+    "ordinaryEntries": 0,
+    "ignoreSourceVariables": false,
+    "result": "恢复失败，原数据已保留；备份包含敏感数据，请先设置本地密码",
+    "observation": "Simulator screenshot; no full before/after storage comparison",
+    "previewClosed": true
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "method": "GET",
+    "path": "/detail",
+    "fixtureHeader": true
+  },
+  {
+    "method": "HEAD",
+    "path": "/download",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/bundle.zip",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/detail",
+    "fixtureHeader": true
+  },
+  {
+    "method": "HEAD",
+    "path": "/download",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/bundle.zip",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/detail",
+    "fixtureHeader": true
+  },
+  {
+    "method": "HEAD",
+    "path": "/download",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/bundle.zip",
+    "fixtureHeader": true
+  }
+]

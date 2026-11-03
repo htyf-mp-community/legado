@@ -1,0 +1,27 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {loadChapters} from './src/core/webBook';
+import ersan from './source-ersan.json';
+import biquge from './source-biquge.json';
+function App(){
+ const [lines,setLines]=useState(['iOS directory rule flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_toc_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_toc_rule');
+  const sources=[ersan,biquge].map(s=>({...s,enabled:true,concurrentRate:'0',loginCheckJs:''}));
+  const html=['<div class="directoryArea"><p><a href="/skip">目录</a><a href="/1">第一章</a><a href="/2">第二章</a><a href="/skip2">下一页</a></p></div>','<div id="list-chapterAll"><dd><a href="1.html">第一章</a></dd><dd><a href="2.html">第二章</a></dd></div>'];
+  global.fetch=async(address,options)=>{const target=String(address),i=sources.findIndex(s=>target.replace(/^https?:/,"").startsWith(s.bookSourceUrl.replace(/^https?:/,"")));if(i<0)return originalFetch(address,options);return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>html[i]};};
+  const worker=createSourceWorkerRuleRunner(e);let stages=0;const runRuleJavaScript=(task,signal)=>{stages++;return worker(task,signal)};
+  for(let i=0;i<sources.length;i++){const source=sources[i],tocUrl=source.bookSourceUrl+(i?'/book/123/':'/book');const book={bookUrl:tocUrl,tocUrl,origin:source.bookSourceUrl,originName:source.bookSourceName,name:'书',author:''};const chapters=await loadChapters(source,book,undefined,{runRuleJavaScript});log(i?'1321 笔趣阁目录':'1321 二三中文目录',chapters.length===2&&chapters[0].title==='第一章'&&chapters[1].title==='第二章',String(chapters.length));if(i)log('source variable',book.variable?.includes('123/'));}
+  log('worker scripts',stages===2,String(stages));
+ }catch(error){log('directory flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

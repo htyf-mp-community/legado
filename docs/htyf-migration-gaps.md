@@ -13,9 +13,11 @@ This file records features paused by the project native-modification boundary. `
 ## Rule JavaScript runtime
 
 - Reason: Legado rules rely on Rhino/JavaScript. The target does not pin QuickJS; a 2026-10-29 read-only audit confirms the current host project pins `react-native-quickjs-sandbox@1.0.1`, but its exposed JSI API evaluates synchronously and provides no interrupt/cancellation, memory-limit or stack-limit controls. The existing package therefore does not yet satisfy the required bounded rule-runtime contract. See `docs/testing/html-text/README.md` for the audited API/source hashes.
-- Impact: `@js:`/`<js>` source rules, coverDecodeJs image decryption, subscription pre-request scripts, custom source/auto-task login UI and login checks, source `callBackJs` events (including the audio custom button and copy-play-URL interception), JS dictionary/RSS rules, arbitrary direct-link download URL expressions, and arbitrary auto-task scripts return explicit unsupported errors. The audio player still provides the safe default copy action and labels the custom button unavailable. Standard source/task WebView login and isolated Cookie synchronization remain available, as do declarative non-JS rules and the bundled direct-link fixed-prefix expression. Cover requests with coverDecodeJs fail explicitly before an encrypted image can be installed; `src/core/bookCoverRequest.ts` records the native-runtime integration boundary.
-- Tried: pure parsing for CSS, XPath, JSONPath, regex, declarative HTTP tasks, standard WebView login with header/Cookie bridging, the bundled direct-link fixed-prefix expression, and WebView-only page injection. None safely executes the user-supplied login UI/check scripts or provides a sandboxed general rule runtime.
-- Native work: expose and verify execution interruption/cancellation and memory/stack limits in the host module, then pin/configure the matching target package and define the Legado host APIs, Cookie/request and login-UI bridges, and compatibility tests. Merely adding the existing 1.0.1 package is insufficient. No `ios/` or `android/` source is changed by this migration.
+- Partial support: pure ES5 `@js:`/`<js>` value/list transformations, DOM `attr`/`text`, bounded JSON parse/stringify, regular-expression match, search, exec, test and string replacement, URL template expressions, and search URL scripts with same-origin `java.ajax` and source Cookie clearing use a step-limited interpreter. The runtime does not enforce a comprehensive heap limit and is not a general replacement for Rhino. Complex `<js>` chaining, ES6 syntax, JSON revivers/function replacers/custom toJSON, regex split/function replacements and unsupported RE2 constructs remain incomplete. RE2 code-point matching can also differ from ES5 UTF-16 behavior for supplementary characters; host bridges remain incomplete.
+- Impact: remaining JavaScript source rules, coverDecodeJs image decryption, subscription pre-request scripts, custom source/auto-task login UI and login checks, source `callBackJs` events (including the audio custom button and copy-play-URL interception), JS dictionary/RSS rules, arbitrary direct-link download URL expressions, and arbitrary auto-task scripts return explicit unsupported errors. The audio player still provides the safe default copy action and labels the custom button unavailable. Standard source/task WebView login and isolated Cookie synchronization remain available, as do declarative non-JS rules and the bundled direct-link fixed-prefix expression. Cover requests with coverDecodeJs fail explicitly before an encrypted image can be installed; `src/core/bookCoverRequest.ts` records the native-runtime integration boundary.
+- Tried: CSS, XPath, JSONPath, declarative HTTP tasks, standard WebView login, and a pure JavaScript ES5 interpreter with bounded execution and RE2-backed matching. Login/UI scripts and complete Rhino-compatible bridging still require further work.
+- Existing host modules provide another possible route: [an isolated iOS Worker experiment](testing/javascript-worker/README.md) used WebView and Nitro HTTP Server to execute two actual search scripts with mocked synchronous host calls and terminate a busy worker. An in-app listener can now share isolated Worker routes with either Web or MCP, but cross-mini-app ownership is not atomic. The runner is not integrated, the parser's synchronous callers need redesign, and resource/security boundaries remain unverified. QuickJS 1.0.1 alone still lacks interruption/cancellation and memory/stack limits. No `ios/` or `android/` source is changed by this migration.
+- Follow-up: an isolated host probe successfully passed QuickJS JSI functions to a separate Worklet, evaluated a finite script and invoked a synchronous test callback while the RN thread remained responsive. See [evidence and limits](testing/javascript-sources/README.md). This does not establish safe interruption or memory bounds; concurrently disposing a running QuickJS context is unsafe in the audited native source. The path is not enabled in the application.
 - Acceptance (current scope: independent iOS simulator): execute representative Legado JS, custom-login and source-callback fixtures deterministically; audio custom-button and copy-play-URL callbacks receive the expected book/chapter/result values; task login checks observe the isolated Cookie state; timeout, memory, network, UI-cancellation and exception paths are verified without exposing unrestricted native APIs.
 
 ## Imported PDF reader
@@ -141,11 +143,10 @@ This file records features paused by the project native-modification boundary. `
 
 ## Reader keep-awake timeout
 
-- Reason: React Native core and the HTYF JS SDK do not provide a scoped keep-screen-awake API. `@sayem314/react-native-keep-awake` and `expo-keep-awake` are allowlisted but neither is version-pinned/configured in this target. The configured orientation and volume modules cannot change idle-timer policy.
-- Impact: the shared reader-settings route supports typography, themes, paging, orientation, header/footer, manga behavior and hardware volume-key paging. The reader follows the normal platform screen timeout and does not expose an ineffective “keep screen on” option.
-- Tried: React Native AppState/StatusBar, timers, the HTYF JS SDK, configured `react-native-volume-manager` and `react-native-orientation-locker`. JavaScript activity and orientation do not safely acquire/release the platform idle-timer lock.
-- Native work: version-pin and configure one allowlisted keep-awake module, scope activation to a focused reader, support the Android timeout choices where feasible, and always release the lock on blur, background, error and unmount.
-- Acceptance: on Android and iOS, focused reading stays awake only for the selected policy; navigating away, backgrounding or disabling immediately restores normal timeout; repeated mounts do not leak locks and battery impact is disclosed.
+- Current host evidence: the HTYF host shares `expo-keep-awake@57.0.2`, and its iOS Podfile.lock includes ExpoKeepAwake. The remote consumes this host module as a singleton with no bundled replacement; the independent non-host debug build uses an explicit unavailable stub.
+- Implemented: reader settings expose the original default/1/5/10 minutes/always choices. A per-reader tag scopes the lock to a focused foreground reader, is released on background, blur or unmount, and restarts the inactivity timer on touch and volume-key paging. Manga auto-scroll requests an always-on lock. Native calls are serialized and failed release is retried at disposal.
+- iOS adaptation: the selected interval controls how long the reader holds the lock; after release, iOS applies its own auto-lock delay. iOS does not expose the system delay through this host API, so the actual lock time is not claimed to equal the selected interval. The UI discloses both this behavior and battery use.
+- Evidence and remaining acceptance: [isolated iOS mock checks](testing/reader-keep-awake/README.md) exercise logic, persistence and the supported `keep_light` backup values; actual HTYF-host module loading, native idle-timer state, device sleep timing, app background transitions and physical iPhone remain unverified. Only the five UI values are mapped from `config.xml`; other snapshot preferences and unsupported XML/value cases remain incomplete and are reported. Android is outside the requested validation scope.
 
 ## Reader whole-paragraph long-press selection
 
@@ -264,3 +265,83 @@ Web 封面跟进：原生规格 84×112 centerCrop PNG、失败默认图、三�
 
 
 敏感备份预校验 / Native sensitive-backup preflight (0.0.47): cookie and source-variable files now undergo fatal ordered validation before ordinary conversion/restoration, with current-local-password defaults, strict fields/exact nonnegative Longs/latest cache keys and no materialized empty rows. All 349 strict-parser cases, 336 native BackupAES/Hutool envelopes, 220 suites / 1,118 tests, TypeScript and changed-file lint pass. After transient CUA binding failures recovered, dedicated iOS verifies password-required rejection for cookies/plaintext caches, ordinary source-only preview/cancel and .47 UI identity; all 27 normal-exported typed entries remain equal before/after, matching the .46 final baseline. Final cold start renders 10 books/9 in reading; Web/MCP/tasks remain off and fixture server is stopped. Correct-password decryption and ignore-switch device matrices remain pending. All UI inputs used CUA; no deletion retry. Local .47 is unpublished; remote remains .34. Jsoup MIT notice is now included in the bundle banner after artifact inspection found its prior omission. No dependency/native/source-repository changes. CookieStore domain/session/merge/raw pipe rows, runtime consumers, exhaustive JSON/password/charset profiles, XML/config/DAO/logging/interruption/storage/large-input and whole-app/physical-host matrices remain open. See [preflight report](testing/native-restore-preflight/README.md). This is finite preflight progress, not complete backup/global parity.
+
+源变量备份 / Source-variable backup (0.0.50): HTYF runtime source variables are separately encrypted and use version 2 to prevent old clients silently dropping them; version 1 remains readable. All 221 suites / 1,128 tests pass. Dedicated iOS verifies version-2 WebDAV download and preview only; actual correct-password QuickCrypto round trip, missing-password rejection and ignore-switch matrix remain pending. Old plaintext exports remain plaintext, and empty-cache password behavior differs from native. The local package is unpublished; full backup and global parity remain open. See [acceptance](testing/backup-source-variables/README.md).
+
+敏感备份选项 / Sensitive backup options (0.0.51): new/default Cookie and source-variable selections are off like native; selected categories require a nonblank password even with no rows, with Cookie first, and existing selections are preserved. 221 suites / 1,134 tests pass. Dedicated iOS verifies the cookie-first no-password error with both previously enabled; first-install defaults, source-only UI and correct-password device round trips remain pending. See [acceptance](testing/backup-sensitive-options/README.md). Local package unpublished; overall parity remains open.
+
+恢复登录头 / Restored login headers (0.0.52): restored per-source cache headers now feed native-style source requests with expiry, option precedence and request-log redaction. RSS and cover-rule search exclude login headers. All 222 suites / 1,142 tests pass; dedicated iOS live-source search/details/105-item contents/first 119-character content succeed, with author still unknown. Protected-site device restore, JS bridge, login UI, CookieStore and global parity remain pending. Local package unpublished. See [acceptance](testing/restored-login-headers/README.md).
+
+书源元数据格式 / Native book metadata formatting (0.0.53): search/explore/details now apply native name/author cleanup, category joining and word-count formatting; 6,267 finite JVM-equivalent inputs and 223 suites / 1,146 tests pass. The real source author selector does not match the current website; no guessed author or source edit. Non-China locale formatting, full metadata and global parity remain pending. Local package unpublished; see [acceptance](testing/native-book-metadata/README.md).
+
+在线详情 / Online detail (0.0.54): displays source-aware cover, word-count/category labels, author and source; label taps search the current source. Shelf conversion now retains category, word count, latest chapter and native type flags. 225 suites / 1,156 tests pass. Complete native detail interactions, full host and global parity remain pending. Local package unpublished; see [acceptance](testing/online-book-detail/README.md).
+
+下载型书源 / File source (0.0.55): details resolve download links and can import supported downloaded files or a chosen ZIP entry. Automated tests cover failure and selection; simulator interaction, unsupported formats, native filename detection and full parity remain open. See [validation](testing/web-file-source/README.md).
+
+文件保留 / File retention (0.0.56): iOS EPUB/MOBI imports preserve the original local file; a dedicated simulator passed download, import and reopening through a core-function harness. File-source UI, ZIP on-device import and real-host validation remain open; see [verification](testing/web-file-retention/README.md).
+
+文件选择 / File chooser (0.0.57): named choices and shelf/read intents implemented; dedicated iOS tested selecting and importing two Chinese-named TXT entries in a ZIP, without persisting a shelf record. Additional archive formats, actual shelf navigation, real host and full parity remain open. See [validation](testing/web-file-choice-ui/README.md).
+
+宿主启动 / Host startup (0.0.58): real HTYF debug host on dedicated iOS simulator exposed the removed InteractionManager getter; remote stack-card compatibility now reaches the shelf and animation sheet. Real source search, contents, first chapter and reopen passed. Physical device and complete parity remain open; see [host validation](testing/real-host-ios/README.md).
+
+## HTYF 宿主依赖约束待核对（2026-11-02）
+
+用户要求小程序只使用 HTYF 的依赖，不能修改原生工程。本轮核对 `/Users/dgz/code/hty/apps/htyf-app/package.json`：`react-native-quick-crypto` 已由宿主提供（宿主 1.1.7、目标和 CLI 共享清单 1.1.6），但目标直接依赖的 `css-select`、`htmlparser2`、`iconv-lite`、`js-interpreter`、`parse5`、`parse5-htmlparser2-tree-adapter` 和 `re2js` 没有作为宿主直接依赖列出。它们是打入小程序的纯 JavaScript，不需要新增原生模块；在按用户要求完成依赖替换/确认之前，不视为满足该约束。宿主已有 `cheerio`、`react-native-quickjs-sandbox`，但后者当前暴露的同步 `evalCode` 没有中断、内存限制接口，不能直接取代现有受限脚本执行并保持其运行边界。后续应逐项核对现有宿主能力、语义和取消机制，不通过改原生工程或直接引入额外依赖解决。
+
+可复现核对：`node scripts/audit-host-dependencies.mjs package.json /path/to/htyf-app/package.json src` 会检查目标的直接运行时依赖及源码中的直接导入（源码扫描是保守文本检查，不代替打包审计）；对当前宿主运行时额外发现源码直接使用了 `domhandler`。构建工具 `@htyf-mp/cli` 不计入宿主运行时依赖。该检查按依赖名称比对，不证明版本或实际宿主共享机制兼容。
+
+`node scripts/probe-host-cheerio.mjs /path/to/htyf-app/package.json` 以宿主 Cheerio 和原选择器比较。简单组合 `filter` 与 `find` 时，`:scope > div` 会错误包含当前节点；目前通过适配查询上下文保留此行为。探针对 9,768 组查询和上下文进行了对照，均一致；这不能证明所有选择器完全兼容。探针仅供开发验证，不进入小程序包。
+
+书源规则现改用宿主已经声明的 `cheerio@1.2.0`，移除了对 `css-select` 的直接运行时导入与直接依赖；Cheerio 本身仍通过传递依赖使用同一选择器库，因此并未从依赖树中彻底移除它。`htmlparser2` 保持原锁定版本 10.0.0，避免此变更附带升级解析器；Re.Pack 禁用包 exports 解析，构建配置为 Cheerio 的 slim 入口提供明确映射。其他不在宿主直接依赖中的包仍待处理。
+
+后续处理：源码不再直接运行时导入 `domhandler`；解析出来的节点由内部弱引用标记，供 JavaScript 规则识别，普通 JSON 不会因包含 `type` 等字段被当作节点。`domhandler` 仍是现有 HTML 解析器的传递依赖，因此整体依赖约束尚未解决。新的依赖检查测试防止源码重新直接引用这个未声明的包。
+
+继续迁移：XML 解析、节点文本提取和节点移除已改为使用 Cheerio 的接口，删除 `htmlparser2` 的直接依赖。Cheerio 仍使用 `htmlparser2` 作为传递依赖，版本从直接锁定的 10.0.0 变为 Cheerio 的 10.1.0；XML 大小写、CDATA、偏移和节点连接已通过定向测试，不能因此认为两个版本完全等价。当前剩余的非宿主直接依赖以依赖审计脚本输出为准。
+
+2026-11-02 构建事故：一次原拟在临时目录运行的构建由于模块在 `process.chdir` 前初始化，错误地清空了项目 `dist/build` 和 `dist/dist` 并覆盖 `dist/app.json`、`dist/dist.dgz`。已从 `/private/tmp/legado-release-review.Kxcb6v/demo/v2/plugin_legado/latest` 的 0.0.58 备份恢复发布包和配置，SHA-256 分别为 `447e1bcc053aac61234f39618897589b707f36f43f6c4e867abf711486ac91fc`、`62e6faa7407bb5b1dda4a4040b2e31b30dbedf08a1fd914e5d23779fb6b3165a`，并从包中恢复 `dist/dist` 及 `dist/build` 内相同哈希的 0.0.58 bundle；`dist/build` 原有的其他构建中间文件没有找到备份，未能原样恢复。之后的临时构建通过设置进程初始工作目录运行，输出仅写入临时目录。
+
+继续迁移：直接依赖 `parse5-htmlparser2-tree-adapter` 已移除，当前从宿主 Cheerio 的解析选项取得其内部树适配器，仍由 Cheerio 作为传递依赖提供。解析器和片段解析逻辑未改；由于适配器取自 Cheerio 1.2.0 的内部 `options.treeAdapter`，升级 Cheerio 前必须重新验证该接口。Re.Pack 禁用包 exports，构建配置为 Cheerio 的 HTML 入口提供明确映射。当前剩余非宿主直接依赖为 `iconv-lite`、`js-interpreter`、`parse5`、`re2js`；并未达到完整宿主依赖约束。
+
+JavaScript 书源后续支持了 `java.base64Encode`/`java.base64Decode`，使用 HTYF 宿主已配置的 `react-native-quick-base64@3.0.1`，未新增原生依赖；它不改变现有 JavaScript 解释器及字符集等四项直接依赖尚待迁移的状态。
+
+JavaScript 书源补充了受限 `String.prototype.includes`、`startsWith` 和 `endsWith`；普通对象及数组的隐式转换仍未支持，完整 ES6 和四项非宿主直接依赖仍待处理。
+
+JavaScript 书源支持受限的 `java.getString` 查询当前规则上下文，也支持脚本提供的 HTML、JSON 对象和已有元素；布尔解码参数重载、嵌套脚本和其他 Java 查询接口仍未实现。单次脚本查询次数和输入体积受限，完整 Rhino 及非宿主直接依赖仍待处理。
+
+JavaScript 书源的搜索、发现、详情、目录及正文规则已接入 `baseUrl`；它们分别使用原版对应的搜索响应地址、详情请求地址和当前目录或正文请求地址。`src` 已提供原始规则内容；正文规则另提供标题、下一章地址和章节字段快照。`book`、章节对象方法及脚本修改回写等原版能力仍未完整支持。
+
+2026-11-02：HTML 文档与响应头片段解析改经宿主已有的 Cheerio 1.2.0，移除 `parse5` 的直接依赖及运行时直接导入；Cheerio 仍通过传递依赖使用 parse5，当前目标和宿主均解析到 7.3.0。未知自闭合标签兼容依赖 parse5 错误回调绑定的内部解析器、`currentToken`、`onEndTag` 和 token 类型值；片段解析依赖 Cheerio 的 `_parse`。这些不是稳定的公开兼容保证，升级 Cheerio 或 parse5 前必须重跑差分与宿主验证。对照原解析器的 532 组文档、四个响应头片段及专用 iOS 本地回放通过；不能据此证明所有畸形 HTML 等价。当前依赖审计仍报告 `iconv-lite`、`js-interpreter`、`re2js`，尚未满足完整宿主依赖约束。
+
+2026-11-02：响应正文的 UTF-8 解码及 HTML head 预扫描改用小程序内的 UTF-8 解码逻辑，不再由该解码路径调用 `iconv-lite`；支持无效字节替换与 BOM 保留，全部单字节、双字节组合及 10000 组随机输入与现有 iconv 结果对照一致。其他编码检测、GBK 等编解码和 TXT 导出仍依赖 `iconv-lite`，因此并未移除该依赖。本轮模拟器调试应用成功加载，书源界面回放未完成。
+
+2026-11-02：修复为脚本提供 `src` 后引入的大页面回归：当原始 HTML 超过输入上限且脚本未读取 `src` 时，可继续处理已选中的短结果；读取超限 `src` 仍受限制。实现依赖当前 JS-Interpreter 的内部 setter 调度接口，升级或替换解释器时必须重新验证。核对宿主 `react-native-nitro-text-decoder` 后确认它仅支持 UTF-8、UTF-16LE 和 UTF-16BE，不能直接替代 GBK 等旧字符集。
+
+2026-11-02：JavaScript 规则新增受限的 `java.getStringList`，支持数组访问及 `size()`、`get()`、`isEmpty()`、`toArray()`，URL 列表按响应地址解析并去重；其他 Java List 方法和完整 Rhino 桥接仍未实现。`java.getString` 和 `java.getStringList` 合计每次脚本最多查询 16 次，并受输入及输出工作量限制。此功能仍依赖非宿主直接依赖 `js-interpreter`，尚不满足仅使用宿主依赖的约束。
+
+2026-11-02：书源 URL 参数和 `java.encodeURI` 使用的 UTF-8 编码已改为小程序内实现，保留 Java 对未配对代理字符的问号替换。覆盖全部 65,536 个 UTF-16 单元、代理字符组合和原版 URL 对照样本；独立 iOS 调试应用通过本地回放。GBK 等其他编码、TXT 导出与其余调用仍依赖 `iconv-lite`；`iconv-lite`、`js-interpreter`、`re2js` 均尚未从直接依赖中移除。
+
+2026-11-02：继续将书源 URL 参数及 `java.encodeURI` 的 UTF-16、UTF-16BE、UTF-16LE、UCS-2 编码改为小程序内实现，并将 UTF-8 TXT 读取改用已有本地解码器。验证包含原版 930 个 UTF-16 URL 编码样本和 UTF-8 TXT 损坏字节、BOM；其他 TXT 字符集、TXT 导出及书源旧字符集仍依赖 `iconv-lite`，此项尚未消除非宿主依赖。
+
+2026-11-02：书源 URL 参数及 `java.encodeURI` 的 GBK/CP936/Windows-936 编码已使用已有 ICU 映射及生成的编码差异表实现，保留原有两种编码的差异、欧元和异常替换语义。基本多文种平面逐字符对照、补充平面原编码器检查、原版 URL 样本和独立 iOS 本地回放通过。差异表依据 iconv-lite 0.7.3 生成，变更或替换源映射时须重新生成和验证；其他编码、字符集检查、响应解码回退及 TXT 导出等仍直接依赖 `iconv-lite`，完整宿主依赖约束仍未满足。
+
+2026-11-02：上述 GBK 替换随后发现连续特殊字符与旧编码器不同，已修复旧编码器的输出缓冲区截断与欧元分段行为。新增 GBK 和 CP936 各 10,000 组混合字符串差分测试及 iOS 本机回放；这只证明所测旧实现兼容，并不证明全部字符与 Android 原版一致。
+
+2026-11-02：书源 URL 与 `java.encodeURI` 的 GB18030 编码改用小程序内的短编码映射和四字节区间；对全部 Unicode 标量及 20,000 组混合字符串进行了旧编码器差分，并通过独立 iOS 本地回放。数据由 `scripts/generate-gb18030-encode-data.cjs` 根据现有 ICU 映射与 iconv-lite 0.7.3 生成，源数据或旧编码器变更后须重新验证。其他编码、字符集检查、解码回退和 TXT 导出等仍直接依赖 `iconv-lite`；`js-interpreter` 和 `re2js` 同样尚未迁移到宿主依赖。
+
+2026-11-02：批量 TXT 导出的 UTF-8、UTF-16LE、UTF-16BE、GBK、GB18030 和 Big5 六种编码改用小程序内实现，`bulkBookExport.ts` 不再直接使用 `iconv-lite`。Big5 依照现有 ICU 数据和 iconv-lite 0.7.3 生成映射差异，保留组合字符和补充平面字符；GBK 导出与书源 URL 使用不同的欧元及缓冲区行为。六种编码的混合字符串、长文本和导出集成测试通过，Big5 覆盖全部 Unicode 标量；这只验证与旧编码器一致，不证明 Android 所有版本均一致。专用 iOS 调试应用已加载，但模拟器窗口与另一任务并发切换，未完成实际导出界面验证。字符集检查、部分解码和其他请求编码仍依赖 `iconv-lite`，另外 `js-interpreter`、`re2js` 也尚未满足宿主依赖约束。
+
+2026-11-02：书源请求、脚本和 TXT 的字符集名称检查改为基于 iconv-lite 0.7.3 生成的可用名称数据，不再为检查名称直接调用 iconv；BIG5、BIG5-HKSCS、CN-BIG5 的书源 URL 编码复用小程序内 Big5 实现，CP950/Windows-950 与它的映射不同，仍保留原编码路径。自动测试覆盖全部已知名称、大小写、年份及未知名称和书源请求；专用 iOS 调试应用已加载，但其他模拟器任务同时切换窗口，未完成 Big5 书源回放。名称数据是旧版本的静态快照，更新编码器或提供新编码时需重新生成验证；部分解码、其他编码以及 `js-interpreter`、`re2js` 仍不满足宿主依赖约束。
+
+2026-11-02：TXT 读取的 UTF-16LE/BE、GBK、GB18030、Big5 路径改用小程序内解码，并修正上轮 UTF-8 TXT 连续 BOM 的行为差异。测试覆盖旧字符集的全部单、双字节和 GB18030 全部四字节地址，另有混合损坏字节对照；专用 iOS 模拟器从临时副本执行六组解码样本通过，见 `testing/txt-local-codec/README.md`。尚未验证系统文件选择器完整导入；其他字符集仍回退 `iconv-lite`，且 `js-interpreter`、`re2js` 仍未满足宿主依赖限制。
+
+2026-11-03：TXT 读取增加 CP936、CP950 及其别名，书源响应对原先回退到 iconv 的常见 UTF、GBK、GB18030、Big5、CP936 和 CP950 别名改用本地解码。已经由 ICU 直接处理的名称保留原路径。新增旧编码器差分及 iOS 临时副本的九组函数验证，详见 `testing/txt-local-codec/README.md`。其他编码仍回退 `iconv-lite`；`js-interpreter`、`re2js` 及系统文件导入、真实宿主验证均未完成。
+
+2026-11-03：80 套单字节映射和 347 个名称/别名改用小程序内数据，覆盖 TXT、响应回退及书源 URL 编码，保留已存在的 ICU 直接解码路径。完整映射差分和独立 iOS 模拟器 8 组函数样本通过，详见 `testing/txt-local-codec/README.md`。数据由 `scripts/generate-single-byte-charset-data.cjs` 从 iconv-lite 0.7.3 生成；其他字符集、`js-interpreter` 与 `re2js` 仍直接依赖非宿主包，尚不满足宿主依赖要求。
+
+2026-11-03：Shift_JIS、EUC-JP 和 EUC-KR/CP949 的 TXT 解码、书源 URL 编码及对应响应别名回退改为小程序内处理，保留原先 ICU 直接解码路径。旧编码器差分和独立 iOS 模拟器 11 组函数样本通过，详见 `testing/txt-local-codec/README.md`；差异数据由 `scripts/generate-east-asian-encode-data.cjs` 和 `scripts/generate-txt-legacy-decode-data.cjs` 生成。其他编码、`js-interpreter` 与 `re2js` 仍依赖非宿主包，完整宿主依赖约束尚未满足。
+
+2026-11-03：CP950、GB2312 和其他常用多字节编码别名的书源 URL 编码改为小程序内处理，保留旧实现中别名与直接名称的欧元及输出缓冲区差异。编码对照及独立 iOS 模拟器 13 组函数样本通过，详见 `testing/txt-local-codec/README.md`；CP950 差异数据由 `scripts/generate-cp950-encode-data.cjs` 生成。其他编码仍回退 `iconv-lite`，`js-interpreter` 和 `re2js` 仍未迁移到宿主依赖。
+
+2026-11-03：UTF-32/UCS-4 自动与固定字节序的 TXT 解码、书源 URL 编码及原有响应别名回退改为小程序内处理，已有 ICU 响应路径保持原行为。对旧编码器的随机和边界测试及独立 iOS 模拟器 12 组函数样本通过，详见 `testing/txt-local-codec/README.md`。其他编码仍回退 `iconv-lite`，`js-interpreter` 和 `re2js` 仍未满足宿主依赖限制。
+
+2026-11-03 后续：剩余 UTF-7、CESU-8、自动 UTF-16 及内部别名路径已改为小程序内实现，`iconv-lite` 移至开发依赖，源码和临时 iOS 构建的模块清单均不再直接包含该包。已知 415 个名称及年份后缀、随机损坏输入、旧编码器差分和独立 iOS 11 组函数样本通过；详见 `testing/txt-local-codec/README.md`。`js-interpreter` 和 `re2js` 仍为非宿主直接运行时依赖，完整约束未满足；未验证真实宿主或物理手机。

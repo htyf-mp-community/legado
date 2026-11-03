@@ -3,6 +3,7 @@ import { isLocalBook } from './bookKinds';
 import { toLibraryBook } from './onlineLibrary';
 import { readableChapterIndex } from './readerToc';
 import { migrationChapterIndex } from './chapterMigration';
+import { mapRemoteChapters } from './chapterIdentity';
 export function needsBookCatalogue(book: Book | undefined) {
   return (
     !!book &&
@@ -31,11 +32,13 @@ export async function fetchBookCatalogue(
     intro: book.intro,
     kind: book.kind,
     bookUrl: book.bookUrl!,
+    ...(book.variable ? {variable:book.variable} : {}),
     tocUrl: book.tocUrl,
     origin: book.origin!,
     originName: book.originName ?? source.bookSourceName,
     coverUrl: book.coverUrl,
     sourceType: book.sourceType,
+    reverseToc: book.reverseToc,
   };
   check();
   const info =
@@ -67,16 +70,7 @@ export function applyBookCatalogue(
           )
         : (current.currentChapterIndex ?? loaded.currentChapterIndex ?? 0),
     );
-  const old = new Map(
-    (current.chapters ?? []).map(chapter => [
-      chapter.url || chapter.id,
-      chapter.content,
-    ]),
-  );
-  const merged = loaded.chapters!.map(chapter => ({
-    ...chapter,
-    content: old.get(chapter.url || chapter.id) ?? chapter.content,
-  }));
+  const merged = mapRemoteChapters(chapters, info.bookUrl, current.chapters);
   return {
     ...current,
     name:
@@ -96,6 +90,7 @@ export function applyBookCatalogue(
     kind:
       current.kind === before.kind ? (info.kind ?? current.kind) : current.kind,
     bookUrl: info.bookUrl,
+    ...(current.variable === before.variable && info.variable ? {variable:info.variable} : {}),
     tocUrl: info.tocUrl ?? current.tocUrl,
     chapters: merged,
     currentChapterIndex: index,

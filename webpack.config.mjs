@@ -31,6 +31,8 @@ const appid = process.env.APP_ID;
 // 构建Module Federation共享依赖对象
 const sharedObj = {};
 for (const key in dependencies) {
+  // Screen wake locks use the HTYF SDK; older hosts do not expose this share.
+  if (key === 'expo-keep-awake') continue;
   const version = dependencies[key];
   sharedObj[key] = {
     /** 是否运行为单例 */
@@ -40,6 +42,10 @@ for (const key in dependencies) {
     eager: true,
     version: `${version}`,
   };
+}
+// The host already supplies this native module. Never bundle a second copy.
+if (appExposesOptions) {
+  sharedObj['react-native-nitro-fetch'] = { singleton: true, eager: true, import: false, requiredVersion: false };
 }
 
 /**
@@ -77,6 +83,16 @@ export default (env = {}) => {
     entry,
     resolve: {
       ..._options,
+      // Re.Pack disables package exports resolution; Cheerio's slim entry is
+      // exposed only through exports, so resolve its pinned CommonJS entry.
+      alias: {
+        ..._options.alias,
+        ...(!appExposesOptions ? {'react-native-nitro-fetch$': path.join(context, 'src/compat/nitroFetchUnavailable.ts')} : {}),
+        'cheerio$': path.join(context, 'node_modules/cheerio/dist/commonjs/load-parse.js'),
+        'cheerio/slim$': path.join(context, 'node_modules/cheerio/dist/commonjs/slim.js'),
+      },
+      // Source scripts use the bounded interpreter and RE2, never Node's vm.
+      fallback: { ..._options.fallback, vm: false },
       extensions: _options.extensions.map(extension =>
         extension.replace('[platform]', platform),
       ),
@@ -123,7 +139,7 @@ export default (env = {}) => {
       // Preserve bundled parser/conversion licenses after minification, before
       // Repack code signing / manifest consumers inspect the final assets.
       new webpack.BannerPlugin({
-        banner: ['jsoup-MIT.txt', 'parse5-MIT.txt', 'parse5-adapter-MIT.txt', 'parse5-entities-BSD.txt', 'quick-transfer-NOTICE.txt', 'quick-transfer-Apache-2.0.txt', 'source-charset-NOTICE.txt', 'icu-Unicode.txt']
+        banner: ['jsoup-MIT.txt', 'parse5-MIT.txt', 'parse5-adapter-MIT.txt', 'parse5-entities-BSD.txt', 'quick-transfer-NOTICE.txt', 'quick-transfer-Apache-2.0.txt', 'source-charset-NOTICE.txt', 'icu-Unicode.txt', 'js-interpreter-Apache-2.0.txt', 're2js-MIT.txt', 'acorn-MIT.txt']
           .map(name => fse.readFileSync(path.join(__dirname, 'docs/licenses', name), 'utf8'))
           .join('\n\n'),
         entryOnly: true,

@@ -1,0 +1,30 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/hostWorkletAbi.test.js
+  ● remote development worklets use the version checked by the current host runtime
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "0.13.1"
+    Received: "0.13.0"
+
+      92 |       for (const callback of pair) {
+      93 |         expect(Array.isArray(callback.__closure)).toBe(true);
+    > 94 |         expect(callback.__pluginVersion).toBe('0.13.1');
+         |                                          ^
+      95 |       }
+      96 |   } finally {
+      97 |     if (old === undefined) delete process.env.APP_EXPOSES_OPTIONS;
+
+      at Object.toBe (__tests__/hostWorkletAbi.test.js:94:42)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        1.115 s

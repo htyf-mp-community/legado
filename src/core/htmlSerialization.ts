@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-import { isTag, type AnyNode, type Element } from 'domhandler';
-import { DomUtils } from 'htmlparser2';
+import type { AnyNode, Element } from 'domhandler';
+import { isSourceElement as isTag } from './sourceDomIdentity';
+import { removeSourceElement } from './sourceDomOperations';
 import {
   sourceBareAttribute,
   sourceDocumentSyntax,
@@ -262,7 +263,7 @@ export function serializeSourceHtml(nodes: AnyNode[], clean: boolean) {
             for (const child of node.children) stack.push(child);
         }
       }
-      for (const node of found) DomUtils.removeElement(node);
+      for (const node of found) removeSourceElement(node);
     }
   let result = '';
   for (const node of nodes) {

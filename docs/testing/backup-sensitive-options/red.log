@@ -1,0 +1,109 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/backupSourceVariables.test.ts
+
+FAIL __tests__/backupSourceVariables.test.ts
+  ● native sensitive backup selection › new and partially stored preferences default sensitive categories to off
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      164 |
+      165 |   test('new and partially stored preferences default sensitive categories to off', () => {
+    > 166 |     expect(defaultBackupPreferences.categories.cookies).toBe(false);
+          |                                                         ^
+      167 |     expect(defaultBackupPreferences.categories.sourceVariables).toBe(false);
+      168 |     appStorage.set('backup.preferences.v1', JSON.stringify({ categories: { cookies: true } }));
+      169 |     const { loadBackupPreferences } = require('../src/data/backupPreferences');
+
+      at Object.toBe (__tests__/backupSourceVariables.test.ts:166:57)
+
+  ● native sensitive backup selection › enabled empty categories require a password with native precedence
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "备份或恢复持久 Cookie 前，请先设置非空的本地密码。"
+
+    Received function did not throw
+
+      180 |     const before = [...mockValues];
+      181 |     for (const blank of ['', '  ', '\t\n', '\u00a0\u3000'])
+    > 182 |       expect(() => createBackup(appStorage, blank)).toThrow(message);
+          |                                                     ^
+      183 |     expect([...mockValues]).toEqual(before);
+      184 |   });
+      185 |
+
+      at toThrow (__tests__/backupSourceVariables.test.ts:182:53)
+      at _loop (__tests__/backupSourceVariables.test.ts:181:59)
+
+  ● native sensitive backup selection › enabled empty categories require a password with native precedence
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "备份或恢复源变量前，请先设置非空的本地密码。"
+
+    Received function did not throw
+
+      180 |     const before = [...mockValues];
+      181 |     for (const blank of ['', '  ', '\t\n', '\u00a0\u3000'])
+    > 182 |       expect(() => createBackup(appStorage, blank)).toThrow(message);
+          |                                                     ^
+      183 |     expect([...mockValues]).toEqual(before);
+      184 |   });
+      185 |
+
+      at toThrow (__tests__/backupSourceVariables.test.ts:182:53)
+      at _loop (__tests__/backupSourceVariables.test.ts:181:59)
+
+  ● native sensitive backup selection › enabled empty categories require a password with native precedence
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "备份或恢复持久 Cookie 前，请先设置非空的本地密码。"
+
+    Received function did not throw
+
+      180 |     const before = [...mockValues];
+      181 |     for (const blank of ['', '  ', '\t\n', '\u00a0\u3000'])
+    > 182 |       expect(() => createBackup(appStorage, blank)).toThrow(message);
+          |                                                     ^
+      183 |     expect([...mockValues]).toEqual(before);
+      184 |   });
+      185 |
+
+      at toThrow (__tests__/backupSourceVariables.test.ts:182:53)
+      at _loop (__tests__/backupSourceVariables.test.ts:181:59)
+
+  ● native sensitive backup selection › empty selected categories produce encrypted containers and round-trip safely
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+      187 |     select(true, true);
+      188 |     const payload = parseBackup(createBackup(appStorage, 'fixture-password'));
+    > 189 |     expect(payload.version).toBe(2);
+          |                             ^
+      190 |     expect(payload.encryptedEntries?.value).toBeTruthy();
+      191 |     expect(payload.encryptedSourceVariables?.value).toBeTruthy();
+      192 |     mockValues.clear();
+
+      at Object.toBe (__tests__/backupSourceVariables.test.ts:189:29)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 11 passed, 16 total
+Snapshots:   0 total
+Time:        0.646 s, estimated 1 s
+Ran all test suites matching __tests__/backupSourceVariables.test.ts.

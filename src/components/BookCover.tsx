@@ -23,12 +23,14 @@ export function BookCover({
   uri,
   book,
   style,
+  height: requestedHeight,
 }: {
   name: string;
   author?: string;
   uri?: string;
   book?: BookCoverLayers;
   style?: StyleProp<ViewStyle>;
+  height?: number;
 }) {
   const { colors, t, dark } = useAppTheme(),
     preferences = useCoverPreferences(),
@@ -39,7 +41,7 @@ export function BookCover({
   const [width, setWidth] = useState(0);
   const fixedWidth = StyleSheet.flatten(style)?.width;
   const coverWidth = typeof fixedWidth === 'number' ? fixedWidth : width,
-    height = (coverWidth * 4) / 3;
+    height = requestedHeight ?? (coverWidth * 4) / 3;
   const path = (book ? displayBookCover(book) : uri)?.trim(),
     remote = /^https?:/i.test(path ?? '');
   const allowed =

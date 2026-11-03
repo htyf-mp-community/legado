@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -27,6 +27,17 @@ export function SourceDebug({
   const [events, setEvents] = useState<SourceDebugEvent[]>([]);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
+  const request = useRef<AbortController | undefined>(undefined);
+  useEffect(() => {
+    setSource(undefined);
+    setEvents([]);
+    setError('');
+    setRunning(false);
+    return () => {
+      request.current?.abort();
+      request.current = undefined;
+    };
+  }, [sourceUrl]);
   useEffect(() => {
     let active = true;
     void loadSources()
@@ -45,22 +56,31 @@ export function SourceDebug({
   }, [sourceUrl, t]);
   const start = async () => {
     const key = keyword.trim();
-    if (!source || !key || running) return;
+    if (!source || !key || request.current) return;
+    const controller = new AbortController();
+    request.current = controller;
     setEvents([]);
     setError('');
     setRunning(true);
     try {
-      await runSourceDebug(source, key, event =>
+      await runSourceDebug(source, key, event => {
+        if (request.current !== controller || controller.signal.aborted) return;
         setEvents(current => {
           const next = current.filter(item => item.stage !== event.stage);
           return [...next, event];
-        }),
+        });
+      },
         (messageKey, values) => t(messageKey, values),
+        { signal: controller.signal },
       );
     } catch (reason) {
-      setError(reason instanceof SourceDebugPipelineError ? t(reason.code) : reason instanceof Error ? reason.message : String(reason));
+      if (request.current === controller && !controller.signal.aborted)
+        setError(reason instanceof SourceDebugPipelineError ? t(reason.code) : reason instanceof Error ? reason.message : String(reason));
     } finally {
-      setRunning(false);
+      if (request.current === controller) {
+        request.current = undefined;
+        setRunning(false);
+      }
     }
   };
   return (

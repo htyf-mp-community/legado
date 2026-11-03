@@ -187,8 +187,8 @@ export async function fetchRssFeedPage(
       enabledExplore: false,
     } as BookSource;
   const request = options.key === undefined
-    ? buildSourcePageRequest(definition, url, page)
-    : buildSourceRequest(definition, url, options.key, page);
+    ? buildSourcePageRequest(definition, url, page, false)
+    : buildSourceRequest(definition, url, options.key, page, true, false);
   const response = await fetcher(request.url, {
     method: request.method,
     headers: {
@@ -276,6 +276,8 @@ async function fetchText(
       enabledExplore: false,
     } as BookSource,
     url,
+    1,
+    false,
   );
   const response = await fetcher(request.url, {
     method: request.method,

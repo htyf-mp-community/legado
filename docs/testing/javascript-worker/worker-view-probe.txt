@@ -1,0 +1,21 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {SourceWorkerView} from './src/components/SourceWorkerView';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerRuntime} from './src/core/sourceWorkerRuntime';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker runtime lifecycle']),[page,setPage]=useState(null);const web=useRef(null),runtime=useRef(null);
+ useEffect(()=>{let live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  let n=0;const r=new SourceWorkerRuntime({acquire:()=>acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT),nonce:()=>`ios_runtime_${++n}`,showPage:setPage,send:command=>{if(!web.current)throw Error('WebView missing');web.current.injectJavaScript(sourceWorkerCommandScript(command));}});runtime.current=r;
+  await r.start();const bridge={baseUrl:'https://example.org',sourceUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{},variables:new Map()};
+  log('page ready and execution',(await r.runJavaScript('6*7',bridge))===42);web.current.injectJavaScript('location.href="https://example.invalid/blocked";true;');await new Promise(resolve=>setTimeout(resolve,300));log('external navigation blocked',(await r.runJavaScript('40+2',bridge))===42);
+  const pending=r.runJavaScript('while(true){}',bridge);setTimeout(()=>r.pageUnavailable('ios_runtime_1'),150);let rejected=false;try{await pending}catch(error){rejected=String(error).includes('不可用')}log('page failure cancels task',rejected);
+  r.reload();r.pageUnavailable('ios_runtime_1');r.receive('{"type":"ready","nonce":"ios_runtime_1"}');log('fresh page ignores stale callbacks',(await r.runJavaScript('40+2',bridge))===42);
+  await r.dispose();let closed=false;try{await r.runJavaScript('1',bridge)}catch(error){closed=String(error).includes('关闭')}log('dispose closes runtime',closed);
+ }catch(error){log('runtime',false,String(error));}})();
+ return()=>{live=false;runtime.current?.dispose().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{page?<SourceWorkerView runtime={runtime.current} page={page} webRef={web}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

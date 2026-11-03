@@ -6,7 +6,7 @@ jest.mock('../src/data/sources', () => ({ loadSources: jest.fn() }));
 jest.mock('../src/core/webBook', () => ({
   loadBookInfo: jest.fn(),
   loadChapters: jest.fn(),
-  loadChapterContent: jest.fn(),
+  loadChapterPayload: jest.fn(),
 }));
 jest.mock('../src/data/appLog', () => ({ addAppLog: jest.fn() }));
 jest.mock('../src/data/appPreferences', () => ({
@@ -18,7 +18,7 @@ import { loadLibrary, updateLibrary } from '../src/data/library';
 import { loadSources } from '../src/data/sources';
 import {
   loadBookInfo,
-  loadChapterContent,
+  loadChapterPayload,
   loadChapters,
 } from '../src/core/webBook';
 import type { Book } from '../src/types';
@@ -96,7 +96,7 @@ beforeEach(() => {
     ]);
 });
 test('first refresh uses information-derived identity and metadata for notification, caching and summary', async () => {
-  jest.mocked(loadChapterContent).mockResolvedValue('Body');
+  jest.mocked(loadChapterPayload).mockResolvedValue({content:'Body',subContent:''});
   const notify = jest.fn(async () => true);
   await expect(
     executeAutoTaskProtocolAction(
@@ -113,16 +113,16 @@ test('first refresh uses information-derived identity and metadata for notificat
   expect(notify).toHaveBeenCalledWith(
     expect.objectContaining({ title: 'Canonical 已更新' }),
   );
-  expect(loadChapterContent).toHaveBeenCalledWith(
+  expect(loadChapterPayload).toHaveBeenCalledWith(
     expect.anything(),
     expect.objectContaining({ bookUrl: 'https://source/canonical' }),
   );
   expect(stored[0].content).toBe('Body');
 });
 test('deletion while fetching chapter content aborts cache completion instead of claiming it was saved', async () => {
-  jest.mocked(loadChapterContent).mockImplementation(async () => {
+  jest.mocked(loadChapterPayload).mockImplementation(async () => {
     stored = [];
-    return 'Body';
+    return {content:'Body',subContent:''};
   });
   await expect(
     executeAutoTaskProtocolAction(
@@ -134,6 +134,6 @@ test('deletion while fetching chapter content aborts cache completion instead of
       task,
     ),
   ).rejects.toMatchObject({ name: 'AbortError' });
-  expect(loadChapterContent).toHaveBeenCalledTimes(1);
+  expect(loadChapterPayload).toHaveBeenCalledTimes(1);
   expect(stored).toEqual([]);
 });

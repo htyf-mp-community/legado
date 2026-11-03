@@ -1,6 +1,7 @@
 import { LOCAL_WEB_PAGE } from '../core/localWebPage';
 import { webBookCover } from '../services/webBookCover';
 import { applyBookshelfRefresh } from '../core/bookshelfRefresh';
+import { mapRemoteChapters } from '../core/chapterIdentity';
 import {
   localServerState,
   startLocalServer,
@@ -325,25 +326,9 @@ export function createLocalWebServiceHandler(
           originName: book.originName ?? source.bookSourceName,
           tocUrl: book.tocUrl,
           sourceType: book.sourceType,
+          reverseToc: book.reverseToc,
         });
-        const old = new Map(
-          (book.chapters ?? []).map(chapter => [
-            chapter.url ?? chapter.id,
-            chapter,
-          ]),
-        );
-        const chapters = incoming.map(chapter => ({
-          id: chapter.url || `${book.id}-${chapter.index}`,
-          title: chapter.title,
-          content: old.get(chapter.url)?.content ?? '',
-          url: chapter.url,
-          baseUrl: chapter.baseUrl,
-          isVolume: chapter.isVolume,
-          isVip: chapter.isVip,
-          isPay: chapter.isPay,
-          tag: chapter.tag,
-          wordCount: chapter.wordCount,
-        }));
+        const chapters = mapRemoteChapters(incoming, book.id, book.chapters);
         const next = normalizeBook({
           ...book,
           chapters,

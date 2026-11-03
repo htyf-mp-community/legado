@@ -1,0 +1,38 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {sourceRuleText,sourceRuleValues,sourceRuleTextAsync,sourceRuleValuesAsync} from './src/core/sourceRule';
+import ersan from './source-ersan.json';
+import biquge from './source-biquge.json';
+function App(){
+ const [lines,setLines]=useState(['iOS asynchronous rule chain']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_async_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_async_rule');
+  const runner=createSourceWorkerRuleRunner(e);
+  const html='<div class="directoryArea"><p><a href="/skip">目录</a><a href="/1">第一章</a><a href="/2">第二章</a><a href="/skip2">下一页</a></p></div>';
+  const ctx={baseUrl:ersan.bookSourceUrl+'/book',sourceUrl:ersan.bookSourceUrl,variables:new Map()};
+  const chapters=await sourceRuleValuesAsync(html,ersan.ruleToc.chapterList,ctx,runner);const expected=sourceRuleValues(html,ersan.ruleToc.chapterList,ctx);
+  log('1321 二三中文异步目录',JSON.stringify(chapters)===JSON.stringify(expected)&&chapters.length===2);
+  const otherHtml='<div id="list-chapterAll"><dd><a href="1.html">第一章</a></dd><dd><a href="2.html">第二章</a></dd></div>';
+  const otherCtx={baseUrl:biquge.bookSourceUrl+'/book/123/',sourceUrl:biquge.bookSourceUrl,variables:new Map()};
+  const other=await sourceRuleValuesAsync(otherHtml,biquge.ruleToc.chapterList,otherCtx,runner);
+  log('1321 笔趣阁异步目录',other.length===2&&other[1].href===otherCtx.baseUrl+'2.html');
+  const page='<h1>书名</h1><span class="author">作者</span><p>第一章</p>';
+  const rules=['tag.h1@text@js:result+":"+java.getString("class.author@text")','p@text@js:result.replace(/第一/,"第二")'];
+  for(const rule of rules){const actual=await sourceRuleTextAsync(page,rule,false,undefined,runner);log('rule parity '+rule.slice(0,12),actual===sourceRuleText(page,rule),String(actual));}
+  const variables=new Map();const template=await sourceRuleTextAsync('','{{java.get("x")}}:{{java.put("x","值")}}',false,{variables},runner);log('template stage order',template==='值:值'&&variables.get('x')==='值',template);
+  const input='<div><a href="/1">第一章</a></div>';const selectedRule='tag.div@js:result[0].select("a").attr("href")';
+  const selected=await sourceRuleTextAsync(input,selectedRule,false,undefined,runner);log('selected node input',selected===sourceRuleText(input,selectedRule),selected);
+  const persisted={get:key=>key==='saved'?'持久值':'',put:(_key,value)=>value,getVariable:()=>'',setVariable:()=>{}};
+  const fallback=await sourceRuleTextAsync('','@js:java.get("saved")',false,{sourceUrl:'https://example.org',sourceVariables:persisted},runner);log('source variable fallback',fallback==='持久值',fallback);
+ }catch(error){log('async rule',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

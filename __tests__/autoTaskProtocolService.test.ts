@@ -6,7 +6,7 @@ jest.mock('../src/data/sources', () => ({ loadSources: jest.fn() }));
 jest.mock('../src/core/webBook', () => ({
   loadBookInfo: jest.fn(),
   loadChapters: jest.fn(),
-  loadChapterContent: jest.fn(),
+  loadChapterPayload: jest.fn(),
 }));
 jest.mock('../src/data/appLog', () => ({ addAppLog: jest.fn() }));
 jest.mock('../src/data/appPreferences', () => ({
@@ -21,7 +21,7 @@ import { loadLibrary, updateLibrary } from '../src/data/library';
 import { loadSources } from '../src/data/sources';
 import {
   loadBookInfo,
-  loadChapterContent,
+  loadChapterPayload,
   loadChapters,
 } from '../src/core/webBook';
 import { addAppLog } from '../src/data/appLog';
@@ -194,9 +194,9 @@ test('minimum count and source-style falsy strings suppress notifications, while
 });
 test('cache option fetches only new non-volume chapters and retries transient content failures', async () => {
   jest
-    .mocked(loadChapterContent)
+    .mocked(loadChapterPayload)
     .mockRejectedValueOnce(new Error('temporary'))
-    .mockResolvedValueOnce('New body');
+    .mockResolvedValueOnce({content:'New body',subContent:'',variable:'{\"token\":\"saved\"}'});
   const pause = jest.fn(async () => {});
   await expect(
     executeAutoTaskProtocolAction(
@@ -209,14 +209,15 @@ test('cache option fetches only new non-volume chapters and retries transient co
       { pause },
     ),
   ).resolves.toBe('Name: +1, cached 1');
-  expect(loadChapterContent).toHaveBeenCalledTimes(2);
-  expect(loadChapterContent).toHaveBeenCalledWith(
+  expect(loadChapterPayload).toHaveBeenCalledTimes(2);
+  expect(loadChapterPayload).toHaveBeenCalledWith(
     expect.anything(),
     expect.objectContaining({ url: '/two', isVolume: false }),
   );
   expect(
     stored[0].chapters?.find(chapter => chapter.url === '/two')?.content,
   ).toBe('New body');
+  expect(JSON.parse(stored[0].chapters!.find(chapter => chapter.url === '/two')!.variable!).token).toBe('saved');
   expect(pause).toHaveBeenCalledWith(1000);
 });
 test('a source change during fetching cannot overwrite the new book or emit a successful refresh notification', async () => {

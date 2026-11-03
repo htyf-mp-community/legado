@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { PageHeader } from '../components/PageHeader';
 import { cacheBookChapters, mergeRefreshedChapters, type CacheFailure, type CacheProgress } from '../core/bookCache';
-import { loadBookInfo, loadChapterContent, loadChapters } from '../core/webBook';
+import { loadBookInfo, loadChapterPayload, loadChapters } from '../core/webBook';
 import { cacheMangaBatch, clearMangaCache, mangaCacheStats } from '../core/mangaCache';
 import { parseMangaImages } from '../core/manga';
 import { buildSourceRequest } from '../core/sourceRequest';
@@ -49,6 +49,7 @@ export function BookCache({ book, back, changed }: { book?: Book; back: () => vo
         setSource(found);
         const searchBook: SearchBook = {
           bookUrl: book.bookUrl!,
+          ...(book.variable ? {variable:book.variable} : {}),
           tocUrl: book.tocUrl,
           origin: book.origin!,
           originName: book.originName ?? found.bookSourceName,
@@ -56,6 +57,7 @@ export function BookCache({ book, back, changed }: { book?: Book; back: () => vo
           author: book.author,
           intro: book.intro,
           coverUrl: book.coverUrl,
+          reverseToc: book.reverseToc,
         };
         return loadBookInfo(found, searchBook).then(info => loadChapters(found, info).then(chapters => ({ info, chapters })));
       })
@@ -92,15 +94,17 @@ export function BookCache({ book, back, changed }: { book?: Book; back: () => vo
         (chapter, index) => {
           const remote: BookChapter = {
             url: chapter.url!,
+            variable: chapter.variable, bookVariable: draft.variable, bookName: draft.name,
             title: chapter.title,
             index,
+            nextChapterUrl: draft.chapters?.[index + 1]?.url,
             bookUrl: draft.bookUrl ?? '',
             baseUrl: chapter.baseUrl ?? draft.tocUrl ?? draft.bookUrl ?? '',
             isVolume: !!chapter.isVolume,
             isVip: !!chapter.isVip,
             isPay: !!chapter.isPay,
           };
-          return loadChapterContent(source, remote);
+          return loadChapterPayload(source, remote);
         },
         {
           fromIndex: fromCurrent ? (draft.currentChapterIndex ?? 0) : 0,

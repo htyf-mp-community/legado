@@ -1,0 +1,24 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {searchSource,exploreSource,loadBookInfo,loadChapters} from './src/core/webBook';
+function App(){
+ const [lines,setLines]=useState(['iOS async search flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);const e=new SourceWorkerExecutor('ios_search_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_search_rule');
+  let requests=0;global.fetch=async(address,options)=>{const target=String(address);if(!target.startsWith('https://example.org/'))return originalFetch(address,options);requests++;const direct=target.includes('direct');const body=JSON.stringify(direct?{name:'直达书',author:'作者',chapters:[{name:'第一章',url:'/1'}]}:{items:[{id:'1',name:'甲'},{id:'2',name:'乙'}]});return {ok:true,status:200,url:direct?'https://example.org/book/99':target,headers:{get:()=>null,forEach:()=>{}},text:async()=>body};};
+  const source={bookSourceUrl:'https://example.org',bookSourceName:'测试',bookSourceType:0,customOrder:0,enabled:true,enabledExplore:true,searchUrl:'/search',ruleSearch:{bookList:'@js:java.put("scope","列表");result.items',name:'@js:java.put("id",result.id);result.name+java.get("scope")',bookUrl:'@js:"/book/"+java.get("id")'},ruleExplore:{bookList:'@js:result.items',name:'@js:result.name',bookUrl:'@js:"/book/"+result.id'},ruleBookInfo:{name:'@js:result.name',author:'@js:result.author',tocUrl:'@js:baseUrl'},ruleToc:{chapterList:'$.chapters[*]',chapterName:'$.name',chapterUrl:'$.url'}};
+  const worker=createSourceWorkerRuleRunner(e);let stages=0;const runRuleJavaScript=(task,signal)=>{stages++;return worker(task,signal)};const options={runRuleJavaScript};
+  const books=await searchSource(source,'书',1,undefined,options);log('search list',books.map(x=>x.name).join(',')==='甲列表,乙列表');log('item variables',books.map(x=>JSON.parse(x.variable).id).join(',')==='1,2');
+  const found=await exploreSource(source,{title:'发现',url:'/explore'},1,options);log('explore list',found.map(x=>x.name).join(',')==='甲,乙');
+  const direct={...source,searchUrl:'/direct',bookUrlPattern:'https://example\\.org/book/\\d+'};const before=requests;const [book]=await searchSource(direct,'书',1,undefined,options);const info=await loadBookInfo(direct,book,undefined,options);const chapters=await loadChapters(direct,info);log('direct detail + cache',book.name==='直达书'&&chapters[0].title==='第一章'&&requests===before+1);log('worker stages',stages>=12,String(stages));
+ }catch(error){log('search flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

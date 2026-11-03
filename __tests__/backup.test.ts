@@ -27,6 +27,19 @@ jest.mock('react-native-quick-crypto', () => ({
 
 import { createBackup, parseBackup, restoreBackup } from '../src/data/backup';
 import { convertLegacyBackup } from '../src/data/legacyBackup';
+import { appStorage } from '../src/data/storage';
+
+afterEach(() => jest.mocked(appStorage.getString).mockReset());
+
+function selectCookieBackup() {
+  jest
+    .mocked(appStorage.getString)
+    .mockImplementation(key =>
+      key === 'backup.preferences.v1'
+        ? JSON.stringify({ categories: { cookies: true } })
+        : undefined,
+    );
+}
 
 function memory(initial: Record<string, string | number | boolean> = {}) {
   const values = new Map(Object.entries(initial));
@@ -74,6 +87,13 @@ test('round-trips supported values while preserving categories absent from the b
   });
 });
 
+test('bookshelf backup and restore retain book and chapter variables', () => {
+  const library = [{id:'book',name:'书',variable:'{"book":"value"}',chapters:[{id:'chapter',title:'章',content:'正文',variable:'{"chapter":"value"}'}]}];
+  const source = memory({'library.v1':JSON.stringify(library)}), target = memory();
+  restoreBackup(createBackup(source.storage),target.storage);
+  expect(JSON.parse(String(target.values.get('library.v1')))).toEqual(library);
+});
+
 test('rejects malformed and foreign backups before mutating storage', () => {
   const target = memory({ keep: 'safe' });
   expect(() => restoreBackup('{', target.storage)).toThrow('JSON');
@@ -110,6 +130,7 @@ test('does not export persisted WebDAV credentials', () => {
 });
 
 test('encrypts source cookies and restores them with the local password', () => {
+  selectCookieBackup();
   const source = memory({
     library: 'books',
     'source-cookie.v1.https%3A%2F%2Fexample.com': '{"sid":"secret"}',
@@ -129,6 +150,7 @@ test('encrypts source cookies and restores them with the local password', () => 
 });
 
 test('requires a local password when cookies are present', () => {
+  selectCookieBackup();
   const source = memory({ 'source-cookie.v1.a': '{"sid":"secret"}' });
   expect(() => createBackup(source.storage, '')).toThrow('本地密码');
 });
@@ -359,6 +381,7 @@ test('ignored encrypted cookies require no password and local-only cookies and v
   const raw = backupWith({ a: 'imported' }),
     payload = JSON.parse(raw);
   payload.encryptedEntries = { algorithm: 'AES-128-ECB', value: 'undecodable' };
+  selectCookieBackup();
   // Use the actual format identifier so this exercises skip-before-decrypt, not a format error.
   const encrypted = parseBackup(
     createBackup(

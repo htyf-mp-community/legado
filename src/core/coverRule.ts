@@ -8,7 +8,7 @@ export async function searchBookCover(book: Book, rule: CoverRule) {
   if (!rule.enable || !rule.searchUrl.trim() || !rule.coverRule.trim()) return '';
   if (rule.coverRule.includes('@js:') || rule.coverRule.includes('<js>')) throw new UnsupportedRuleError('JavaScript 封面规则', '封面规则');
   const source: BookSource = { bookSourceUrl: /^https?:/i.test(rule.searchUrl) ? rule.searchUrl : 'https://cover-rule.invalid/', bookSourceName: '封面规则', bookSourceType: 0, customOrder: 0, enabled: true, enabledExplore: false, header: rule.header, enabledCookieJar: rule.enabledCookieJar };
-  const request = buildSourceRequest(source, rule.searchUrl, book.name, 1), response = await executeSourceRequest(request), value = sourceRuleText(response.data, rule.coverRule, true);
+  const request = buildSourceRequest(source, rule.searchUrl, book.name, 1, true, false), response = await executeSourceRequest(request), value = sourceRuleText(response.data, rule.coverRule, true);
   if (!value) return '';
   return resolveNativeResourceUrl(value, response.url);
 }

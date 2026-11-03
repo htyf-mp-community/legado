@@ -88,6 +88,18 @@ test('info is loaded before the directory, and a known TOC skips the info reques
   );
   expect(loadInfo).not.toHaveBeenCalled();
 });
+test('catalogue hydration carries source variables and respects concurrent updates', async () => {
+  const before = { ...book, variable: '{"key":"search"}' };
+  const loaded = { ...info, variable: '{"key":"detail"}' };
+  const loadInfo = jest.fn(async (_source: BookSource, _book: SearchBook) => loaded);
+  const loadToc = jest.fn(async (_source: BookSource, _book: SearchBook) => chapters);
+  await fetchBookCatalogue(before, source, loadInfo, loadToc);
+  expect(loadInfo.mock.calls[0][1]).toMatchObject({ variable: before.variable });
+  expect(loadToc.mock.calls[0][1]).toMatchObject({ variable: loaded.variable });
+  expect(applyBookCatalogue(before, before, loaded, chapters).variable).toBe(loaded.variable);
+  const current = { ...before, variable: '{"key":"edited"}' };
+  expect(applyBookCatalogue(current, before, loaded, chapters).variable).toBe(current.variable);
+});
 test('empty catalogues fail and cancellation between steps prevents the next request', async () => {
   await expect(
     fetchBookCatalogue(

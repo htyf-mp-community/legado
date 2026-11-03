@@ -1,0 +1,29 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS worker source encryption']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_crypto_source',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_crypto_source');
+  const bridge={baseUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{}};
+  const run=(script,input='')=>e.run(script,bridge,input);
+  log('1321 legacy AES decode',await run('java.aesBase64DecodeToString(result,"Pxga!h*e4@T8xfOm","AES/CBC/PKCS5Padding","E&z!EHGLd$fli*8R")','VVYptzB1ev/mjJFL7HWv3w==')==='西游记正文');
+  const aes='java.createSymmetricCrypto("AES/CBC/PKCS5Padding","0123456789abcdef","abcdef9876543210")';
+  log('AES encrypt',await run(aes+'.encryptBase64(result)','西游记 Hello!')==='rBxCEOLiCHJixsNEParqjoneatg7duqjgePjyWOSJQ0=');
+  const byteScript='var k=java.base64DecodeToByteArray("MDEyMzQ1Njc4OWFiY2RlZg==");var v=java.base64DecodeToByteArray("YWJjZGVmOTg3NjU0MzIxMA==");var c=java.createSymmetricCrypto("AES/CBC/PKCS5Padding",k,v);java.bytesToStr(c.decrypt(c.encrypt(result)))';
+  log('AES byte roundtrip',await run(byteScript,'西游记 Hello!')==='西游记 Hello!');
+  log('DES JCE vector',await run('java.createSymmetricCrypto("DES/CBC/PKCS5Padding","KW8Dvm2N","1ae2c94b").encryptBase64(result)','西游记 Hello!')==='3yhJENxs1je7Da3+j3+DA4ZHbX4rtOBI');
+  log('signed bytes',await run('java.base64DecodeToByteArray("/4A=").join(",")')==='-1,-128');
+  log('ISO-8859-1 bytes',await run('java.bytesToStr(java.strToBytes("éÿ","ISO-8859-1"),"ISO-8859-1")')==='éÿ');
+  let rejected=false;try{await run('java.createSymmetricCrypto("AES/CBC/PKCS5Padding","short","abcdef9876543210")')}catch(error){rejected=/密钥/.test(String(error))}log('invalid key rejected',rejected);
+  log('after rejection',await run('java.md5Encode("abc")')==='900150983cd24fb0d6963f7d28e17f72');
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

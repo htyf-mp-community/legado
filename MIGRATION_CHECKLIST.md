@@ -40,6 +40,16 @@
 
 所有底层入口、Dialog 和实体还需对照入口全集逐一确认，不能仅凭此分组表宣布完成。
 
+书源列表方向与发现回退（开发构建）：按原版处理列表规则 `-` / `+`、先去重再倒序及发现列表空白时复用搜索规则。用户集合中的原样“📂盗墓笔记”在独立 iOS 模拟器发现 11 本并打开 75 章详情；231 suites / 1,182 tests 通过。测试书源保留；作者规则、其他源和完整发现功能仍待验证。待确认的 0.0.58 包未更改，本次改动尚未打包或发布。见[验收记录](docs/testing/book-list-rule/README.md)。
+
+搜索直达详情（开发构建）：按原版的地址模式和空列表条件回退详情规则，复用瞬时详情页和同地址目录响应；独立 iOS 的本机 302 夹具验证搜索、两章目录与单次详情请求，真实“盗墓笔记”发现和 75 章目录回归通过。232 suites / 1,190 tests 通过；Java 正则完整语法、真实直达站点/真机和全功能仍待验收。待确认 0.0.58 未变更，新逻辑尚未打包。见[验收记录](docs/testing/direct-book-search/README.md)。
+
+目录规则与章节身份（开发构建）：补齐前缀方向、原始 URL 去重、多页链接、分卷/状态/字数与刷新时书籍反转状态；1,452 组源 Kotlin 排序对照和 234 suites / 1,202 tests 通过。独立 iOS 三页目录、分卷、阅读与冷启动通过，真实《西游记》105 章目录回归通过。测试源和书保留；JS 目录脚本、完整语法与真实宿主仍待验收，0.0.58 未改变。见[验收记录](docs/testing/native-toc-rules/README.md)。
+
+换源与目录刷新位置（开发构建）：源章节匹配后保留字符位置，来源改变时同步阅读器索引；目录刷新保持原版索引及当前字符位置，不再强制翻到首页。独立 iOS 模拟器以 A/B 本机源验证目录插章后的第二章第 2/9 页、刷新和冷启动恢复；235 suites / 1,207 tests 通过。测试源和书保留；不同正文/阅读模式、并发操作、真实源与宿主仍待验收，0.0.58 未变更。见[验收记录](docs/testing/source-switch-position/README.md)。
+
+阅读中目录更新并发（开发构建）：网络返回后合并最新章节/字符游标和缓存，来源或目录身份变化时丢弃旧结果，连续请求只允许最新请求提交。独立 iOS 本机慢请求验证等待时翻页、切章、乱序返回和冷启动；235 suites / 1,215 tests 通过。滚动/漫画、真实源、后台和真实宿主仍待验收；0.0.58 不变。见[验收记录](docs/testing/reader-toc-concurrency/README.md)。
+
 2026-10-28 主页面与 iOS 实测细项见 .htyf-migration/home-parity-report.md（历史报告已移除 / historical report removed）。局部通过不改变本表的全量出口条件。
 
 书架分组、排序与即时导入的后续证据见 .htyf-migration/bookshelf-parity-report.md（历史报告已移除 / historical report removed）。冷启动归组/排序实测通过；完整书架管理页、布局、导入导出和旧备份章节恢复仍未全量验收。
@@ -97,3 +107,21 @@
 
 
 敏感备份预校验 / Native sensitive-backup preflight (0.0.47): cookie and source-variable files now undergo fatal ordered validation before ordinary conversion/restoration, with current-local-password defaults, strict fields/exact nonnegative Longs/latest cache keys and no materialized empty rows. All 349 strict-parser cases, 336 native BackupAES/Hutool envelopes, 220 suites / 1,118 tests, TypeScript and changed-file lint pass. After transient CUA binding failures recovered, dedicated iOS verifies password-required rejection for cookies/plaintext caches, ordinary source-only preview/cancel and .47 UI identity; all 27 normal-exported typed entries remain equal before/after, matching the .46 final baseline. Final cold start renders 10 books/9 in reading; Web/MCP/tasks remain off and fixture server is stopped. Correct-password decryption and ignore-switch device matrices remain pending. All UI inputs used CUA; no deletion retry. Local .47 is unpublished; remote remains .34. Jsoup MIT notice is now included in the bundle banner after artifact inspection found its prior omission. No dependency/native/source-repository changes. CookieStore domain/session/merge/raw pipe rows, runtime consumers, exhaustive JSON/password/charset profiles, XML/config/DAO/logging/interruption/storage/large-input and whole-app/physical-host matrices remain open. See [preflight report](docs/testing/native-restore-preflight/README.md). This is finite preflight progress, not complete backup/global parity.
+
+源变量备份 / Source-variable backup (0.0.50): HTYF runtime source variables are separately encrypted and use version 2 to prevent old clients silently dropping them; version 1 remains readable. All 221 suites / 1,128 tests pass. Dedicated iOS verifies version-2 WebDAV download and preview only; actual correct-password QuickCrypto round trip, missing-password rejection and ignore-switch matrix remain pending. Old plaintext exports remain plaintext, and empty-cache password behavior differs from native. The local package is unpublished; full backup and global parity remain open. See [acceptance](docs/testing/backup-source-variables/README.md).
+
+敏感备份选项 / Sensitive backup options (0.0.51): new/default Cookie and source-variable selections are off like native; selected categories require a nonblank password even with no rows, with Cookie first, and existing selections are preserved. 221 suites / 1,134 tests pass. Dedicated iOS verifies the cookie-first no-password error with both previously enabled; first-install defaults, source-only UI and correct-password device round trips remain pending. See [acceptance](docs/testing/backup-sensitive-options/README.md). Local package unpublished; overall parity remains open.
+
+恢复登录头 / Restored login headers (0.0.52): restored per-source cache headers now feed native-style source requests with expiry, option precedence and request-log redaction. RSS and cover-rule search exclude login headers. All 222 suites / 1,142 tests pass; dedicated iOS live-source search/details/105-item contents/first 119-character content succeed, with author still unknown. Protected-site device restore, JS bridge, login UI, CookieStore and global parity remain pending. Local package unpublished. See [acceptance](docs/testing/restored-login-headers/README.md).
+
+书源元数据格式 / Native book metadata formatting (0.0.53): search/explore/details now apply native name/author cleanup, category joining and word-count formatting; 6,267 finite JVM-equivalent inputs and 223 suites / 1,146 tests pass. The real source author selector does not match the current website; no guessed author or source edit. Non-China locale formatting, full metadata and global parity remain pending. Local package unpublished; see [acceptance](docs/testing/native-book-metadata/README.md).
+
+在线详情 / Online detail (0.0.54): displays source-aware cover, word-count/category labels, author and source; label taps search the current source. Shelf conversion now retains category, word count, latest chapter and native type flags. 225 suites / 1,156 tests pass. Complete native detail interactions, full host and global parity remain pending. Local package unpublished; see [acceptance](docs/testing/online-book-detail/README.md).
+
+下载型书源 / File source (0.0.55): details resolve download links and can import supported downloaded files or a chosen ZIP entry. Automated tests cover failure and selection; simulator interaction, unsupported formats, native filename detection and full parity remain open. See [validation](docs/testing/web-file-source/README.md).
+
+文件保留 / File retention (0.0.56): iOS EPUB/MOBI imports preserve the original local file; a dedicated simulator passed download, import and reopening through a core-function harness. File-source UI, ZIP on-device import and real-host validation remain open; see [verification](docs/testing/web-file-retention/README.md).
+
+文件选择 / File chooser (0.0.57): named choices and shelf/read intents implemented; dedicated iOS tested selecting and importing two Chinese-named TXT entries in a ZIP, without persisting a shelf record. Additional archive formats, actual shelf navigation, real host and full parity remain open. See [validation](docs/testing/web-file-choice-ui/README.md).
+
+宿主启动 / Host startup (0.0.58): real HTYF debug host on dedicated iOS simulator exposed the removed InteractionManager getter; remote stack-card compatibility now reaches the shelf and animation sheet. Real source search, contents, first chapter and reopen passed. Physical device and complete parity remain open; see [host validation](docs/testing/real-host-ios/README.md).

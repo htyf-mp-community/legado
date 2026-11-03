@@ -1,5 +1,6 @@
 import { appStorage } from './storage';
 import type { ChineseConverterType } from '../core/chineseConversion';
+import type { ScreenTimeoutSeconds } from '../core/readerKeepAwake';
 const KEY = 'reader.preferences.v1';
 export type ReaderTheme = 'paper' | 'green' | 'night' | 'epaper';
 export type ReaderMode = 'scroll' | 'page';
@@ -29,6 +30,7 @@ export type ReaderPreferences = {
   highlightActionTrigger: HighlightActionTrigger;
   brightness: number;
   orientation: ReaderOrientation;
+  screenTimeoutSeconds: ScreenTimeoutSeconds;
   mangaHorizontal: boolean;
   mangaAutoScroll: boolean;
   mangaAutoScrollSpeed: number;
@@ -90,6 +92,7 @@ export const defaultReaderPreferences: ReaderPreferences = {
   highlightActionTrigger: 'click',
   brightness: 1,
   orientation: 'auto',
+  screenTimeoutSeconds: 0,
   mangaHorizontal: false,
   mangaAutoScroll: false,
   mangaAutoScrollSpeed: 30,
@@ -190,6 +193,10 @@ export function normalizeReaderPreferences(
       orientation === 'portrait' || orientation === 'landscape'
         ? orientation
         : 'auto',
+    screenTimeoutSeconds:
+      value?.screenTimeoutSeconds === -1 || value?.screenTimeoutSeconds === 60 ||
+      value?.screenTimeoutSeconds === 300 || value?.screenTimeoutSeconds === 600
+        ? value.screenTimeoutSeconds : 0,
     mangaHorizontal: value?.mangaHorizontal === true,
     mangaAutoScroll: value?.mangaAutoScroll === true,
     mangaAutoScrollSpeed: clamp(

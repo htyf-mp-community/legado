@@ -1,0 +1,43 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {searchSource,exploreSource,loadBookInfo,loadChapters,loadChapterPayload} from './src/core/webBook';
+import {parseBookSources} from './src/data/sources';
+import defaults from './defaultBookSources.json';
+const item='<div class="item"><dl><dt><a href="/123_456/">西游记</a></dt></dl><div class="btm"><a>吴承恩</a></div></div>';
+function App(){
+ const [lines,setLines]=useState(['iOS source pages flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_pages',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_pages');
+  let requests=0,scripts=0;global.fetch=async(address,options)=>{
+   const target=String(address);if(!/^https?:\/\/www\.kkbiquge\.net(?:\/|$)/i.test(target))return originalFetch(address,options);requests++;
+   let body;
+   if(target.includes('/search42.html')||target.includes('/class/'))body=item;
+   else if(target.includes('/123_456/toc'))body='<div id="list"><dl><a href="/123_456/1.html"><dd>第一章</dd></a><a href="/123_456/2.html"><dd>第二章</dd></a></dl></div>';
+   else if(target.includes('/123_456/1_2.html'))body='<div id="chaptercontent"><div id="booktxt"><p>第二页正文</p></div></div><a id="next_url"></a>';
+   else if(target.includes('/123_456/1.html'))body='<div id="chaptercontent"><div id="booktxt"><p>第一页正文</p></div></div><a id="next_url" href="1_2.html">下页</a>';
+   else if(target.includes('/123_456/'))body='<div id="info"><h1>西游记</h1></div><div id="intro">简介测试</div>';
+   else body='<form id="search" action="/search42.html"></form>';
+   return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>body};
+  };
+  const source={...parseBookSources(JSON.stringify(defaults))[0],concurrentRate:'0'};
+  const runJavaScript=(script,bridge,input,signal)=>{scripts++;return e.run(script,bridge,input,signal)};
+  const controller=new AbortController(),options={runJavaScript,signal:controller.signal};
+  const searched=await searchSource(source,'西游记',1,controller.signal,options);log('search',searched.length===1&&searched[0].name==='西游记');
+  const explored=await exploreSource(source,{title:'玄幻',url:'/class/xuanhuanmofa/1/'},1,options);log('explore',explored.length===1&&explored[0].name==='西游记');
+  const info=await loadBookInfo(source,searched[0],controller.signal,options);log('book detail',info.intro?.includes('简介测试'));
+  const book={...info,tocUrl:source.bookSourceUrl+'/123_456/toc'};
+  const chapters=await loadChapters(source,book,controller.signal,options);log('table of contents',chapters.length===2&&chapters[0].title==='第一章');
+  const payload=await loadChapterPayload(source,{...chapters[0],bookUrl:book.bookUrl,baseUrl:book.bookUrl},options);
+  log('two content pages',payload.content.includes('第一页正文')&&payload.content.includes('第二页正文'));
+  log('all login checks use worker',requests===7&&scripts===8,`${requests} requests / ${scripts} scripts`);
+ }catch(error){log('pages flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

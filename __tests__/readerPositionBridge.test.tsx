@@ -53,6 +53,15 @@ afterEach(() => {
   tree = undefined;
   jest.useRealTimers();
 });
+
+test('exposes the latest visible cursor before its delayed persistence fires', () => {
+  const ref = createRef<ReaderPositionHandle>();
+  const props = base({ book: { ...book, readingPosition: { chapterId: 'c', position: 3 } } });
+  act(() => { tree = create(<ReaderPositionBridge ref={ref} {...props} />); });
+  act(() => { tree!.update(<ReaderPositionBridge ref={ref} {...props} pageIndex={1} />); });
+  expect(props.commit).not.toHaveBeenCalled();
+  expect(ref.current!.snapshot()).toEqual({ chapterId: 'c', position: 6, titleVisible: true });
+});
 test('restores the page containing the native UTF-16 cursor without writing an initial page-zero record', () => {
   const props = base();
   act(() => {

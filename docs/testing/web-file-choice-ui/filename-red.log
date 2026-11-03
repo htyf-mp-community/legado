@@ -1,0 +1,49 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/webFileImport.test.ts
+  ● file choices show filenames and inspect headers only when the URL has no usable suffix
+
+    TypeError: describeWebFiles is not a function
+
+      202 |   })) as unknown as typeof fetch;
+      203 |   try {
+    > 204 |     const files = await describeWebFiles(source, book, ['https://source.test/book.zip', 'https://source.test/download']);
+          |                         ^
+      205 |     expect(files).toEqual([{ url: 'https://source.test/book.zip', name: 'book.zip' }, { url: 'https://source.test/download', name: '测试.epub' }]);
+      206 |     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+      207 |     expect(globalThis.fetch).toHaveBeenCalledWith('https://source.test/download', expect.objectContaining({ method: 'HEAD', headers: { Cookie: 'session=1' } }));
+
+      at Object.describeWebFiles (__tests__/webFileImport.test.ts:204:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+  ● file choice falls back to the book identity when HEAD cannot resolve a filename
+
+    TypeError: describeWebFiles is not a function
+
+      214 |   const originalFetch = globalThis.fetch;
+      215 |   globalThis.fetch = jest.fn(async () => { throw new Error('offline'); }) as unknown as typeof fetch;
+    > 216 |   try { expect(await describeWebFiles(source, book, ['https://source.test/download'])).toEqual([{ url: 'https://source.test/download', name: '书 作者：作者.txt' }]); }
+          |                      ^
+      217 |   finally { globalThis.fetch = originalFetch; }
+      218 | });
+      219 |
+
+      at Object.describeWebFiles (__tests__/webFileImport.test.ts:216:22)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 5 passed, 7 total
+Snapshots:   0 total
+Time:        0.541 s, estimated 1 s

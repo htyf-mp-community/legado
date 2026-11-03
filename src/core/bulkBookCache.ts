@@ -2,7 +2,7 @@ import type { Book, BookChapter, BookSource } from '../types';
 import type { BookGroupSort } from '../data/bookshelf';
 import { sortShelfBooks } from './bookshelfGroups';
 import { cacheBookChapters } from './bookCache';
-import { loadChapterContent } from './webBook';
+import { loadChapterContent, loadChapterPayload } from './webBook';
 
 export type BulkBookGroupFilter = 'all' | 'ungrouped' | string;
 export function filterBulkBooksByGroup(
@@ -84,6 +84,7 @@ export async function cacheBookshelfSelection(
         (chapter, index) => {
           const remote: BookChapter = {
             url: chapter.url!,
+            variable: chapter.variable, bookVariable: book.variable, bookName: book.name,
             title: chapter.title,
             index,
             bookUrl: book.bookUrl ?? '',
@@ -92,7 +93,7 @@ export async function cacheBookshelfSelection(
             isVip: !!chapter.isVip,
             isPay: !!chapter.isPay,
           };
-          return (options.load ?? loadChapterContent)(source, remote);
+          return options.load ? options.load(source, remote) : loadChapterPayload(source, remote);
         },
         {
           fromIndex: options.fromCurrent ? (book.currentChapterIndex ?? 0) : 0,

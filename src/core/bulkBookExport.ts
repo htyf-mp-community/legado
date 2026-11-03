@@ -5,7 +5,6 @@ import {
   writeFile,
 } from '@dr.pogodin/react-native-fs';
 import { saveDocuments } from '@react-native-documents/picker';
-import iconv from 'iconv-lite';
 import { fromByteArray } from 'react-native-quick-base64';
 import { getUnzip } from 'react-native-nitro-unzip';
 import {
@@ -26,6 +25,7 @@ import {
 } from './bookExport';
 import { uploadRemoteBookFile } from './remoteBooks';
 import { downloadBookExportImages } from './bookExportImages';
+import { encodeTxtExport } from './txtExportEncoding';
 
 export type BulkBookExportFormat = Exclude<BookExportFormat, 'json'>;
 export type BulkBookExportEntry = { book: Book; fileName: string };
@@ -151,7 +151,7 @@ export async function saveBulkBookExport(
         await writeFile(
           path,
           fromByteArray(
-            iconv.encode(renderBookTxt(book, preferences), preferences.charset),
+            encodeTxtExport(renderBookTxt(book, preferences), preferences.charset),
           ),
           'base64',
         );

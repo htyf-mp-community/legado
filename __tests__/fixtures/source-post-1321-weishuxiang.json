@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "📥伪书香",
+  "bookSourceUrl": "https://www.sxcnw.org",
+  "searchUrl": "@js:\nurl=source.getKey()+\"/e/search/index.php\";\nbody=`show=title,softwriter&keyboard=${key}&tbname=download&tempid=1`;\nsurl=java.post(url,body,{}).header(\"location\");\nString(surl).replace(/result.*searchid/,\n\"/e/search/result/index.php?page={{page-1}}&searchid\")"
+}

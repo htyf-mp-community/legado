@@ -1,0 +1,15 @@
+{
+  "version": "0.0.53",
+  "device": "Legado HTYF 调试, iPhone 17 Pro, iOS 26.5",
+  "existingSource": "iOS 批量正常验收源",
+  "fixtureRawName": "模拟书 作者：测试作者",
+  "fixtureRawAuthor": "作者：测试作者 著",
+  "displayedName": "模拟书",
+  "displayedAuthor": "测试作者",
+  "tocCount": 1,
+  "addedToBookshelf": false,
+  "sourceCount": 9,
+  "bookCount": 10,
+  "readingCount": 9,
+  "scope": "No UI observation of category or word count; data was not compared entry by entry."
+}

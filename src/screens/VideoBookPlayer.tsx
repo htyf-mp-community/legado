@@ -34,18 +34,20 @@ export function VideoBookPlayer({ book, back, update: commitBook, download }: Pr
       const source = all.find(item => item.bookSourceUrl === book.origin);
       if (!source) throw new Error(t('videoSourceMissing'));
       let content = chapter.content, subContent = chapter.danmaku ?? '';
+      let chapterVariable: string | undefined, bookVariable: string | undefined;
       if (!content || !subContent) {
         if (!chapter.url) throw new Error(t('episodeRuleMissing'));
-        const payload = await loadChapterPayload(source, { url: chapter.url, title: chapter.title, index: chapterIndex, bookUrl: book.bookUrl ?? '', baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '', isVolume: !!chapter.isVolume, isVip: !!chapter.isVip, isPay: !!chapter.isPay });
+        const payload = await loadChapterPayload(source, { url: chapter.url, variable: chapter.variable, bookVariable: book.variable, bookName: book.name, title: chapter.title, index: chapterIndex, nextChapterUrl: chapters[chapterIndex + 1]?.url, bookUrl: book.bookUrl ?? '', baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '', isVolume: !!chapter.isVolume, isVip: !!chapter.isVip, isPay: !!chapter.isPay });
         content ||= payload.content; subContent ||= payload.subContent;
+        chapterVariable = payload.variable; bookVariable = payload.bookVariable;
       }
       const parsed = parseVideoSources(content, chapter.baseUrl ?? chapter.url ?? book.bookUrl);
       if (!parsed.length) throw new Error(t('noPlayableVideo'));
       const requestHeaders = chapter.url ? buildSourceRequest(source, chapter.url).headers : {};
       if (active) {
         setSources(parsed); setHeaders(requestHeaders);
-        const nextChapters = chapters.map((item, index) => index === chapterIndex ? { ...item, content, danmaku: subContent } : item);
-        update({ ...book, chapters: nextChapters, currentChapterIndex: chapterIndex, chapterTitle: chapter.title, content, progress: (chapterIndex + 1) / Math.max(1, chapters.length), updatedAt: Date.now() });
+        const nextChapters = chapters.map((item, index) => index === chapterIndex ? { ...item, content, danmaku: subContent, ...(chapterVariable !== undefined ? {variable: chapterVariable} : {}) } : item);
+        update({ ...book, ...(bookVariable !== undefined ? {variable: bookVariable} : {}), chapters: nextChapters, currentChapterIndex: chapterIndex, chapterTitle: chapter.title, content, progress: (chapterIndex + 1) / Math.max(1, chapters.length), updatedAt: Date.now() });
       }
     }).catch(reason => { if (active) setError(reason instanceof Error ? reason.message : String(reason)); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; if (request && positionRef.current > 2) saveVideoProgress(request.uri, positionRef.current); };

@@ -1,0 +1,9 @@
+{
+  "bookSourceName": "⚡📂笔趣阁",
+  "bookSourceUrl": "https://www.biquge.casa",
+  "ruleToc": {
+    "chapterList": "<js>\nbase = baseUrl;\nid = baseUrl.match(/(\\d+\\/)/)[1]\njava.put(\"id\",id)\nlis = java.getElements('#list-chapterAll@dd');\nvar list = [];\n\nfor (var i = 0; i < lis.length; i++) {\n     var href = lis[i].select('a').attr('href');\n     var text = lis[i].text();\n     if (href==0) {\n        if ( i < lis.length - 1 ) {\n            var url = \"https://www.baidu.com/\" + id + lis[i + 1].select('a').attr('href');         \n        } else {\n            var url = \"https://cn.bing.com/\" + id + lis[i - 1].select('a').attr('href');\n        }\n     } else { var url = base + href; }\n     java.log(lis[i].text()+\":\"+url);\n     list.push({\"text\": text, \"href\": url});\n}\n\nlist\n</js>",
+    "chapterName": "text",
+    "chapterUrl": "href"
+  }
+}

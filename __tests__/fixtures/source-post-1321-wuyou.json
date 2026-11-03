@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "📂无忧小说",
+  "bookSourceUrl": "https://www.51eshu.com",
+  "searchUrl": "@js:\nvar base_url=source.getKey(),\n url=base_url + \"/search.html\",\n body=\"searchtype=all&searchkey=\"+key,\n cookies=cookie.getCookie(base_url);\nbody=String(body);\nif(cookies.indexOf('; ') < 0) cookies=\"waf_sc=5889647726; novel_87069=65248472%7C1706004912\";\npost=java.post(url,body,{\n \"Referer\": source.getKey(),\n \"Cookie\": cookies\n}).header(\"Location\");\nString(post).replace(/\\d+.html/,page+\".html\");"
+}

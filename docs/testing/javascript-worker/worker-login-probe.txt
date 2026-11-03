@@ -1,0 +1,30 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerSession} from './src/core/sourceWorkerSession';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {prepareSourceWorkerScript,createSourceWorkerBridge} from './src/core/sourceWorkerBridge';
+import defaults from './defaultBookSources.json';
+function App(){
+ const [lines,setLines]=useState(['iOS login bridge']),[url,setUrl]=useState('');const web=useRef(null),session=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const origin=defaults[0].bookSourceUrl,initial={data:'challenge',body:'<script>window.challenge=true</script>',url:origin+'/search',code:403},retried={data:'ok',body:'verified',url:origin+'/search',code:200};
+  let browser=0,removed=0,toast=0,connect=0,current;
+  const bridge={baseUrl:origin,sourceUrl:origin,key:'西游记',page:1,response:initial,ajax:async()=>'',removeCookie:()=>removed++,toast:()=>toast++,browser:async()=>{browser++;return {data:'browser',body:'browser',url:origin,code:200}},connect:async()=>{connect++;return retried}};
+  const s=new SourceWorkerSession('ios_login_1',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)),(action,args,signal)=>current.invoke(action,args,signal),{executionMs:1000,readyMs:10000,resolveResponse:handle=>current.resolveResponse(handle)});session.current=s;setUrl(lease.url+'#ios_login_1');
+  const context={baseUrl:origin,sourceUrl:origin,key:'西游记',page:1,result:''};
+  async function run(script){current=createSourceWorkerBridge(bridge);return s.run(prepareSourceWorkerScript(script),context,undefined,current.initialResponse)}
+  const original=await run('result;');log('initial identity',original===initial);
+  const checked=await run(defaults[0].loginCheckJs);log('7663 login retry',checked===retried&&browser===1&&removed===1&&toast===1&&connect===1,`${browser}/${removed}/${toast}/${connect}`);
+  const fake=await run('({body:"forged",url:baseUrl,code:200});');log('reject forged identity',fake!==initial&&fake!==retried&&fake.body==='forged');
+  const protectedResult=await run('JSON.parse=function(){return {ok:true,value:{handle:"1",body:"fake",url:"x",code:200}}};java.connect(result.url())');log('parser tampering',protectedResult===retried);
+  const postBridge={...bridge,post:async()=>({data:'',body:'',url:origin,code:302,headers:{Location:'/target'}})};
+  current=createSourceWorkerBridge(postBridge);const header=await s.run(prepareSourceWorkerScript('java.post(baseUrl,"",{}).header("location")'),context,undefined,current.initialResponse);log('POST header',header==='/target',String(header));
+ }catch(e){log('login bridge',false,String(e));}})();
+ return()=>{live=false;session.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>session.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

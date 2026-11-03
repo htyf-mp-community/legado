@@ -1,0 +1,32 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/backupSourceVariables.test.ts
+  ● source variables require a password and do not appear in cleartext backups
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "本地密码"
+
+    Received function did not throw
+
+      23 | test('source variables require a password and do not appear in cleartext backups', () => {
+      24 |   appStorage.set(cacheKey, cache);
+    > 25 |   expect(() => createBackup(appStorage, '')).toThrow('本地密码');
+         |                                              ^
+      26 |   const raw = createBackup(appStorage, 'fixture-password');
+      27 |   expect(raw).not.toContain('fixture-secret-token');
+      28 |   expect(parseBackup(raw).entries[cacheKey]).toBeUndefined();
+
+      at Object.toThrow (__tests__/backupSourceVariables.test.ts:25:46)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 passed, 5 total
+Snapshots:   0 total
+Time:        0.63 s
+Ran all test suites matching __tests__/backupSourceVariables.test.ts.

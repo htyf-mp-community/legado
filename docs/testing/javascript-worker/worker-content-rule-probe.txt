@@ -1,0 +1,27 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {loadChapterPayload} from './src/core/webBook';
+function App(){
+ const [lines,setLines]=useState(['iOS content rule flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_content_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_content_rule');
+  let requests=0,stages=[];global.fetch=async(address,options)=>{const target=String(address);if(!target.startsWith('https://example.org/'))return originalFetch(address,options);requests++;const body=target.endsWith('/1')?'<p>正文一</p><i>一</i><a href="/2">下页</a>':'<p>正文二</p><i>二</i>';return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>body};};
+  const source={bookSourceUrl:'https://example.org',bookSourceName:'测试',bookSourceType:0,customOrder:0,enabled:true,ruleContent:{content:'p@text@js:result+java.put("seen","!")',subContent:'i@text@js:result+"副"',nextContentUrl:'a@href@js:result',replaceRegex:'@js:result.replace(/正文/g,"内容")'}};
+  const chapter={url:'https://example.org/1',title:'第一章',index:0,bookUrl:'https://example.org/book',baseUrl:'https://example.org/book',isVolume:false,isVip:false,isPay:false};
+  const worker=createSourceWorkerRuleRunner(e),runRuleJavaScript=(task,signal)=>{stages.push(task.script);return worker(task,signal)};
+  const payload=await loadChapterPayload(source,chapter,{runRuleJavaScript});
+  log('two pages',requests===2&&payload.content.includes('内容一!')&&payload.content.includes('内容二!'));
+  log('subcontent',payload.subContent==='一副\n二副');log('variable persisted',payload.variable?.includes('seen'));
+  log('worker stages',stages.length===6&&stages.filter(x=>x.includes("java.put")).length===2&&stages.filter(x=>x==="result").length===1&&stages.some(x=>x.includes("replace")),String(stages.length));
+ }catch(error){log('content flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

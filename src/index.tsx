@@ -4,6 +4,9 @@ import { inspectWebDavBackupEntry } from './core/remoteBackupArchive';
 import { restoreBackupPreview } from './core/restoreBackupPreview';
 import { LegacyRestoreError } from './data/legacyRestore';
 import { displayBookIntro } from './core/bookMetadata';
+import { CollapsibleBookIntro } from './components/CollapsibleBookIntro';
+import { useReaderSourceChange } from './hooks/useReaderSourceChange';
+import { useReaderKeepAwake } from './hooks/useReaderKeepAwake';
 import {
   useCallback,
   useEffect,
@@ -15,6 +18,7 @@ import {
 import jssdk from '@htyf-mp/js-sdk';
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   BackHandler,
   Easing,
@@ -64,6 +68,7 @@ import { applyBookUpdate } from './core/bookUpdate';
 import { loadBookGroups } from './data/bookshelf';
 import { applyBookshelfRefresh } from './core/bookshelfRefresh';
 import { bookReadingScreen } from './core/bookKinds';
+import { mergeOnlineBookIntoShelf } from './core/onlineLibrary';
 import {
   listBookmarks,
   listHighlights,
@@ -93,6 +98,7 @@ import { TxtTocRuleManager } from './screens/TxtTocRuleManager';
 import { DirectLinkUpload } from './screens/DirectLinkUpload';
 import { OnlineBookDetail } from './screens/OnlineBookDetail';
 import { SourceLogin } from './screens/SourceLogin';
+import { SourceVerificationOverlay } from './components/SourceVerificationOverlay';
 import { SourceDebug } from './screens/SourceDebug';
 import { BookSourceSwitch } from './screens/BookSourceSwitch';
 import { BookCache } from './screens/BookCache';
@@ -253,7 +259,7 @@ import {
 } from './data/replaceRules';
 import { loadSources } from './data/sources';
 import { addAppLog } from './data/appLog';
-import { loadChapterContent } from './core/webBook';
+import { loadChapterPayload } from './core/webBook';
 import { BookSearch } from './screens/BookSearch';
 import { autoSwitchSourceForChapter } from './core/bookSourceSwitch';
 import {
@@ -261,6 +267,7 @@ import {
   refreshBookMetadata,
   refreshReaderChapter,
   refreshReaderToc,
+  StaleReaderTocError,
 } from './core/readerRefresh';
 import { buildSourceRequest } from './core/sourceRequest';
 import { startAutoTaskScheduler } from './services/autoTaskScheduler';
@@ -431,11 +438,9 @@ function Shell() {
   const replaceBooks = useCallback((next: Book[]) => {
     void saveLibrary(next).catch(error => setLibraryError(String(error)));
   }, []);
-  const upsertBook = useCallback((book: Book) => {
-    void updateLibrary(current => [
-      ...current.filter(item => item.id !== book.id),
-      book,
-    ]).catch(error => setLibraryError(String(error)));
+  const upsertBook = useCallback(async (book: Book) => {
+    const saved = await updateLibrary(current => mergeOnlineBookIntoShelf(current, book));
+    return saved.find(item => item.id === book.id) ?? book;
   }, []);
   if (loading)
     return (
@@ -832,9 +837,13 @@ function Shell() {
           <OnlineBookDetail
             initialBook={route.params.book}
             back={() => navigation.goBack()}
-            added={book => {
-              upsertBook(book);
-              navigation.replace('Book', { bookId: book.id });
+            search={(sourceUrl, query) => navigation.push('Search', { sourceUrl, query })}
+            added={(book, readAfterImport) => {
+              void upsertBook(book).then(saved => {
+                if (!navigation.isFocused()) return;
+                if (readAfterImport) navigation.replace(bookReadingScreen(saved), { bookId: saved.id });
+                else navigation.replace('Book', { bookId: saved.id });
+              }).catch(error => setLibraryError(String(error)));
             }}
           />
         )}
@@ -1635,7 +1644,7 @@ function BookDetail({
           </Text>
         ) : null}
         <Text style={s.sectionTitle}>{t('introduction')}</Text>
-        <Text style={s.body}>{displayBookIntro(book)}</Text>
+        <CollapsibleBookIntro text={displayBookIntro(book)} style={s.body} />
         <Text style={s.sectionTitle}>{t('latestChapter')}</Text>
         <Text style={s.body}>{book.chapterTitle}</Text>
         {book.bookUrl ? (
@@ -1714,25 +1723,7 @@ function BookDetail({
     </View>
   );
 }
-function Reader({
-  book,
-  initialChapterIndex,
-  contentSearchRequest,
-  openContentSearch,
-  back,
-  update: commitBook,
-  openReviews,
-  openEditor,
-  openSourceSwitch,
-  openOfflineCache,
-  openHighlightRules,
-  openReplaceRule,
-  openTxtTocRules,
-  openLogs,
-  openReaderSettings,
-  openHelp,
-  openSpeechEngines,
-}: {
+type ReaderProps = {
   book?: Book;
   initialChapterIndex?: number;
   contentSearchRequest?: ContentSearchRequest;
@@ -1750,7 +1741,39 @@ function Reader({
   openReaderSettings: () => void;
   openHelp: () => void;
   openSpeechEngines: () => void;
-}) {
+};
+
+function Reader(props: ReaderProps) {
+  const { t } = useAppTheme();
+  if (!props.book) {
+    return (
+      <View style={s.center}>
+        <Text>{t('cannotReadBook')}</Text>
+      </View>
+    );
+  }
+  return <ReaderContent {...props} book={props.book} />;
+}
+
+function ReaderContent({
+  book,
+  initialChapterIndex,
+  contentSearchRequest,
+  openContentSearch,
+  back,
+  update: commitBook,
+  openReviews,
+  openEditor,
+  openSourceSwitch,
+  openOfflineCache,
+  openHighlightRules,
+  openReplaceRule,
+  openTxtTocRules,
+  openLogs,
+  openReaderSettings,
+  openHelp,
+  openSpeechEngines,
+}: ReaderProps & { book: Book }) {
   const update = useCallback(
     (next: Book) => commitBook(next, book),
     [commitBook, book],
@@ -1863,6 +1886,7 @@ function Reader({
     replacePreviewTouches = useRef<Array<{ x: number; y: number }>>([]),
     chapterSwitchingRef = useRef(false),
     chapterSwitchRequest = useRef(0),
+    tocRefreshRequest = useRef(0),
     readerScrollAtTop = useRef(true),
     mangaScroll = useRef<ScrollView>(null),
     textScroll = useRef<ScrollView>(null),
@@ -1890,9 +1914,22 @@ function Reader({
     previousPageCapacity = useRef(pageCapacity),
     safeLayout = readerSafeLayout(insets, capsuleLayout.capsule, window.width);
   const catalogue = useBookCatalogue(book, setIndex);
+  const onReaderSourceChange = useCallback((chapterIndex: number) => {
+    chapterSwitchRequest.current++;
+    tocRefreshRequest.current++;
+    chapterSwitchingRef.current = false;
+    setChapterTransition(undefined);
+    setIndex(chapterIndex);
+  }, []);
+  useReaderSourceChange(book, onReaderSourceChange);
   const mangaSpecialUi =
       book?.sourceType === 2 && loadGeneralPreferences().showMangaUi,
     mangaHorizontal = mangaSpecialUi ? prefs.mangaHorizontal : true;
+  const resetScreenTimeout = useReaderKeepAwake(
+    focused && !!book,
+    mangaSpecialUi && prefs.mangaAutoScroll ? -1 : prefs.screenTimeoutSeconds,
+    () => Alert.alert(t('readerScreenTimeoutError')),
+  );
   const progressSyncRef = useRef({ book, index });
   const handledContentSearchRequest = useRef<number | undefined>(undefined);
   useEffect(() => {
@@ -1909,6 +1946,7 @@ function Reader({
   useEffect(
     () => () => {
       chapterSwitchRequest.current++;
+      tocRefreshRequest.current++;
       chapterSwitchingRef.current = false;
     },
     [],
@@ -2148,6 +2186,7 @@ function Reader({
       if (direction > 0) nextPageRef.current();
       else if (direction < 0) previousPageRef.current();
       else return;
+      resetScreenTimeout();
       restoring = true;
       void VolumeManager.setVolume(restore, { showUI: false }).catch(() => {
         restoring = false;
@@ -2161,7 +2200,7 @@ function Reader({
       if (reset) clearTimeout(reset);
       subscription.remove();
     };
-  }, [focused, prefs.volumeKeyPage]);
+  }, [focused, prefs.volumeKeyPage, resetScreenTimeout]);
   useEffect(() => {
     if (!book || catalogue.needed) return;
     const chapters = book.chapters ?? [],
@@ -2175,10 +2214,12 @@ function Reader({
       .then(sources => {
         const source = sources.find(item => item.bookSourceUrl === book.origin);
         if (!source) throw new Error(t('sourceMissing'));
-        return loadChapterContent(source, {
+        return loadChapterPayload(source, {
           url: chapter.url!,
+          variable: chapter.variable, bookVariable: book.variable, bookName: book.name,
           title: chapter.title,
           index: safeIndex,
+          nextChapterUrl: chapters[safeIndex + 1]?.url,
           bookUrl: book.bookUrl ?? '',
           baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
           isVolume: !!chapter.isVolume,
@@ -2186,13 +2227,15 @@ function Reader({
           isPay: !!chapter.isPay,
         });
       })
-      .then(content => {
+      .then(payload => {
         if (!active || chapterSwitchingRef.current) return;
+        const {content} = payload;
         const nextChapters = chapters.map((item, chapterIndex) =>
-          chapterIndex === safeIndex ? { ...item, content } : item,
+          chapterIndex === safeIndex ? { ...item, content, ...(payload.variable !== undefined ? {variable: payload.variable} : {}) } : item,
         );
         update({
           ...book,
+          ...(payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}),
           chapters: nextChapters,
           chapterTitle: chapter.title,
           content,
@@ -2267,10 +2310,12 @@ function Reader({
           preferences.preDownloadNum,
           preferences.threadCount,
           (chapter, chapterIndex) =>
-            loadChapterContent(source, {
+            loadChapterPayload(source, {
               url: chapter.url!,
+              variable: chapter.variable, bookVariable: book.variable, bookName: book.name,
               title: chapter.title,
               index: chapterIndex,
+              nextChapterUrl: book.chapters?.[chapterIndex + 1]?.url,
               bookUrl: book.bookUrl ?? '',
               baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
               isVolume: !!chapter.isVolume,
@@ -2288,12 +2333,6 @@ function Reader({
       active = false;
     };
   }, [book, index, update]);
-  if (!book)
-    return (
-      <View style={s.center}>
-        <Text>{t('cannotReadBook')}</Text>
-      </View>
-    );
   const allChapters = book.chapters?.length
       ? book.chapters
       : [
@@ -2545,21 +2584,24 @@ function Reader({
             const sources = await loadSources(),
               source = sources.find(item => item.bookSourceUrl === book.origin);
             if (!source) throw new Error(t('sourceMissing'));
-            content = await loadChapterContent(source, {
+            const payload = await loadChapterPayload(source, {
               url: next.url!,
+              variable: next.variable, bookVariable: book.variable, bookName: book.name,
               title: next.title,
               index: safe,
+              nextChapterUrl: chapters[safe + 1]?.url,
               bookUrl: book.bookUrl ?? '',
               baseUrl: next.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
               isVolume: !!next.isVolume,
               isVip: !!next.isVip,
               isPay: !!next.isPay,
             });
+            content = payload.content;
             if (request !== chapterSwitchRequest.current) return;
             const nextChapters = chapters.map((chapterItem, chapterIndex) =>
-              chapterIndex === safe ? { ...chapterItem, content } : chapterItem,
+              chapterIndex === safe ? { ...chapterItem, content, ...(payload.variable !== undefined ? {variable: payload.variable} : {}) } : chapterItem,
             );
-            commit({ ...book, chapters: nextChapters }, safe, content);
+            commit({ ...book, ...(payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}), chapters: nextChapters }, safe, content);
           } catch (primaryError) {
             if (request !== chapterSwitchRequest.current) return;
             addAppLog(
@@ -2762,19 +2804,39 @@ function Reader({
       }
     },
     updateOnlineToc = async () => {
+      const request = ++tocRefreshRequest.current;
       setAdvancedMessage(t('updatingOnlineToc'));
       try {
         const sources = await loadSources(),
           source = sources.find(item => item.bookSourceUrl === book.origin);
+        if (request !== tocRefreshRequest.current) return;
         if (!source) throw new Error(t('sourceMissing'));
-        const refreshed = await refreshReaderToc(book, source);
+        const refreshed = await refreshReaderToc(book, source, undefined, () => {
+          if (request !== tocRefreshRequest.current) return undefined;
+          const live = progressSyncRef.current;
+          if (!live.book) return undefined;
+          const bridge = readingPosition.current;
+          const position = bridge?.snapshot();
+          bridge?.flush();
+          const chapter = live.book.chapters?.[live.index];
+          return {
+            ...live.book,
+            currentChapterIndex: live.index,
+            ...(position?.chapterId === chapter?.id ? { readingPosition: position } : {}),
+          };
+        });
+        if (request !== tocRefreshRequest.current) return;
         setIndex(refreshed.currentChapterIndex ?? 0);
-        setPageIndex(0);
+        // The text bridge owns the saved character anchor. Resetting the page
+        // here looks like a user page turn and overwrites that anchor.
+        if (!readingPosition.current) setPageIndex(0);
         update(refreshed);
         setAdvancedMessage(
           t('onlineTocUpdated', { count: refreshed.chapters?.length ?? 0 }),
         );
       } catch (error) {
+        if (request !== tocRefreshRequest.current) return;
+        if (error instanceof StaleReaderTocError) { setAdvancedMessage(''); return; }
         setAdvancedMessage(
           t('updateOnlineTocFailed', {
             error: error instanceof Error ? error.message : String(error),
@@ -2925,6 +2987,8 @@ function Reader({
   }, [focused, pendingContentSearch, index, replacedTitle, displayContent, prefs.paragraphIndent, prefs.adaptSpecialStyle]);
   return (
     <View
+      onTouchStart={resetScreenTimeout}
+      onTouchEnd={resetScreenTimeout}
       style={[
         s.reader,
         {
@@ -2954,7 +3018,7 @@ function Reader({
         segment => segment.type === 'text',
       ) ? (
         <ReaderPositionBridge
-          key={`${book.id}:${chapter.id}`}
+          key={JSON.stringify([book.id, book.origin, book.bookUrl, chapter.id])}
           ref={readingPosition}
           book={book}
           chapterId={chapter.id}
@@ -6082,6 +6146,7 @@ function AppNavigation() {
           </View>
         )}
       </InTreeSheet>
+      <SourceVerificationOverlay />
     </View>
   );
 }

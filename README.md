@@ -8,10 +8,10 @@ A React Native HTYF migration of Legado. Feature and visual parity acceptance is
 **当前调试 / Current preview:** 使用独立的“Legado HTYF 调试”iPhone 17 Pro 模拟器（iOS 26.5）。本轮只调试 iOS。
 Use the dedicated “Legado HTYF 调试” iPhone 17 Pro Simulator (iOS 26.5). This iteration targets iOS only.
 
-**[配置分享入口 / Configured share entry](https://mp.dagouzhi.com/share?data=%7B%22type%22%3A%22app%22%2C%22entry%22%3A%22.%2Fsrc%2Findex.tsx%22%2C%22version%22%3A%220.0.47%22%2C%22name%22%3A%22Legado%22%2C%22appid%22%3A%22plugin_legado%22%2C%22rotate%22%3A%22auto%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fdist.dgz%22%2C%22projectname%22%3A%22%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22engines%22%3A%222.0.0%22%7D)**：该链接使用当前本地 `plugin_legado` / `0.0.47` 配置。本轮代码尚未部署，不能用它验证新增功能；App 扫码添加尚待验收。
-This link uses the current local `plugin_legado` / `0.0.47` configuration. The current changes have not been deployed; App scan/add acceptance remains pending.
-远程配置/包地址本次返回 HTTP 200/200，配置版本为 0.0.34；不能作为本轮本地 0.0.47 包的验收证据。
-The configured remote config/package URLs returned HTTP 200/200; the config version is 0.0.34. This does not verify the local 0.0.47 archive.
+**[配置分享入口 / Configured share entry](https://mp.dagouzhi.com/share?data=%7B%22type%22%3A%22app%22%2C%22entry%22%3A%22.%2Fsrc%2Findex.tsx%22%2C%22version%22%3A%220.0.58%22%2C%22name%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22appid%22%3A%22plugin_legado%22%2C%22rotate%22%3A%22auto%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fdist.dgz%22%2C%22projectname%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22engines%22%3A%222.0.0%22%7D)**：该链接使用当前本地 `plugin_legado` / `0.0.58` 配置。本轮代码尚未部署，不能用它验证新增功能；App 扫码添加尚待验收。
+This link uses the current local `plugin_legado` / `0.0.58` configuration. The current changes have not been deployed; App scan/add acceptance remains pending.
+远程配置/包地址本次返回 HTTP 200/200，配置版本为 0.0.49；不能作为本轮本地 0.0.58 包的验收证据。
+The configured remote config/package URLs returned HTTP 200/200; the config version is 0.0.49. This does not verify the local 0.0.58 archive.
 
 ![Legado HTYF 分享二维码 / Share QR code](docs/assets/htyf-share-qr.png)
 
@@ -24,8 +24,8 @@ The configured remote config/package URLs returned HTTP 200/200; the config vers
 4. 将分享链接或二维码图片发给其他用户，即可按相同步骤添加。
    Share the link or QR image with another user to follow the same process.
 
-在线使用前，必须先将当前构建的 `dist/app.json` 和 `dist/dist.dgz` 分别上传到配置地址和包地址。本轮已生成 iOS 资源包；本地包仍需在宿主内验收，远程入口尚未更新。打包或生成二维码不会自动上传。
-Before remote use, upload the current `dist/app.json` and `dist/dist.dgz` to the configured metadata/package URLs. An iOS package has been generated for this iteration; host acceptance is pending and the remote entry has not been updated. Packaging and QR generation do not upload files.
+在线使用前，必须先将当前构建的 `dist/app.json` 和 `dist/dist.dgz` 分别上传到配置地址和包地址。本地包已在 iOS 模拟器的红糖云服调试宿主验证，远程入口尚未更新，物理手机仍需验收。打包或生成二维码不会自动上传。
+Before remote use, upload the current `dist/app.json` and `dist/dist.dgz` to the configured metadata/package URLs. The local package has been exercised in the HTYF debug host on an iOS simulator; the remote entry and physical-device acceptance remain pending. Packaging and QR generation do not upload files.
 
 - 配置 / Metadata: [app.json](https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/app.json)
 - 资源包 / Package: [dist.dgz](https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/dist.dgz)
@@ -60,6 +60,21 @@ node scripts/http-tts-fixture.mjs
 In My → Other settings → More settings → Speech engines → More → Import from URL, enter `http://127.0.0.1:8098/engines`, select the local test engine, and open Read aloud in the reader. This macOS built-in speech fixture only validates the HTTP audio flow and is not part of the production mini-program runtime.
 
 ## 实现与验收 / Implementation and Acceptance
+
+0.0.58 修复红糖云服宿主中 React Native 移除 `InteractionManager` 导致的启动崩溃；iOS 模拟器的真实宿主已验证书源搜索、105 项目录、第一回正文和重新打开后的阅读进度，见 [宿主验证](docs/testing/real-host-ios/README.md)。部分格式、物理手机及整体 1:1 仍待完成，本地包未发布。
+Version 0.0.58 fixes the host startup crash caused by React Native removing `InteractionManager`. The real HTYF debug host on an iOS simulator passed source search, contents, chapter reading and reopening checks; see [host validation](docs/testing/real-host-ios/README.md). Several formats, physical-device validation and overall parity remain pending; the local package is unpublished.
+
+0.0.53 对齐原版搜索、发现和详情的书名/作者清理、分类连接及字数格式；6,267 组 JVM 等价对照和 223 个套件 / 1,146 项测试通过，见 [书源元数据验收](docs/testing/native-book-metadata/README.md)。真实「阅读书屋」的作者选择器已与网站不匹配，因此仍显示未知；未擅自改源或猜测作者。本地包未发布，整体 1:1 仍未完成。
+Version 0.0.53 aligns native name/author cleanup, category joining and word-count formatting in search, explore and details. All 6,267 finite JVM-equivalent cases and 223 suites / 1,146 tests pass; see [metadata acceptance](docs/testing/native-book-metadata/README.md). The real source’s author selector no longer matches the site, so the author remains unknown; its rule was not changed. The local package is unpublished and overall parity remains incomplete.
+
+0.0.52 让书源请求使用已恢复的登录请求头，按源地址隔离、检查有效期并遮盖请求日志中的登录头；RSS 和封面搜索按原版排除该头。222 个套件 / 1,142 项测试通过；独立 iOS 的真实源搜索、详情、105 项目录和首个正文项通过，详情作者仍显示未知，见 [登录头验收](docs/testing/restored-login-headers/README.md)。受保护站点的设备端登录恢复及整体 1:1 仍待验收，本地包未发布。
+Version 0.0.52 uses restored per-source login headers in source requests, respects expiration and redacts them from request logs; RSS and cover-rule search exclude them as in native. All 222 suites / 1,142 tests pass. Dedicated iOS verifies a live source search, details, 105-item contents and first content item; the author still displays as unknown. Protected-site device restore and overall parity remain pending. See [login-header acceptance](docs/testing/restored-login-headers/README.md). The local package is unpublished.
+
+0.0.51 对齐原版敏感备份选项：Cookie 与源变量默认关闭；用户开启后即使没有对应数据也要求本地密码，已有用户选择不变。221 个套件 / 1,134 项测试通过；独立 iOS 验证两项开启时的 Cookie 优先提示及加密源变量无密码恢复被拒，见 [敏感备份选项验收](docs/testing/backup-sensitive-options/README.md)。正确密码设备往返及全量 1:1 仍待完成，本地包未发布。
+Version 0.0.51 matches the native sensitive-category defaults and requires a local password for selected categories even when empty, preserving saved choices. All 221 suites / 1,134 tests pass; dedicated iOS verifies the cookie-first error with both selected and rejects a source-variable restore without a password. Correct-password device round trips and overall parity remain pending. See [sensitive backup options](docs/testing/backup-sensitive-options/README.md). The local package is unpublished.
+
+0.0.50 修复 HTYF 备份中书源运行变量明文保存的问题，使用本地密码分别加密变量和 Cookie；含变量的新版备份需要支持版本 2 的客户端，旧明文备份仍可读取。221 个套件 / 1,128 项测试通过，独立 iOS 验证新版备份下载与预览；正确密码实际往返及无密码拦截仍待设备验收，见 [源变量备份报告](docs/testing/backup-source-variables/README.md)。本地包尚未发布，整体 1:1 仍未完成。
+Version 0.0.50 encrypts source runtime variables separately from cookies. Backups containing them require a version-2-capable client; older plaintext backups remain readable. All 221 suites / 1,128 tests pass, and dedicated iOS verifies download and preview. Correct-password round trips and missing-password rejection remain pending on device. See the [source-variable backup report](docs/testing/backup-source-variables/README.md). The local package is unpublished; overall parity remains incomplete.
 
 0.0.47 修正原版敏感备份的致命预校验：Cookie/源变量密码与严格字段校验失败时，在普通数据恢复前停止；本地和 WebDAV 默认读取现有本地密码。349 个解析输入、336 个加密封装及 1,118 项回归通过，独立 iOS 验证无密码拦截和普通预览，前后 27 项导出完全一致；正确密码解密和忽略开关设备矩阵仍待验收，见 [预校验报告](docs/testing/native-restore-preflight/README.md)。本地包未发布，整体 1:1 仍未完成。
 Version 0.0.47 makes native cookie/cache preflight fatal before ordinary restoration and defaults archive paths to the current local password. All 349 parser cases, 336 crypto envelopes and 1,118 regression tests pass. Dedicated iOS verifies password-required rejection and ordinary previews; all 27 exported entries remain identical. Correct-password and ignore-switch device matrices remain pending. See the [preflight report](docs/testing/native-restore-preflight/README.md). The local archive is unpublished and overall parity is incomplete.

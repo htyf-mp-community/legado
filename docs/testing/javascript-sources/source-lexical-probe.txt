@@ -1,0 +1,18 @@
+import React from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {sourceRuleText} from './src/core/sourceRule';
+import {runSourceJavaScript} from './src/core/sourceJavaScript';
+function App(){
+ const lines=['iOS JavaScript lexical declarations'];
+ const check=(name,ok)=>lines.push((ok?'PASS ':'FAIL ')+name);
+ try{
+  const rule='@js:\nlet novelId=baseUrl.match(/novelId=(\\d+)/)[1];\nlet url = `novelId=${novelId}`;\nresult = `data:chapterList;base64,${java.base64Encode(url)},{"type":"jjwx"}`;';
+  check('1321 original rule',sourceRuleText('',rule,false,{baseUrl:'https://example.org/?novelId=123'})==='data:chapterList;base64,bm92ZWxJZD0xMjM=,{"type":"jjwx"}');
+  check('top-level let and const',runSourceJavaScript('let x=1;const y=2;x+=y;x','')===3);
+  for(const [name,script] of [['const reassignment','const x=1;x++;'],['shadowing','let x=1;{let x=2;}x'],['early access','x;let x=1;']]){
+   let rejected=false;try{runSourceJavaScript(script,'')}catch(error){rejected=true}check(name+' rejected',rejected);
+  }
+ }catch(error){lines.push('FAIL '+String(error));}
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text></View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

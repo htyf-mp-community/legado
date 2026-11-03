@@ -558,7 +558,8 @@ getUrl(key)`,
       url: 'https://example.com/c1',
       index: 0,
       tag: '今天',
-      wordCount: '1K',
+      // Native TocRule has no wordCount selector; it derives counts from updateTime.
+      wordCount: undefined,
     });
   });
   test('parses legacy HTML chapter nodes with bare text and href extraction', () => {
@@ -659,7 +660,7 @@ getUrl(key)`,
       isVip: true,
     });
   });
-  test('keeps usable legacy search data when an optional cover rule needs JavaScript', () => {
+  test('evaluates a JavaScript cover rule while keeping legacy search data', () => {
     const legacySource: BookSource = {
       ...source,
       ruleSearch: {
@@ -681,7 +682,7 @@ getUrl(key)`,
         name: '真实书名',
         author: '作者甲',
         bookUrl: 'https://example.com/book/1',
-        coverUrl: undefined,
+        coverUrl: 'https://example.com/book/1',
       }),
     ]);
   });
@@ -748,7 +749,8 @@ getUrl(key)`,
       author: '',
     } as SearchBook;
     await expect(loadChapters(pagedSource, book)).resolves.toMatchObject([
-      { title: '一', index: 0 },
+      // Native reverses before URL deduplication and therefore retains the later entry.
+      { title: '一重复', index: 0 },
       { title: '二', index: 1 },
     ]);
     expect(fetchMock).toHaveBeenCalledTimes(2);

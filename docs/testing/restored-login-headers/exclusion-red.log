@@ -1,0 +1,55 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/restoredLoginHeaders.test.ts
+
+FAIL __tests__/restoredLoginHeaders.test.ts
+  ● RSS feed and article requests do not attach restored login headers
+
+    expect(received).toBeUndefined()
+
+    Received: "fixture-secret"
+
+      209 |   await fetchRssArticleContent({id: '1', origin: rss.sourceUrl, sort: '', title: '', link: 'https://example.invalid/article', read: false, starred: false}, rss, fetcher);
+      210 |   for (const [, options] of fetcher.mock.calls) {
+    > 211 |     expect(options.headers['X-Private']).toBeUndefined();
+          |                                          ^
+      212 |     expect(options.headers['X-Base']).toBe('yes');
+      213 |   }
+      214 | });
+
+      at Object.toBeUndefined (__tests__/restoredLoginHeaders.test.ts:211:42)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● cover search does not attach restored login headers
+
+    expect(received).not.toHaveProperty(path)
+
+    Expected path: not "X-Private"
+
+    Received value: "fixture-secret"
+
+      218 |   const fetcher = jest.spyOn(globalThis, 'fetch').mockResolvedValue({ok:true,status:200,url:'https://example.invalid/search',headers:{get:()=>null,forEach:()=>{}},text:async()=>'{"cover":"/x.png"}'} as unknown as Response);
+      219 |   await searchBookCover({ id:'1',name:'fixture',author:'',intro:'',chapterTitle:'',content:'',progress:0,updatedAt:0 }, {enable:true,searchUrl:'https://example.invalid/search',coverRule:'$.cover',enabledCookieJar:false});
+    > 220 |   expect(fetcher.mock.calls[0][1]?.headers).not.toHaveProperty('X-Private');
+          |                                                 ^
+      221 | });
+      222 |
+
+      at Object.toHaveProperty (__tests__/restoredLoginHeaders.test.ts:220:49)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 6 passed, 8 total
+Snapshots:   0 total
+Time:        1.297 s, estimated 3 s
+Ran all test suites matching __tests__/restoredLoginHeaders.test.ts.

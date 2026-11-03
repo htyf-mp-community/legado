@@ -1,0 +1,27 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {HttpServer} from 'react-native-nitro-http-server';
+import {SourceWorkerView} from './src/components/SourceWorkerView';
+import {SourceWorkerRuntime} from './src/core/sourceWorkerRuntime';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker HTTP retry']),[page,setPage]=useState(null);const web=useRef(null),runtime=useRef(null);
+ useEffect(()=>{let live=true;const log=(name,ok,error='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+error]);};
+ (async()=>{let server;try{
+  server=new HttpServer();let fail=true;
+  const port=await server.start(0,async request=>{
+   if(request.path==='/page'&&fail)return {statusCode:404,body:'missing'};
+   const worker=request.path==='/page/worker.js';
+   return {statusCode:200,headers:{'Content-Type':worker?'text/javascript':'text/html','Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'require-corp','Cross-Origin-Resource-Policy':'same-origin','Cache-Control':'no-store'},body:worker?SOURCE_WORKER_SCRIPT:SOURCE_WORKER_HTML};
+  },{host:'127.0.0.1'});
+  let n=0;const r=new SourceWorkerRuntime({acquire:async()=>({url:'http://127.0.0.1:'+port+'/page',release:()=>server.stop()}),nonce:()=>`retry_${++n}`,showPage:setPage,send:command=>web.current.injectJavaScript(sourceWorkerCommandScript(command))});runtime.current=r;
+  await r.start();const bridge={baseUrl:'https://example.org',sourceUrl:'https://example.org',key:'书',page:1,ajax:async()=>'',removeCookie:()=>{}};
+  let rejected=false;try{await r.runJavaScript('6*7',bridge)}catch(error){rejected=String(error).includes('不可用')}
+  log('HTTP 404 cancels waiting task',rejected);
+  fail=false;await r.start();log('start remounts and executes',(await r.runJavaScript('6*7',bridge))===42);
+  await r.dispose();server=undefined;
+ }catch(error){log('retry',false,String(error));if(server)await server.stop().catch(()=>{});}})();
+ return()=>{live=false;runtime.current?.dispose().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{page?<SourceWorkerView runtime={runtime.current} page={page} webRef={web}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

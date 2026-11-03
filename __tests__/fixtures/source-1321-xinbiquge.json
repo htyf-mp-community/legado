@@ -1,0 +1,8 @@
+{
+  "bookSourceName": "⚡📂新笔趣阁",
+  "ruleContent": {
+    "content": "#article@html@js:(function(){var s=String(result||'');s=s.replace(/<p[^>]+class=[\"']readinline[\"'][\\s\\S]*?<\\/p>/gi,'');s=s.replace(/<!--over-->/gi,'');s=s.replace(/<br\\s*\\/?\\>/gi,'\\n').replace(/<\\/p>/gi,'\\n').replace(/<[^>]+>/g,'');s=s.replace(/&nbsp;|&emsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'\"').replace(/&#39;/g,\"'\").replace(/&amp;/g,'&');return s.split(/\\n+/).map(function(x){return x.replace(/^\\s+|\\s+$/g,'');}).filter(function(x){return x;}).join('\\n').replace(/\\n{3,}/g,'\\n\\n').trim();})()",
+    "imageDecode": "",
+    "nextContentUrl": ""
+  }
+}

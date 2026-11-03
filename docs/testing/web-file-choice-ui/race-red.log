@@ -1,0 +1,32 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/onlineWebFileDetail.test.tsx
+  ● ZIP selection sheet stays open while downloading and shows entries when it completes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      209 |   const choice = tree.root.findAllByType(Text).find(node => node.props.children === 'book.zip');
+      210 |   await act(async () => { choice!.parent!.props.onPress(); });
+    > 211 |   expect(tree.root.findAllByType(Text).some(node => node.props.children === 'webFileDownloads')).toBe(true);
+          |                                                                                                  ^
+      212 |   await act(async () => { resolve({ files, importFile: jest.fn() as never, dispose: jest.fn(async () => {}) }); });
+      213 |   expect(tree.root.findAllByType(Text).some(node => node.props.children === 'two.txt')).toBe(true);
+      214 |   await act(async () => tree.unmount());
+
+      at Object.toBe (__tests__/onlineWebFileDetail.test.tsx:211:98)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 passed, 4 total
+Snapshots:   0 total
+Time:        0.758 s, estimated 1 s

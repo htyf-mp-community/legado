@@ -1,0 +1,36 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerSession} from './src/core/sourceWorkerSession';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import defaults from './defaultBookSources.json';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker session']),[url,setUrl]=useState('');
+ const web=useRef(null),session=useRef(null);
+ useEffect(()=>{let lease;let live=true;const log=(label,ok,details='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+label+' '+details]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  let bridgeAborted=false;
+  const s=new SourceWorkerSession('ios_probe_1',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)),async(action,args,signal)=>{
+   if(action==='java.ajax'&&args[0]==='wait')return new Promise((resolve,reject)=>{signal.addEventListener('abort',()=>{bridgeAborted=true;reject(Error('cancelled'));},{once:true});});
+   if(action==='java.ajax'&&args[0]==='test')return '桥接成功';
+   if(action==='java.ajax')return '<form id="search" action="/search21.html">';
+   if(action==='java.encodeURI')return encodeURIComponent(args[0]);
+   if(action==='cookie.removeCookie')return undefined;
+   throw Error('unsupported');
+  },{executionMs:800,readyMs:10000});session.current=s;setUrl(lease.url+'#ios_probe_1');
+  const value=await s.run('__legado.call("java.ajax",["test"])',{});log('sync RPC',value==='桥接成功',String(value));
+  const parts=Array.from(defaults[0].searchUrl.matchAll(/\{\{([\s\S]*?)\}\}/g),m=>m[1]);
+  const prelude='var source={getKey:function(){return "http://www.kkbiquge.net"}};var key="西游记";var cookie={removeCookie:function(u){return __legado.call("cookie.removeCookie",[u])}};var java={ajax:function(u){return __legado.call("java.ajax",[u])},encodeURI:function(s){return __legado.call("java.encodeURI",[s])}};';
+  await s.run(prelude+parts[0],{});
+  const search=await s.run(prelude+parts[1],{});log('7663 expressions',search==='http://www.kkbiquge.net/search21.html?searchkey=%E8%A5%BF%E6%B8%B8%E8%AE%B0',String(search));
+  const hidden=await s.run('typeof BroadcastChannel+"|"+typeof postMessage',{});log('channel guard',hidden==='undefined|undefined',String(hidden));
+  const controller=new AbortController();setTimeout(()=>controller.abort(),300);let cancelled=false;try{await s.run('__legado.call("java.ajax",["wait"])',{},controller.signal);}catch(e){cancelled=e.name==='AbortError';}log('RPC cancellation',cancelled&&bridgeAborted);
+  let timeout=false;try{await s.run('while(true){}',{});}catch(e){timeout=String(e).includes('超时');}log('runaway timeout',timeout);
+  const after=await s.run('6*7',{});log('subsequent task',after===42,String(after));
+ }catch(e){log('setup or task',false,String(e));}})();
+ return()=>{live=false;session.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>session.current?.receive(e.nativeEvent.data)} />:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

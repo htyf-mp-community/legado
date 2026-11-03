@@ -1,0 +1,24 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {SourceWorkerHost} from './src/components/SourceWorkerHost';
+const bridge={baseUrl:'https://example.org',sourceUrl:'https://example.org',key:'书',page:1,ajax:async()=>'',removeCookie:()=>{}};
+function App(){
+ const [mounted,setMounted]=useState(true),[lines,setLines]=useState(['iOS Worker host owner']);
+ const host=useRef(null),phase=useRef(0),live=useRef(true);
+ useEffect(()=>()=>{live.current=false;},[]);
+ useEffect(()=>{const log=(name,ok,error='')=>{if(live.current)setLines(lines=>[...lines,(ok?'PASS ':'FAIL ')+name+' '+error]);};
+  if(mounted&&phase.current===0){phase.current=1;(async()=>{try{
+   await host.current.start();
+   log('mount and execute',(await host.current.runJavaScript('6*7',bridge))===42);
+   const pending=host.current.runJavaScript('while(true){}',bridge);
+   setTimeout(()=>setMounted(false),150);
+   try{await pending;log('unmount cancels active task',false);}catch(error){log('unmount cancels active task',String(error).includes('关闭'));}
+   phase.current=2;setMounted(true);
+  }catch(error){log('first host',false,String(error));}})();}
+  else if(mounted&&phase.current===2){phase.current=3;(async()=>{try{
+   await host.current.start();log('remount and execute',(await host.current.runJavaScript('21*2',bridge))===42);
+  }catch(error){log('second host',false,String(error));}})();}
+ },[mounted]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{mounted?<SourceWorkerHost ref={host}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

@@ -11,6 +11,8 @@ export function exportBookshelfJson(books: Book[]) {
   return JSON.stringify(
     books.map(book => ({
       bookUrl: book.bookUrl || book.id,
+      tocUrl: book.tocUrl,
+      variable: book.variable,
       name: book.name,
       author: book.author,
       intro: book.intro,
@@ -49,7 +51,9 @@ export function parseBookshelfJson(raw: string): Book[] {
           ? value._htyf
           : undefined,
       id = text(embedded?.id) || text(value.bookUrl),
-      name = text(embedded?.name) || text(value.name);
+      name = text(embedded?.name) || text(value.name),
+      variable = typeof embedded?.variable === 'string' ? embedded.variable
+        : typeof value.variable === 'string' ? value.variable : undefined;
     if (!id || !name || seen.has(id)) continue;
     const chapterTitle =
         text(embedded?.chapterTitle) ||
@@ -75,6 +79,7 @@ export function parseBookshelfJson(raw: string): Book[] {
     books.push(
       normalizeLegacyCover({
         ...(embedded ?? {}),
+        ...(variable !== undefined ? {variable} : {}),
         id,
         name,
         author: text(embedded?.author) || text(value.author),
@@ -94,6 +99,7 @@ export function parseBookshelfJson(raw: string): Book[] {
               origin: text(value.origin) || undefined,
               originName: text(value.originName) || undefined,
               bookUrl: text(value.bookUrl) || undefined,
+              tocUrl: text(value.tocUrl) || undefined,
               coverUrl: text(value.coverUrl) || undefined,
               customCoverUrl: text(value.customCoverUrl) || undefined,
               persistedCoverUrl: text(value.persistedCoverUrl) || undefined,

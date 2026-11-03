@@ -3,6 +3,10 @@ export type LocalChapter = {
   title: string;
   content: string;
   url?: string;
+  /** Raw source chapter URL, used by Legado for chapter identity. */
+  sourceUrl?: string;
+  variable?: string;
+  nextChapterUrl?: string;
   baseUrl?: string;
   isVolume?: boolean;
   isVip?: boolean;
@@ -50,6 +54,7 @@ export type Book = {
   origin?: string;
   originName?: string;
   bookUrl?: string;
+  variable?: string;
   tocUrl?: string;
   coverUrl?: string;
   customCoverUrl?: string;
@@ -100,6 +105,7 @@ export type BookSource = {
   enabled: boolean;
   enabledExplore: boolean;
   searchUrl?: string;
+  bookUrlPattern?: string;
   exploreUrl?: string;
   bookSourceComment?: string;
   ruleSearch?: Record<string, unknown>;
@@ -112,6 +118,7 @@ export type BookSource = {
 };
 export type SearchBook = {
   bookUrl: string;
+  variable?: string;
   origin: string;
   originName: string;
   name: string;
@@ -122,10 +129,18 @@ export type SearchBook = {
   wordCount?: string;
   latestChapterTitle?: string;
   tocUrl?: string;
+  downloadUrls?: string[];
   sourceType?: number;
+  reverseToc?: boolean;
 };
 export type BookChapter = {
   url: string;
+  variable?: string;
+  bookVariable?: string;
+  bookName?: string;
+  sourceUrl?: string;
+  /** Boundary for multi-page content links that also point to the next chapter. */
+  nextChapterUrl?: string;
   title: string;
   index: number;
   bookUrl: string;

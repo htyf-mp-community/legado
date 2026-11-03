@@ -1,0 +1,13 @@
+import http from 'node:http';
+import {readFile} from 'node:fs/promises';
+http.createServer(async(req,res)=>{
+  if(req.method!=='GET'){res.writeHead(405);res.end();return;}
+  const pathname=new URL(req.url,'http://127.0.0.1').pathname;
+  if(pathname==='/rpc'){
+    setTimeout(()=>{const body=Buffer.from('mock-source-response');res.writeHead(200,{'Content-Type':'text/plain','Content-Length':body.length});res.end(body);},120);
+    return;
+  }
+  const file=pathname==='/app.json'?'dist/app.json':pathname==='/dist.dgz'?'dist/dist.dgz':null;
+  if(!file){res.writeHead(404);res.end();return;}
+  try{const body=await readFile(file);res.writeHead(200,{'Content-Type':file.endsWith('.json')?'application/json':'application/octet-stream','Content-Length':body.length,'Cache-Control':'no-store'});res.end(body);}catch{res.writeHead(503);res.end();}
+}).listen(18219,'127.0.0.1');

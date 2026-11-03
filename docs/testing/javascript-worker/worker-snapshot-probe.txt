@@ -1,0 +1,23 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {createSourceRuleLookup,sourceRuleText} from './src/core/sourceRule';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker checked output']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);const e=new SourceWorkerExecutor('ios_snapshot',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_snapshot');
+  const html='<p><a href="/1">甲</a><a href="/2">乙</a></p>',bridge={baseUrl:'https://example.org',sourceUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{},variables:new Map(),lookup:createSourceRuleLookup(html)};
+  const obj=await e.run('var n=0;({get value(){return ++n===1?"safe":"changed"}})',bridge,html);log('object snapshot',obj.value==='safe',obj.value);
+  const arr=await e.run('var a=[],n=0;Object.defineProperty(a,0,{enumerable:true,get:function(){return ++n===1?"safe":"changed"}});a',bridge,html);log('array snapshot',arr[0]==='safe',arr[0]);
+  const numbers=await e.run('[NaN,Infinity,-Infinity,-0]',bridge,html);log('nested special numbers',Number.isNaN(numbers[0])&&numbers[1]===Infinity&&numbers[2]===-Infinity&&Object.is(numbers[3],-0));
+  const single=await Promise.all(['NaN','Infinity','-Infinity','-0'].map(script=>e.run(script,bridge,html)));log('scalar special numbers',Number.isNaN(single[0])&&single[1]===Infinity&&single[2]===-Infinity&&Object.is(single[3],-0));
+  const nodes=await e.run('java.getElements("tag.a")',bridge,html);log('DOM node list',nodes.length===2&&sourceRuleText(nodes[1],'text')==='乙');
+ }catch(error){log('snapshot flow',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

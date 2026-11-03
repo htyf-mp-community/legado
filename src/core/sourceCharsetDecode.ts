@@ -1,5 +1,10 @@
-import iconv from 'iconv-lite';
 import mappingData from '../data/sourceCharsetDecodeData.json';
+import { canEncodeSourceCharset } from './sourceCharsetAvailability';
+import { decodeTxtLegacy, legacyTxtCharset } from './txtLegacyDecode';
+import { decodeRawUtf16 } from './rawUtf16Decode';
+import { decodeSingleByte, supportsSingleByteCharset } from './singleByteCharset';
+import { decodeUtf32Compatibility, utf32Order } from './utf32Compatibility';
+import {decodeAutoUtf16, decodeRemainingCharset, supportsRemainingCharset} from './remainingCharsets';
 
 type MultiMap = { single: string; double: Record<string, string>; triple: Record<string, string> };
 const multiMaps = mappingData.multi as Record<string, MultiMap>;
@@ -7,7 +12,41 @@ const singleMaps = mappingData.single as Record<string, string>;
 
 const keyOf = (name: string) => name.toLowerCase().replace(/[-_:]/g, '');
 export const canDecodeSourceCharset = (name: string) => /^[A-Za-z0-9][A-Za-z0-9._:+-]*$/.test(name)
-  && (iconv.encodingExists(name) || ['iso2022jp', 'iso2022kr', 'iso2022cn'].includes(keyOf(name)));
+  && (canEncodeSourceCharset(name) || ['iso2022jp', 'iso2022kr', 'iso2022cn'].includes(keyOf(name)));
+
+/** UTF-8 replacement decoding, retaining BOM as required by the source parser. */
+function utf8(bytes: Uint8Array, javaReplacement = false) {
+  const chunks: string[] = [], units: number[] = [];
+  const append = (code: number) => {
+    if (code <= 0xffff) units.push(code);
+    else { const value = code - 0x10000; units.push(0xd800 | (value >> 10), 0xdc00 | (value & 0x3ff)); }
+    if (units.length >= 4096) { chunks.push(String.fromCharCode(...units)); units.length = 0; }
+  };
+  for (let i = 0; i < bytes.length;) {
+    const lead = bytes[i];
+    if (lead < 0x80) { append(lead); i++; continue; }
+    const length = lead >= 0xc2 && lead <= 0xdf ? 2 : lead >= 0xe0 && lead <= 0xef ? 3 : lead >= 0xf0 && lead <= 0xf4 ? 4 : 0;
+    if (!length) { append(0xfffd); i++; continue; }
+    let code = lead & (0x7f >> length), consumed = 1;
+    while (consumed < length && i + consumed < bytes.length) {
+      const next = bytes[i + consumed];
+      if (next < 0x80 || next > 0xbf ||
+          (consumed === 1 && ((lead === 0xe0 && next < 0xa0) || (lead === 0xed && next > 0x9f && !javaReplacement) ||
+            (lead === 0xf0 && next < 0x90) || (lead === 0xf4 && next > 0x8f)))) break;
+      code = (code << 6) | (next & 0x3f);
+      consumed++;
+    }
+    append(consumed === length && !(javaReplacement && code >= 0xd800 && code <= 0xdfff) ? code : 0xfffd);
+    i += consumed;
+  }
+  if (units.length) chunks.push(String.fromCharCode(...units));
+  return chunks.join('');
+}
+
+/** Java UTF-8 decoding consumes an encoded surrogate as one malformed sequence. */
+export function decodeJavaUtf8(bytes: Uint8Array) {
+  return utf8(bytes, true);
+}
 
 function utf16(bytes: Uint8Array, little: boolean) {
   let result = '';
@@ -144,6 +183,7 @@ const canonicalMaps = Object.fromEntries([...Object.keys(multiMaps), ...Object.k
 
 export function decodeSourceCharset(bytes: Uint8Array, name: string) {
   const key = keyOf(name);
+  if (key === 'utf8') return utf8(bytes);
   if (key === 'utf16le' || key === 'unicodelittleunmarked') return utf16(bytes, true);
   if (key === 'utf16be' || key === 'unicodebigunmarked') return utf16(bytes, false);
   if (key === 'utf16' || key === 'unicode') {
@@ -156,5 +196,16 @@ export function decodeSourceCharset(bytes: Uint8Array, name: string) {
   const canonical = canonicalMaps[key];
   if (canonical && multiMaps[canonical]) return multiByte(bytes, canonical);
   if (canonical && singleMaps[canonical]) return Array.from(bytes, b => singleMaps[canonical][b]).join('');
-  return iconv.decode(bytes, name, { stripBOM: false });
+  const fallbackKey = name.toLowerCase().replace(/:\d{4}$|[^0-9a-z]/g, '');
+  if (fallbackKey === 'utf8' || fallbackKey === 'unicode11utf8') return utf8(bytes);
+  if (fallbackKey === 'utf16') return decodeAutoUtf16(bytes);
+  if (fallbackKey === 'utf16le' || fallbackKey === 'ucs2' || fallbackKey === 'utf16be')
+    return decodeRawUtf16(bytes, fallbackKey !== 'utf16be');
+  const utf32Fallback = utf32Order(name);
+  if (utf32Fallback) return decodeUtf32Compatibility(bytes, utf32Fallback);
+  const legacy = legacyTxtCharset(fallbackKey);
+  if (legacy) return decodeTxtLegacy(bytes, legacy);
+  if (supportsSingleByteCharset(name)) return decodeSingleByte(bytes, name);
+  if (supportsRemainingCharset(name)) return decodeRemainingCharset(bytes, name);
+  throw new Error('UNSUPPORTED_CHARSET');
 }

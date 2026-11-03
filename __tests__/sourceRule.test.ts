@@ -313,12 +313,12 @@ test('supports remaining XPath relationship axes and node tests', () => {
   expect(sourceRuleText(nodes, '//x:item/namespace::x')).toBe('urn:x');
 });
 
-test('supports regex list rules and rejects JavaScript', () => {
+test('supports regex list rules and JavaScript transformations', () => {
   expect(sourceRuleValues('第1章\n第2章', ':(第\\d章)')).toEqual([
     '第1章',
     '第2章',
   ]);
-  expect(() => sourceRuleText(html, 'a@js:result')).toThrow('JavaScript');
+  expect(sourceRuleText('<a>章节</a>', 'a@js:result')).toBe('章节');
 });
 
 test('safely unwraps challenge pass-through and URL extraction rules from imported collections', () => {
@@ -423,13 +423,8 @@ test('native first-match replacement returns the transformed match rather than t
   ).toBe('');
 });
 
-test('does not silently truncate unsupported JavaScript expressions inside metadata templates', () => {
-  expect(() =>
-    sourceRuleText(
-      '<h1>Book</h1>',
-      'Name={{"prefix" + java.getString("h1@text")}}',
-    ),
-  ).toThrow('JavaScript');
+test('runs JavaScript expressions inside metadata templates', () => {
+  expect(sourceRuleText('<h1>Book</h1>', 'Name={{"prefix" + java.getString("h1@text")}}')).toBe('Name=prefixBook');
 });
 
 test('decodes static template string escapes without evaluating code', () => {

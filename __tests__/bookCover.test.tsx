@@ -7,6 +7,7 @@ import { BookCover } from '../src/components/BookCover';
 jest.mock('../src/data/storage', () => ({
   appStorage: {
     getString: () => undefined,
+    set: () => undefined,
     addOnValueChangedListener: () => ({ remove: () => undefined }),
   },
 }));

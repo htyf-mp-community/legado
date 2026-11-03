@@ -56,7 +56,7 @@ test('runs the declarative source in the reported collection through content', a
   expect(result.info.tocUrl).toBe(
     'https://appi.kuwo.cn/novels/api/book/1/chapters?paging=0',
   );
-  expect(result.chapter.url).toBe(
+  expect(result.chapter?.url).toBe(
     'https://appi.kuwo.cn/novels/api/book/1/chapters/2',
   );
   expect(result.content).toBe('章节正文');

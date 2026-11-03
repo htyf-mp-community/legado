@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "⚡📂小小阅读",
+  "bookSourceUrl": "https://s.chuangke.tv",
+  "searchUrl": "/v4/1/lists.api?keyword={{java.put('key',key)}}&form=1"
+}

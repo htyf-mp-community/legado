@@ -1,0 +1,49 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/webFileRetention.test.ts
+  ● downloaded epub remains available after parsing and staging cleanup
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      63 |   expect(imported.content).toBeTruthy();
+      64 |   const retainedUri = imported.localUri || imported.bookUrl!;
+    > 65 |   expect(mockFiles.has(mockPath(retainedUri))).toBe(true);
+         |                                                ^
+      66 | });
+      67 |
+
+      at toBe (__tests__/webFileRetention.test.ts:65:48)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● downloaded mobi remains available after parsing and staging cleanup
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      63 |   expect(imported.content).toBeTruthy();
+      64 |   const retainedUri = imported.localUri || imported.bookUrl!;
+    > 65 |   expect(mockFiles.has(mockPath(retainedUri))).toBe(true);
+         |                                                ^
+      66 | });
+      67 |
+
+      at toBe (__tests__/webFileRetention.test.ts:65:48)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        0.636 s

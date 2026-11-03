@@ -1,0 +1,38 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {searchSource} from './src/core/webBook';
+import {parseBookSources} from './src/data/sources';
+import {sourceVerification} from './src/core/sourceVerification';
+import defaults from './defaultBookSources.json';
+const html='<div class="item"><dl><dt><a href="/book/1">西游记</a></dt></dl><div class="btm"><a>吴承恩</a></div></div>';
+function App(){
+ const [lines,setLines]=useState(['iOS real search flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true,unsubscribe;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_search_flow',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_search_flow');
+  let challenge=false,verified=false,requests=0,checks=0,scriptCount=0;
+  global.fetch=async(address,options)=>{
+   const target=String(address);if(!/^https?:\/\/www\.kkbiquge\.net(?:\/|$)/i.test(target))return originalFetch(address,options);
+   requests++;const search=target.includes('/search42.html');
+   const body=search?(challenge&&!verified?'<script>window.challenge=true</script>':html):'<form id="search" action="/search42.html"></form>';
+   const status=search&&challenge&&!verified?403:200;
+   return {ok:status===200,status,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>body};
+  };
+  const source={...parseBookSources(JSON.stringify(defaults))[0],concurrentRate:'0'};
+  const runJavaScript=(script,bridge,input,signal)=>{scriptCount++;return e.run(script,bridge,input,signal)};
+  let books=await searchSource(source,'西游记',1,undefined,{runJavaScript});
+  log('search + login + parse',books.length===1&&books[0].name==='西游记'&&books[0].author==='吴承恩'&&requests===2&&scriptCount===3,`${requests} requests / ${scriptCount} scripts`);
+  challenge=true;verified=false;requests=0;scriptCount=0;
+  unsubscribe=sourceVerification.subscribe(request=>{if(request){checks++;verified=true;sourceVerification.finish(request.id,{url:request.url,html:'verified'});}});
+  books=await searchSource(source,'西游记',1,undefined,{runJavaScript});
+  log('403 verification + retry',books.length===1&&books[0].name==='西游记'&&checks===1&&verified,`${requests} requests / ${checks} verification`);
+ }catch(error){log('search flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;unsubscribe?.();executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)} onError={()=>executor.current?.pageUnavailable('ios_search_flow')} onContentProcessDidTerminate={()=>executor.current?.pageUnavailable('ios_search_flow')}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

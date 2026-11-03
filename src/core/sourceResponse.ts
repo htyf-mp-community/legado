@@ -1,7 +1,6 @@
-import iconv from 'iconv-lite';
-import { parseFragment, html } from 'parse5';
-import { adapter } from 'parse5-htmlparser2-tree-adapter';
-import { isTag, type AnyNode } from 'domhandler';
+import { parseSourceHtmlFragment } from './sourceDomOperations';
+import type { AnyNode } from 'domhandler';
+import { isSourceElement as isTag } from './sourceDomIdentity';
 import { detectSourceCharset } from './sourceCharset';
 import { SourceRuleError } from './errors';
 import { canDecodeSourceCharset, decodeSourceCharset } from './sourceCharsetDecode';
@@ -20,10 +19,10 @@ const byteIndex = (bytes: Uint8Array, pattern: Uint8Array, start = 0) => {
 export function sourceHtmlCharset(bytes: Uint8Array) {
   let head: string | undefined;
   const start = byteIndex(bytes, openHead), end = start < 0 ? -1 : byteIndex(bytes, closeHead, start);
-  if (end >= 0) head = iconv.decode(bytes.subarray(start, end + closeHead.length), 'UTF-8', { stripBOM: false });
-  else head = /<head>[\s\S]*?<\/head>/i.exec(iconv.decode(bytes, 'UTF-8', { stripBOM: false }))?.[0];
+  if (end >= 0) head = decodeSourceCharset(bytes.subarray(start, end + closeHead.length), 'UTF-8');
+  else head = /<head>[\s\S]*?<\/head>/i.exec(decodeSourceCharset(bytes, 'UTF-8'))?.[0];
   if (head !== undefined) {
-    const document = parseFragment(adapter.createElement('body', html.NS.HTML, []), head, { treeAdapter: adapter, scriptingEnabled: false });
+    const document = parseSourceHtmlFragment(head);
     const visit = (node: AnyNode): string | undefined => {
       if (isTag(node) && node.name === 'meta') {
         const charset = node.attribs.charset;

@@ -314,6 +314,17 @@ test('retains native reading cursor separately from progress and requires a comp
   expect(book.progress).toBeLessThanOrEqual(1);
 });
 
+test('preserves serialized book variables when converting a native bookshelf backup', () => {
+  const variable = '{"token":"关键字","empty":""}';
+  const preview = convertLegacyBackup({'bookshelf.json': JSON.stringify([
+    {bookUrl:'https://source/book',origin:'https://source',name:'书',variable},
+    {bookUrl:'https://source/other',origin:'https://source',name:'无变量',variable:null},
+  ])});
+  const restored = JSON.parse(String(preview.payload.entries['library.v1'].value));
+  expect(restored[0].variable).toBe(variable);
+  expect(restored[1].variable).toBeUndefined();
+});
+
 test('imports native device/title read records without inventing shelf IDs or rounding Long counters', () => {
   const preview = convertLegacyBackup(
     {

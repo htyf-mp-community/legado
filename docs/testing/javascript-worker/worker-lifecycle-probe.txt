@@ -1,0 +1,29 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerSession} from './src/core/sourceWorkerSession';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker lifecycle']),[url,setUrl]=useState(''),[version,setVersion]=useState(0);
+ const web=useRef(null),session=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  let onInvoke,wasAborted=false;
+  const invoked=new Promise(resolve=>{onInvoke=resolve});
+  const s=new SourceWorkerSession('lifecycle_old',command=>web.current?.injectJavaScript(sourceWorkerCommandScript(command)),(_action,_args,signal)=>new Promise((resolve,reject)=>{signal.addEventListener('abort',()=>{wasAborted=true;reject(Error('aborted'))},{once:true});onInvoke();}),{readyMs:10000,executionMs:1000});
+  session.current=s;setUrl(lease.url+'#lifecycle_old');
+  const pending=s.run('__legado.call("java.ajax",["wait"])',{});await invoked;
+  s.replacePage('lifecycle_new');setUrl(lease.url+'#lifecycle_new');setVersion(1);
+  let interrupted=false;try{await pending}catch(e){interrupted=String(e).includes('重新加载');}log('reload cancels host call',interrupted&&wasAborted);
+  const next=s.run('6*7',{});s.pageUnavailable('lifecycle_old');s.receive('{"type":"ready","nonce":"lifecycle_old"}');s.receive('{"type":"result","nonce":"lifecycle_old","task":2,"value":99}');
+  log('new WebView + stale messages',(await next)===42);
+  s.pageUnavailable();let unavailable=false;try{await s.run('1',{})}catch(e){unavailable=String(e).includes('不可用')}log('unavailable rejects task',unavailable);
+  s.receive('{"type":"ready","nonce":"lifecycle_new"}');s.replacePage('lifecycle_recovered');setUrl(lease.url+'#lifecycle_recovered');setVersion(2);
+  log('recovery with fresh page',(await s.run('40+2',{}))===42);
+ }catch(e){log('lifecycle '+String(e),false);}})();
+ return()=>{live=false;session.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView key={version} ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>session.current?.receive(e.nativeEvent.data)} onError={()=>session.current?.pageUnavailable(url.split('#')[1])} onContentProcessDidTerminate={()=>session.current?.pageUnavailable(url.split('#')[1])}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

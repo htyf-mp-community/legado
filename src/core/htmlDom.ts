@@ -1,8 +1,7 @@
-import { Parser, Token } from 'parse5';
-import { adapter, type Htmlparser2TreeAdapterMap } from 'parse5-htmlparser2-tree-adapter';
-import { parseDocument } from 'htmlparser2';
-import { isTag, type AnyNode, type Element } from 'domhandler';
-import { sourceHtmlKnownTag, markSourceXmlTag } from './htmlTagMetadata';
+import type { AnyNode, Element } from 'domhandler';
+import { isSourceElement as isTag, markSourceNode } from './sourceDomIdentity';
+import { parseSourceHtml, parseSourceXml, sourceHtmlAdapter as adapter } from './sourceDomOperations';
+import { markSourceXmlTag } from './htmlTagMetadata';
 
 const syntax = new WeakMap<object, 'html' | 'xml'>();
 const bareAttributes = new WeakMap<Element, Set<string>>();
@@ -20,24 +19,6 @@ export function sourceDataText(node: AnyNode) {
     ['script', 'style'].includes(node.parent.name.toLowerCase()) &&
     sourceDocumentSyntax(node) === 'html'
   );
-}
-
-// Jsoup honors '/>' on unknown HTML tags; HTML5 normally ignores that slash.
-// Keep the pinned parser's tree repair, closing only a node this token opened.
-class SourceHtmlParser extends Parser<Htmlparser2TreeAdapterMap> {
-  override onStartTag(token: Token.TagToken) {
-    const unknownClosed =
-      token.selfClosing && !sourceHtmlKnownTag(token.tagName);
-    super.onStartTag(token);
-    const current = this.openElements.current;
-    if (
-      unknownClosed &&
-      current &&
-      adapter.getNodeSourceCodeLocation(current)?.startTag?.startOffset ===
-        token.location?.startOffset
-    )
-      this.onEndTag({ ...token, type: Token.TokenType.END_TAG });
-  }
 }
 
 /** Returns the owning parser's syntax; detached nodes use Jsoup's HTML default. */
@@ -63,22 +44,13 @@ export const sourceSelfClosing = (node: Element) => selfClosing.has(node);
 export function parseSourceDocument(input: string) {
   const xml = /^<\?xml/i.test(input);
   const document = xml
-    ? parseDocument(input, {
-        xmlMode: true,
-        recognizeCDATA: true,
-        recognizeSelfClosing: true,
-        withStartIndices: true,
-        withEndIndices: true,
-      })
-    : SourceHtmlParser.parse(input, {
-        treeAdapter: adapter,
-        sourceCodeLocationInfo: true,
-        scriptingEnabled: false,
-      });
+    ? parseSourceXml(input)
+    : parseSourceHtml(input);
   syntax.set(document, xml ? 'xml' : 'html');
   const stack: AnyNode[] = [document];
   while (stack.length) {
     const node = stack.pop()!;
+    markSourceNode(node);
     if (
       node.type === 'text' &&
       node.parent &&

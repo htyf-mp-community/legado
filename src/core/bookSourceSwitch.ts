@@ -1,6 +1,6 @@
 import type { Book, BookSource, SearchBook } from '../types';
 import { switchLibraryBookSource } from './onlineLibrary';
-import { loadBookInfo, loadChapterContent, loadChapters, searchSource } from './webBook';
+import { loadBookInfo, loadChapterContent, loadChapterPayload, loadChapters, searchSource } from './webBook';
 import { addAppLog } from '../data/appLog';
 
 export type SourceSwitchErrorCode = 'sourceSwitchSourceRemoved' | 'sourceSwitchEmptyToc';
@@ -71,7 +71,9 @@ export async function applySourceSwitchCandidate(book: Book, candidate: SearchBo
   const source = sources.find(item => item.bookSourceUrl === candidate.origin);
   if (!source) throw new SourceSwitchError('sourceSwitchSourceRemoved');
   addAppLog(`[source-switch] candidate load start source=${source.bookSourceName} bookUrl=${candidate.bookUrl}`);
-  const info = await loadInfo(source, candidate), chapters = await loadToc(source, info);
+  const info = await loadInfo(source, candidate);
+  info.reverseToc = book.reverseToc;
+  const chapters = await loadToc(source, info);
   addAppLog(`[source-switch] candidate load complete source=${source.bookSourceName} resolvedBookUrl=${info.bookUrl} tocUrl=${info.tocUrl ?? ''} chapters=${chapters.length}`);
   if (!chapters.length) throw new SourceSwitchError('sourceSwitchEmptyToc');
   return switchLibraryBookSource(book, info, chapters);
@@ -83,7 +85,7 @@ export async function autoSwitchSourceForChapter(
   sources: BookSource[],
   discover: typeof discoverSourceSwitchCandidates = discoverSourceSwitchCandidates,
   apply: typeof applySourceSwitchCandidate = applySourceSwitchCandidate,
-  loadContent: typeof loadChapterContent = loadChapterContent,
+  loadContent?: typeof loadChapterContent,
 ) {
   const currentChapter = book.chapters?.[chapterIndex];
   if (!currentChapter) throw new SourceSwitchError('sourceSwitchEmptyToc');
@@ -106,20 +108,24 @@ export async function autoSwitchSourceForChapter(
         source = sources.find(item => item.bookSourceUrl === switched.origin);
       addAppLog(`[source-switch] chapter selected source=${switched.originName ?? switched.origin ?? ''} requestedIndex=${chapterIndex} targetIndex=${targetIndex} requestedTitle=${JSON.stringify(currentChapter.title)} targetTitle=${JSON.stringify(chapter?.title ?? '')} url=${chapter?.url ?? ''}`);
       if (!chapter?.url || !source) throw new SourceSwitchError('sourceSwitchSourceRemoved');
-      const content = await loadContent(source, {
+      const remote = {
         url: chapter.url,
+        variable: chapter.variable, bookVariable: switched.variable, bookName: switched.name,
         title: chapter.title,
         index: targetIndex,
+        nextChapterUrl: switched.chapters?.[targetIndex + 1]?.url,
         bookUrl: switched.bookUrl ?? '',
         baseUrl: chapter.baseUrl ?? switched.tocUrl ?? switched.bookUrl ?? '',
         isVolume: !!chapter.isVolume,
         isVip: !!chapter.isVip,
         isPay: !!chapter.isPay,
-      });
+      };
+      const payload = loadContent ? {content: await loadContent(source, remote)} : await loadChapterPayload(source, remote);
+      const {content} = payload;
       if (!content.trim()) throw new Error('empty chapter content');
       addAppLog(`[source-switch] content success source=${source.bookSourceName} index=${targetIndex} chars=${content.length} url=${chapter.url}`);
-      const chapters = switched.chapters?.map((item, index) => index === targetIndex ? { ...item, content } : item);
-      return { ...switched, chapters, content, chapterTitle: chapter.title, updatedAt: Date.now() };
+      const chapters = switched.chapters?.map((item, index) => index === targetIndex ? { ...item, content, ...('variable' in payload && payload.variable !== undefined ? {variable: payload.variable} : {}) } : item);
+      return { ...switched, ...('bookVariable' in payload && payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}), chapters, content, chapterTitle: chapter.title, updatedAt: Date.now() };
     } catch (error) {
       lastError = error;
       addAppLog(`[source-switch] candidate failed source=${candidate.originName} url=${candidate.bookUrl}`, error);

@@ -1,0 +1,22 @@
+[
+  {
+    "method": "GET",
+    "path": "/native.epub",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/native.mobi",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/native.epub",
+    "fixtureHeader": true
+  },
+  {
+    "method": "GET",
+    "path": "/native.mobi",
+    "fixtureHeader": true
+  }
+]

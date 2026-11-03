@@ -1,0 +1,84 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/restoredLoginHeaders.test.ts
+
+FAIL __tests__/restoredLoginHeaders.test.ts
+  ● restored login headers are used for that source and options override them
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 2
+    + Received  + 1
+
+      Object {
+    -   "Authorization": "Bearer public-fixture",
+    -   "User-Agent": "login-UA",
+    +   "User-Agent": "default-UA",
+        "X-Base": "yes",
+        "X-Mode": "option",
+      }
+
+      38 |   ]);
+      39 |   const request = buildSourceRequest({...source, header:'{"X-Mode":"base","X-Base":"yes"}'}, '/search,{"headers":{"X-Mode":"option"}}');
+    > 40 |   expect(request.headers).toMatchObject({Authorization:'Bearer public-fixture','X-Mode':'option','X-Base':'yes','User-Agent':'login-UA'});
+         |                           ^
+      41 |   expect(buildSourceRequest({...source,bookSourceUrl:'https://missing.invalid'}, '/search').headers.Authorization).toBeUndefined();
+      42 | });
+      43 |
+
+      at Object.toMatchObject (__tests__/restoredLoginHeaders.test.ts:40:27)
+
+  ● expired, null and malformed restored values do not contribute headers
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ok"
+    Received: undefined
+
+      48 |   }
+      49 |   mockValues.clear(); restore([row('loginHeader_https://example.invalid','{"X-Fixture":"ok"}','9223372036854775807')]);
+    > 50 |   expect(buildSourceRequest(source,'/search').headers['X-Fixture']).toBe('ok');
+         |                                                                     ^
+      51 | });
+      52 |
+      53 | test('login header values are redacted in request diagnostics even for arbitrary header names', async () => {
+
+      at Object.toBe (__tests__/restoredLoginHeaders.test.ts:50:69)
+
+  ● login header values are redacted in request diagnostics even for arbitrary header names
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "X-Custom": "public-fixture-secret",
+    +   "User-Agent": "default-UA",
+      }
+
+      55 |   const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue({ok:true,status:200,url:'https://example.invalid/search',headers:{get:()=>null,forEach:()=>{}},text:async()=> 'ok'} as unknown as Response);
+      56 |   await executeSourceRequest(buildSourceRequest(source,'/search'));
+    > 57 |   expect(fetchMock.mock.calls[0][1]?.headers).toMatchObject({'X-Custom':'public-fixture-secret'});
+         |                                               ^
+      58 |   expect(mockHttpLog).toHaveBeenCalled();
+      59 |   expect(JSON.stringify(mockHttpLog.mock.calls)).not.toContain('public-fixture-secret');
+      60 | });
+
+      at Object.toMatchObject (__tests__/restoredLoginHeaders.test.ts:57:47)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.657 s
+Ran all test suites matching __tests__/restoredLoginHeaders.test.ts.

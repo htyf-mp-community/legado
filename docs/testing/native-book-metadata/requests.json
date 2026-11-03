@@ -1,0 +1,1 @@
+{"requests":[{"method":"GET","path":"/__state"},{"method":"GET","path":"/normal/search"},{"method":"GET","path":"/normal/book/fixture"},{"method":"GET","path":"/normal/toc/fixture"},{"method":"GET","path":"/__state"}]}

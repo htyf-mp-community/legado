@@ -1,16 +1,20 @@
 import type { Book, BookChapter, BookSource, SearchBook } from '../types';
-import { loadBookInfo, loadChapterContent, loadChapters } from './webBook';
+import { loadBookInfo, loadChapterContent, loadChapterPayload, loadChapters } from './webBook';
+import { mapRemoteChapters } from './chapterIdentity';
 
 export async function refreshReaderChapter(
   book: Book,
   chapterIndex: number,
   source: BookSource,
-  load: typeof loadChapterContent = loadChapterContent,
+  load?: typeof loadChapterContent,
 ) {
   const chapter = book.chapters?.[chapterIndex];
   if (!chapter?.url) throw new Error('chapter URL missing');
-  const content = await load(source, {
+  const remote: BookChapter = {
     url: chapter.url,
+    variable: chapter.variable,
+    bookVariable: book.variable,
+    bookName: book.name,
     title: chapter.title,
     index: chapterIndex,
     bookUrl: book.bookUrl ?? '',
@@ -18,13 +22,16 @@ export async function refreshReaderChapter(
     isVolume: !!chapter.isVolume,
     isVip: !!chapter.isVip,
     isPay: !!chapter.isPay,
-  });
+  };
+  const payload = load ? {content: await load(source, remote)} : await loadChapterPayload(source, remote);
+  const {content} = payload;
   if (!content.trim()) throw new Error('empty chapter content');
   const chapters = book.chapters?.map((item, index) =>
-    index === chapterIndex ? { ...item, content } : item,
+    index === chapterIndex ? { ...item, content, ...('variable' in payload && payload.variable !== undefined ? {variable: payload.variable} : {}) } : item,
   );
   return {
     ...book,
+    ...('bookVariable' in payload && payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}),
     chapters,
     content,
     chapterTitle: chapter.title,
@@ -33,15 +40,21 @@ export async function refreshReaderChapter(
   };
 }
 
+export class StaleReaderTocError extends Error {
+  constructor() { super('reader directory changed while refreshing'); this.name = 'StaleReaderTocError'; }
+}
+
 export async function refreshReaderToc(
   book: Book,
   source: BookSource,
   load: typeof loadChapters = loadChapters,
+  latest?: () => Book | undefined,
 ) {
   if (!book.bookUrl || !book.origin)
     throw new Error('online book identity missing');
   const remote: SearchBook = {
     bookUrl: book.bookUrl,
+    ...(book.variable ? {variable:book.variable} : {}),
     origin: book.origin,
     originName: book.originName ?? source.bookSourceName,
     name: book.name,
@@ -50,46 +63,40 @@ export async function refreshReaderToc(
     coverUrl: book.coverUrl,
     intro: book.intro,
     sourceType: book.sourceType,
+    reverseToc: book.reverseToc,
   };
-  const incoming = await load(source, remote);
+  const currentBook = () => {
+    const current = latest ? latest() : book;
+    if (!current || current.id !== book.id || current.origin !== book.origin ||
+        current.bookUrl !== book.bookUrl || current.tocUrl !== book.tocUrl || current.sourceType !== book.sourceType ||
+        (current.reverseToc === true) !== (book.reverseToc === true))
+      throw new StaleReaderTocError();
+    return current;
+  };
+  let incoming: BookChapter[];
+  try { incoming = await load(source, remote); }
+  catch (error) { currentBook(); throw error; }
+  const currentBookSnapshot = currentBook();
   if (!incoming.length) throw new Error('empty chapter directory');
-  const old = book.chapters ?? [],
-    byUrl = new Map(
-      old.filter(item => item.url).map(item => [item.url!, item]),
-    ),
-    byTitle = new Map(old.map(item => [item.title, item])),
-    chapters = incoming.map((item: BookChapter) => {
-      const cached = byUrl.get(item.url) ?? byTitle.get(item.title);
-      return {
-        id: item.url || `${book.id}:chapter:${item.index}`,
-        title: item.title,
-        content: cached?.content ?? '',
-        url: item.url,
-        baseUrl: item.baseUrl,
-        isVolume: item.isVolume,
-        isVip: item.isVip,
-        isPay: item.isPay,
-        tag: item.tag,
-        wordCount: item.wordCount,
-        danmaku: cached?.danmaku,
-        lyric: cached?.lyric,
-      };
-    }),
+  const old = currentBookSnapshot.chapters ?? [],
+    chapters = mapRemoteChapters(incoming, currentBookSnapshot.id, old, true),
     oldIndex = Math.max(
       0,
-      Math.min(book.currentChapterIndex ?? 0, Math.max(0, old.length - 1)),
+      Math.min(currentBookSnapshot.currentChapterIndex ?? 0, Math.max(0, old.length - 1)),
     ),
-    oldTitle = old[oldIndex]?.title ?? book.chapterTitle,
-    matched = chapters.findIndex(item => item.title === oldTitle),
-    currentChapterIndex =
-      matched >= 0 ? matched : Math.min(oldIndex, chapters.length - 1),
-    current = chapters[currentChapterIndex];
+    currentChapterIndex = Math.min(oldIndex, chapters.length - 1),
+    current = chapters[currentChapterIndex],
+    position = currentBookSnapshot.readingPosition?.chapterId === old[oldIndex]?.id
+      ? currentBookSnapshot.readingPosition : undefined;
   return {
-    ...book,
+    ...currentBookSnapshot,
+    ...(currentBookSnapshot.variable === book.variable && remote.variable !== book.variable
+      ? { variable: remote.variable } : {}),
     chapters,
     currentChapterIndex,
     chapterTitle: current.title,
     content: current.content,
+    ...(position ? { readingPosition: { ...position, chapterId: current.id } } : {}),
     progress: (currentChapterIndex + 1) / chapters.length,
     updatedAt: Date.now(),
   };
@@ -105,6 +112,7 @@ export async function refreshBookMetadata(
     throw new Error('online book identity missing');
   const info = await infoLoader(source, {
       bookUrl: book.bookUrl,
+      ...(book.variable ? {variable:book.variable} : {}),
       origin: book.origin,
       originName: book.originName ?? source.bookSourceName,
       name: book.name,
@@ -116,6 +124,7 @@ export async function refreshBookMetadata(
     }),
     updated = {
       ...book,
+      ...(info.variable ? {variable:info.variable} : {}),
       name: info.name || book.name,
       author: info.author || book.author,
       intro: info.intro ?? book.intro,

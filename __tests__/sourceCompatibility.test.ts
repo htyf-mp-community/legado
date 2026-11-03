@@ -54,3 +54,12 @@ test('summarizes mixed source collections without rejecting compatible entries',
     ]),
   ).toEqual({ total: 2, searchable: 1, searchBlocked: 1, contentBlocked: 0 });
 });
+
+test('does not execute untrusted JavaScript while inspecting a source', () => {
+  const runtime = require('../src/core/sourceJavaScript');
+  const execute = jest.spyOn(runtime, 'runSourceJavaScript');
+  const result = inspectSourceCompatibility(source({ruleContent:{content:'<js>while(true){}</js>'}}));
+  expect(result.content).toBe('unsupported');
+  expect(execute).not.toHaveBeenCalled();
+  execute.mockRestore();
+});

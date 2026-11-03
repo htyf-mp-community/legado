@@ -1,0 +1,16 @@
+import React,{useState} from 'react';
+import {AppRegistry,Pressable,Text,View} from 'react-native';
+import {AppThemeProvider} from './src/theme/AppTheme';
+import {CollapsibleBookIntro} from './src/components/CollapsibleBookIntro';
+const long='第一段：天地玄黃，宇宙洪荒。這是一段足夠長的書籍介紹，用於驗證文字會按畫面寬度自然換行。\n第二段：日月盈昃，辰宿列張。這本書的詳細介紹需要顯示多行內容，測試展開及收起操作。\n第三段：寒來暑往，秋收冬藏。更多文字確保無論在寬屏還是窄屏時，內容都超過四行。';
+function Content(){
+ const [short,setShort]=useState(false),[narrow,setNarrow]=useState(false);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:20,backgroundColor:'#fff'}}>
+  <Text>iOS book introduction</Text>
+  <View style={{width:narrow?180:320,marginTop:15,borderWidth:1,padding:8}}><CollapsibleBookIntro text={short?'简短简介':long} style={{fontSize:18,lineHeight:26,color:'#222'}}/></View>
+  <Pressable accessibilityRole="button" accessibilityLabel="切换长短简介" onPress={()=>setShort(value=>!value)} style={{minHeight:48,justifyContent:'center'}}><Text>切换长短简介</Text></Pressable>
+  <Pressable accessibilityRole="button" accessibilityLabel="切换宽度" onPress={()=>setNarrow(value=>!value)} style={{minHeight:48,justifyContent:'center'}}><Text>切换宽度</Text></Pressable>
+ </View>;
+}
+function App(){return <AppThemeProvider><Content/></AppThemeProvider>}
+AppRegistry.registerComponent('apps',()=>App);

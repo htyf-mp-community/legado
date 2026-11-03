@@ -1,0 +1,8 @@
+{
+  "bundle": "plugin_legado_isolated_verify_v0_0_65.bundle",
+  "bundleSha256": "d40440e789b3253beba5045ea50341fba865c279e5c64ac62c64a61bd8a44b07",
+  "packageSha256": "370a4618d029a5ccb6c6b5c68f10dedc42dcaa1e06ce5334d28d1a86adbe06b0",
+  "compiledArrayClosures": 460,
+  "unexpectedClosureAssignments": [],
+  "compiledPluginVersions": {}
+}

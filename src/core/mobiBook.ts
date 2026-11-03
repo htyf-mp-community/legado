@@ -1,7 +1,7 @@
 import { readFile, unlink } from '@dr.pogodin/react-native-fs';
-import { keepLocalCopy } from '@react-native-documents/picker';
 import { toByteArray } from 'react-native-quick-base64';
 import type { Book, LocalChapter } from '../types';
+import { stageBookFile } from './stageBookFile';
 
 const u16 = (bytes: Uint8Array, offset: number) => (bytes[offset] << 8) | bytes[offset + 1];
 const u32 = (bytes: Uint8Array, offset: number) => ((bytes[offset] * 0x1000000) + (bytes[offset + 1] << 16) + (bytes[offset + 2] << 8) + bytes[offset + 3]) >>> 0;
@@ -57,11 +57,9 @@ export function parseMobi(bytes: Uint8Array) {
 }
 
 export async function importMobiBook(uri: string, fileName = '本地书籍.mobi'): Promise<Book> {
-  const copies = await keepLocalCopy({ files: [{ uri, fileName }], destination: 'cachesDirectory' }), copy = copies[0];
-  if (copy.status === 'error') throw new Error(copy.copyError);
-  const archive = decodeURIComponent(copy.localUri.replace(/^file:\/\//, ''));
+  const archive = await stageBookFile(uri, fileName);
   try {
     const parsed = parseMobi(toByteArray(await readFile(archive, 'base64'))), first = parsed.chapters[0], id = `local-mobi:${uri}`;
-    return { id, name: parsed.title || fileName.replace(/\.(?:mobi|prc|azw)$/i, ''), author: '', intro: '本地 MOBI / PalmDOC 电子书', chapterTitle: first.title, content: first.content, chapters: parsed.chapters.map(chapter => ({ ...chapter, id: `${id}#${chapter.id}` })), currentChapterIndex: 0, progress: 0, updatedAt: Date.now(), origin: 'local', originName: fileName, bookUrl: uri, sourceType: 0 };
+    return { id, name: parsed.title || fileName.replace(/\.(?:mobi|prc|azw)$/i, ''), author: '', intro: '本地 MOBI / PalmDOC 电子书', chapterTitle: first.title, content: first.content, chapters: parsed.chapters.map(chapter => ({ ...chapter, id: `${id}#${chapter.id}` })), currentChapterIndex: 0, progress: 0, updatedAt: Date.now(), origin: 'local', originName: fileName, bookUrl: uri, localUri: uri, sourceType: 0 };
   } finally { try { await unlink(archive); } catch {} }
 }

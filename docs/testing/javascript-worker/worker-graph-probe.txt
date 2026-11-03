@@ -1,0 +1,44 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {createSourceRuleLookup,sourceRuleText} from './src/core/sourceRule';
+import {isSourceNode} from './src/core/sourceDomIdentity';
+import ersan from './source-ersan.json';
+import biquge from './source-biquge.json';
+function App(){
+ const [lines,setLines]=useState(['iOS DOM source bridge']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_dom',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_dom');
+  const html='<div class="directoryArea"><p><a href="/skip">目录</a><a href="/1">第一章</a><a href="/2">第二章</a><a href="/skip2">下一页</a></p></div>';
+  const bridge={baseUrl:ersan.bookSourceUrl+'/book',sourceUrl:ersan.bookSourceUrl,key:null,page:1,ajax:async()=>'',removeCookie:()=>{},variables:new Map(),lookup:createSourceRuleLookup(html)};
+  const script=ersan.ruleToc.chapterList.trim().replace(/^<js>/,'').replace(/<\/js>$/,'');
+  const chapters=await e.run(script,bridge,html);log('1321 二三中文目录',chapters.length===2&&chapters[0].name==='第一章'&&chapters[1].surl==='/2');
+  const otherHtml='<div id="list-chapterAll"><dd><a href="1.html">第一章</a></dd><dd><a href="2.html">第二章</a></dd></div>';
+  const other={...bridge,baseUrl:biquge.bookSourceUrl+'/book/123/',sourceUrl:biquge.bookSourceUrl,lookup:createSourceRuleLookup(otherHtml),variables:new Map()};
+  const otherScript=biquge.ruleToc.chapterList.trim().replace(/^<js>/,'').replace(/<\/js>$/,'');
+  const otherChapters=await e.run(otherScript,other,otherHtml);log('1321 笔趣阁嵌套选择',otherChapters.length===2&&otherChapters[0].text==='第一章'&&otherChapters[1].href===other.baseUrl+'2.html');
+  const nodes=await e.run('java.getElements("tag.a")',bridge,html);log('returned node identity',Array.isArray(nodes)&&nodes.length===4&&sourceRuleText(nodes[1],'text')==='第一章');
+  const methods=await e.run('var xs=java.getElements("tag.a");xs.size()+":"+xs.get(2).text()+":"+xs.toArray()[1].attr("href")',bridge,html);log('list methods',methods==='4:第二章:/1',String(methods));
+  const nested=await e.run('var xs=java.getElements("tag.p");xs.select("a").attr("href")+":"+xs.select("a").text()',bridge,html);log('collection selection',nested==='/skip:目录 第一章 第二章 下一页',String(nested));
+  const jsonLookup=createSourceRuleLookup({items:[{name:'甲'},{name:'乙'}]});
+  const json=await e.run('var xs=java.getElements("$.items[*]");xs.size()+":"+xs.get(1).name',{...bridge,lookup:jsonLookup},'');log('JSON elements',json==='2:乙',String(json));
+  const selected=await e.run('var node=java.getElements("tag.p")[0];java.getString("tag.a@href",node)+"|"+java.setContent(node).getString("tag.a@text")',{...bridge,lookup:createSourceRuleLookup(html)},html);
+  log('element as lookup content',selected.includes('/1')&&selected.includes('第一章'),String(selected).replace(/\n/g,','));
+  let rejected=false;try{await e.run('java.getElements("tag.p")[0].select({})',bridge,html)}catch(error){rejected=String(error).includes('基本类型')}log('invalid selector rejected',rejected);
+  let spoofRejected=false;try{const fake=await e.run('java.getElements("tag.a");var x=[{}];x.every=function(){return true};x.map=function(){return ["1"]};x',bridge,html);spoofRejected=Array.isArray(fake)&&!isSourceNode(fake[0]);}catch(error){spoofRejected=true;}log('array spoof rejected',spoofRejected);
+  const mixed=await e.run('var x=java.getElements("tag.a");[{title:"甲",node:x[1]},x[2],{kind:"node",handle:"1"},undefined,NaN]',bridge,html);
+  log('mixed nested node values',isSourceNode(mixed[0].node)&&sourceRuleText(mixed[0].node,'text')==='第一章'&&isSourceNode(mixed[1])&&!isSourceNode(mixed[2])&&mixed[2].kind==='node'&&mixed[3]===undefined&&Number.isNaN(mixed[4]));
+  const original={data:'',body:'原始',url:bridge.baseUrl,code:200};
+  const combined=await e.run('var x=java.getElements("tag.a");({page:result,node:x[1]})',{...bridge,response:original},'');
+  log('nested response identity',combined.page===original&&isSourceNode(combined.node));
+  let cyclic=false;try{await e.run('var x={};x.self=x;x',bridge,html)}catch(error){cyclic=String(error).includes('cycle')}log('cyclic output rejected',cyclic);
+ }catch(error){log('DOM bridge',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

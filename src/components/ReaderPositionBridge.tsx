@@ -42,6 +42,7 @@ export type ReaderPositionHandle = {
   onExtent: (height: number) => void;
   onViewport: (height: number) => void;
   flush: () => void;
+  snapshot: () => { chapterId: string; position: number; titleVisible: boolean };
   seekPage: (index: number) => void;
 };
 type Line = { start: number; end: number; top: number; height: number };
@@ -308,6 +309,7 @@ export const ReaderPositionBridge = forwardRef<
       restoreScroll();
     },
     flush,
+    snapshot: () => ({ chapterId: latest.current.chapterId, position: cursor.current, titleVisible: titleVisible.current }),
     seekPage: index => {
       const p = latest.current;
       const target = Math.max(

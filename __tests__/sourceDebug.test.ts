@@ -6,7 +6,10 @@ jest.mock('../src/data/storage', () => ({
   },
 }));
 
-import { runSourceDebug, SourceDebugPipelineError } from '../src/core/sourceDebug';
+import {
+  runSourceDebug,
+  SourceDebugPipelineError,
+} from '../src/core/sourceDebug';
 import type { BookSource } from '../src/types';
 
 const source: BookSource = {
@@ -78,7 +81,7 @@ test('emits the failing stage and stops the pipeline', async () => {
     headers: { get: () => null },
     text: async () => '',
     url: 'https://debug.example/search',
-    } as unknown as Response);
+  } as unknown as Response);
   const events: string[] = [];
   await expect(
     runSourceDebug(source, '测试', event => events.push(event.status)),
@@ -88,16 +91,93 @@ test('emits the failing stage and stops the pipeline', async () => {
 });
 
 test('uses the caller formatter for every user-facing stage message', async () => {
-  const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true, headers: { get: () => null }, text: async () => JSON.stringify({ books: [] }), url: 'https://debug.example/search' } as unknown as Response);
+  const fetchMock = jest
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValue({
+      ok: true,
+      headers: { get: () => null },
+      text: async () => JSON.stringify({ books: [] }),
+      url: 'https://debug.example/search',
+    } as unknown as Response);
   const messages: string[] = [];
-  await expect(runSourceDebug(source, 'none', event => messages.push(event.message), (key, values = {}) => `${key}:${Object.values(values).join('|')}`)).rejects.toMatchObject({ code: 'debugNoSearchResult' });
-  expect(messages).toEqual(['debugStageRunning:debugSearch:', 'debugSearchSuccess:0']);
+  await expect(
+    runSourceDebug(
+      source,
+      'none',
+      event => messages.push(event.message),
+      (key, values = {}) => `${key}:${Object.values(values).join('|')}`,
+    ),
+  ).rejects.toMatchObject({ code: 'debugNoSearchResult' });
+  expect(messages).toEqual([
+    'debugStageRunning:debugSearch:',
+    'debugSearchSuccess:0',
+  ]);
   fetchMock.mockRestore();
 });
 
 test('returns a translatable error when contents has no readable chapter', async () => {
-  const responses = [{ books: [{ name: 'Book', url: '/book' }] }, { name: 'Book', toc: '/toc' }, { chapters: [] }];
-  const fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => ({ ok: true, headers: { get: () => null }, text: async () => JSON.stringify(responses.shift()), url: 'https://debug.example' }) as unknown as Response);
-  await expect(runSourceDebug(source, 'Book')).rejects.toEqual(new SourceDebugPipelineError('debugNoChapter'));
+  const responses = [
+    { books: [{ name: 'Book', url: '/book' }] },
+    { name: 'Book', toc: '/toc' },
+    { chapters: [] },
+  ];
+  const fetchMock = jest
+    .spyOn(globalThis, 'fetch')
+    .mockImplementation(
+      async () =>
+        ({
+          ok: true,
+          headers: { get: () => null },
+          text: async () => JSON.stringify(responses.shift()),
+          url: 'https://debug.example',
+        }) as unknown as Response,
+    );
+  await expect(runSourceDebug(source, 'Book')).rejects.toEqual(
+    new SourceDebugPipelineError('debugNoChapter'),
+  );
   fetchMock.mockRestore();
+});
+
+test('file source debugging reports download links and skips contents and chapter requests', async () => {
+  const responses = [
+    { books: [{ name: '文件书', author: '作者', url: '/book' }] },
+    { files: ['/one.epub', '/two.txt'] },
+  ];
+  const fetchMock = jest.spyOn(globalThis, 'fetch').mockImplementation(
+    async (input: Parameters<typeof fetch>[0]) =>
+      ({
+        ok: true,
+        headers: { get: () => null },
+        text: async () => JSON.stringify(responses.shift()),
+        url: String(input),
+      }) as unknown as Response,
+  );
+  try {
+    const events: Array<{ stage: string; status: string; message: string }> =
+      [];
+    const result = await runSourceDebug(
+      {
+        ...source,
+        bookSourceType: 3,
+        ruleBookInfo: { downloadUrls: '$.files[*]' },
+      },
+      '文件书',
+      event => events.push(event),
+    );
+    expect(result.info.downloadUrls).toEqual([
+      'https://debug.example/one.epub',
+      'https://debug.example/two.txt',
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(events.map(event => `${event.stage}:${event.status}`)).toEqual([
+      'search:running',
+      'search:success',
+      'info:running',
+      'info:success',
+      'toc:success',
+    ]);
+    expect(events.at(-1)?.message).toContain('2');
+  } finally {
+    fetchMock.mockRestore();
+  }
 });

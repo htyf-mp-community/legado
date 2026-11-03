@@ -1,0 +1,32 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/backupSourceVariables.test.ts
+  ● version 2 cannot silently drop its encrypted source-variable data
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "敏感数据"
+
+    Received function did not throw
+
+      119 |   const payload = JSON.parse(createBackup(appStorage, 'fixture-password'));
+      120 |   delete payload.encryptedSourceVariables;
+    > 121 |   expect(() => parseBackup(JSON.stringify(payload))).toThrow('敏感数据');
+          |                                                      ^
+      122 | });
+      123 |
+      124 | test('malformed encrypted variable entries cannot inject other storage keys or partially restore settings', () => {
+
+      at Object.toThrow (__tests__/backupSourceVariables.test.ts:121:54)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 passed, 10 total
+Snapshots:   0 total
+Time:        1.126 s
+Ran all test suites matching __tests__/backupSourceVariables.test.ts.

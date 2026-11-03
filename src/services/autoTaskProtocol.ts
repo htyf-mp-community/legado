@@ -9,7 +9,7 @@ import { isLocalBook } from '../core/bookKinds';
 import { applyBookCatalogue, fetchBookCatalogue } from '../core/bookCatalogue';
 import {
   loadBookInfo,
-  loadChapterContent,
+  loadChapterPayload,
   loadChapters,
 } from '../core/webBook';
 import {
@@ -226,16 +226,19 @@ export async function executeAutoTaskProtocolAction(
         }
         if (current.chapters?.find(value => value.url === chapter.url)?.content)
           return;
-        const content = await loadChapterContent(source, {
+        const payload = await loadChapterPayload(source, {
           url: chapter.url!,
+          variable: chapter.variable, bookVariable: current.variable, bookName: current.name,
           title: chapter.title,
           index: after.indexOf(chapter),
+          nextChapterUrl: after[after.indexOf(chapter) + 1]?.url,
           bookUrl: prepared.bookUrl ?? '',
           baseUrl: chapter.baseUrl ?? prepared.tocUrl ?? prepared.bookUrl ?? '',
           isVolume: false,
           isVip: !!chapter.isVip,
           isPay: !!chapter.isPay,
         });
+        const {content} = payload;
         if (!content.trim())
           throw new Error(`Failed to cache ${prepared.name}: ${chapter.title}`);
         let committed = false;
@@ -248,10 +251,11 @@ export async function executeAutoTaskProtocolAction(
               return book;
             committed = true;
             const next = book.chapters?.map(value =>
-              value.url === chapter.url ? { ...value, content } : value,
+              value.url === chapter.url ? { ...value, content, ...(value.variable === chapter.variable && payload.variable !== undefined ? {variable: payload.variable} : {}) } : value,
             );
             return {
               ...book,
+              ...(book.variable === current.variable && payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}),
               chapters: next,
               content:
                 next?.[book.currentChapterIndex ?? 0]?.content ?? book.content,

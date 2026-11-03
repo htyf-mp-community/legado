@@ -1,0 +1,28 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS worker capability checks']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_capabilities',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_capabilities');
+  let hits=0,removed=0,reads=0;
+  const sourceVariables={get:()=>{reads++;return 'secret'},put:(_key,value)=>value,getVariable:()=>'',setVariable:()=>{}};
+  const bridge={baseUrl:'https://example.org',key:null,page:1,ruleMode:true,ajax:async()=>{hits++;return 'ok'},removeCookie:()=>{removed++},sourceVariables};
+  const call=action=>`try{__legado.call('${action}',['https://example.org']);'allowed'}catch(e){'blocked'}`;
+  const denied=async action=>{try{await e.run(call(action),bridge);return false}catch(error){return String(error).includes('不支持')}};
+  log('raw ajax denied',await denied('java.ajax')&&hits===0);
+  log('raw cookie denied',await denied('cookie.removeCookie')&&removed===0);
+  log('hidden source denied',await denied('source.get')&&reads===0);
+  log('rule Base64 still works',await e.run('java.base64Encode("西游记")',bridge)==='6KW/5ri46K6w');
+  log('network mode available',await e.run('java.ajax("https://example.org")',{...bridge,ruleMode:false})==='ok'&&hits===1);
+  log('source object available',await e.run('source.get("name")',{...bridge,sourceUrl:'https://example.org'})==='secret'&&reads===1);
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

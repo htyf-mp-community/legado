@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "📂全免小说（优++）",
+  "bookSourceUrl": "http://qmbook.taoyuewenhua.net/#@遇知",
+  "searchUrl": "@js:\ntime=Date.now();\nt=\"appid=qmbook&brand=XIAOMI&channel=Tencent&ctype=1&device_id=17af4cb0a45440e5b5bcba1798d760c6&keywords=\"+key+\"&model=10X&optype=3&ostype=0&osversion=7.1.2&package_name=com.martian.qmbook&page=\"+(page-1)+\"&pageSize=10&searchType=1&sourceName=tf&t=\"+time+\"&token=489fecb8-532b-4ad9-b89f-4213768599bf&uid=74514329&version_code=410&version_name=1.5.9&key=tfbook_free\";\nsign=java.md5Encode(t).toUpperCase();\n\nr=String(t).replace(/key=tfbook_free/,'sign=')+sign;\n\n\"http://qmbook.taoyuewenhua.net/authopt/ty/search_books?\"+r;"
+}

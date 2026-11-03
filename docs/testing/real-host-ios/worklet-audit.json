@@ -1,0 +1,16 @@
+{
+  "version": "0.0.58",
+  "bundle": "plugin_legado_v0_0_58.bundle",
+  "bundleSha256": "80ebffc3ebcc4a4d396625288e7b35f7920f9bdc0f9711354037e1b27485903b",
+  "packageSha256": "447e1bcc053aac61234f39618897589b707f36f43f6c4e867abf711486ac91fc",
+  "compiledArrayClosures": 460,
+  "unexpectedClosureAssignments": [],
+  "libraryJestHelpers": [
+    "fn.__closure={}",
+    "w.__closure={...original.__closure}"
+  ],
+  "compiledPluginVersions": {},
+  "hostCompilerSha256": "059cb16c0bede1b9a72315a105f788b2ae15d3f9cf0c0e27689a2050f7d847ce",
+  "hostWorkletsVersion": "0.13.1",
+  "hostReanimatedVersion": "4.7.1"
+}

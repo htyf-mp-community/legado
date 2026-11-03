@@ -1,0 +1,26 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {loadChapters} from './src/core/webBook';
+function App(){
+ const [lines,setLines]=useState(['iOS concurrent directory pages']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_toc_concurrency',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_toc_concurrency');
+  let pending=0,maxPending=0,release;const both=new Promise(resolve=>{release=resolve});
+  global.fetch=async(address,options)=>{const target=String(address);if(!target.startsWith('https://example.org/'))return originalFetch(address,options);const first=target.endsWith('/toc'),second=target.endsWith('/p2');if(!first){pending++;maxPending=Math.max(maxPending,pending);if(pending===2)release();await both;pending--;}
+   const data=first?{id:'first',items:[{name:'一',url:'/1'}],next:['/p2','/p3']}:{id:second?'second':'third',items:[{name:second?'二':'三',url:target}]};return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>JSON.stringify(data)};};
+  const source={bookSourceUrl:'https://example.org',bookSourceName:'测试',bookSourceType:0,customOrder:0,enabled:true,enabledExplore:false,ruleToc:{chapterList:'@js:java.put("current",result.id); result.items',nextTocUrl:'$.next[*]',chapterName:'@js:result.name+":"+java.get("current")',chapterUrl:'$.url'}};
+  const book={bookUrl:'https://example.org/book',tocUrl:'https://example.org/toc',origin:source.bookSourceUrl,originName:source.bookSourceName,name:'书',author:''};
+  const chapters=await loadChapters(source,book,undefined,{runRuleJavaScript:createSourceWorkerRuleRunner(e)});const titles=chapters.map(x=>x.title).join(' ');
+  log('network concurrency',maxPending===2,String(maxPending));log('page variables stay isolated',titles==='一:first 二:second 三:third',titles);
+ }catch(error){log('concurrency',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

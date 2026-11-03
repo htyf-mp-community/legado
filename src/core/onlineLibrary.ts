@@ -1,23 +1,32 @@
 import type { Book, BookChapter, SearchBook } from '../types';
 import { migrationChapterIndex } from './chapterMigration';
+import { mapRemoteChapters } from './chapterIdentity';
+import { isLocalBook } from './bookKinds';
+const nativeTypeForSource = (sourceType?: number) =>
+  [8, 32, 64, 136, 4][sourceType ?? 0] ?? 8;
 
 export function onlineBookId(book: SearchBook) {
   return `remote:${encodeURIComponent(book.origin)}:${encodeURIComponent(book.bookUrl)}`;
 }
 
+export function mergeOnlineBookIntoShelf(current: Book[], incoming: Book): Book[] {
+  const existing = current.find(item => item.id === incoming.id);
+  const sameOnlineBook = existing && incoming.origin && incoming.bookUrl &&
+    !isLocalBook(existing) && !isLocalBook(incoming) &&
+    existing.origin === incoming.origin && existing.bookUrl === incoming.bookUrl;
+  if (!sameOnlineBook) {
+    return [...current.filter(item => item.id !== incoming.id), incoming];
+  }
+  if (!existing.notShelf && !((existing.nativeType ?? 0) & 1024)) return current;
+  return current.map(item => item.id === existing.id ? {
+    ...existing,
+    notShelf: false,
+    ...(existing.nativeType === undefined ? {} : { nativeType: existing.nativeType & ~1024 }),
+  } : item);
+}
+
 export function toLibraryBook(book: SearchBook, chapters: BookChapter[]): Book {
-  const localChapters = chapters.map(chapter => ({
-    id: chapter.url || `${book.bookUrl}#${chapter.index}`,
-    title: chapter.title,
-    content: '',
-    url: chapter.url,
-    baseUrl: chapter.baseUrl,
-    isVolume: chapter.isVolume,
-    isVip: chapter.isVip,
-    isPay: chapter.isPay,
-    tag: chapter.tag,
-    wordCount: chapter.wordCount,
-  }));
+  const localChapters = mapRemoteChapters(chapters, book.bookUrl);
   const firstIndex = Math.max(
       0,
       localChapters.findIndex(chapter => !chapter.isVolume),
@@ -37,9 +46,14 @@ export function toLibraryBook(book: SearchBook, chapters: BookChapter[]): Book {
     origin: book.origin,
     originName: book.originName,
     bookUrl: book.bookUrl,
+    ...(book.variable ? {variable: book.variable} : {}),
     tocUrl: book.tocUrl,
     coverUrl: book.coverUrl,
     sourceType: book.sourceType,
+    nativeType: nativeTypeForSource(book.sourceType),
+    kind: book.kind,
+    wordCount: book.wordCount,
+    latestChapterTitle: book.latestChapterTitle,
   };
 }
 
@@ -57,7 +71,10 @@ export function switchLibraryBookSource(
           current.chapters?.length ?? 0,
         )
       : 0,
-    chapter = switched.chapters?.[currentIndex];
+    chapter = switched.chapters?.[currentIndex],
+    previousChapter = current.chapters?.[current.currentChapterIndex ?? 0],
+    position = current.readingPosition?.chapterId === previousChapter?.id
+      ? current.readingPosition : undefined;
   const config: Partial<Book> = {};
   for (const key of [
     'reSegment',
@@ -89,7 +106,7 @@ export function switchLibraryBookSource(
     kind: remote.kind,
     wordCount: remote.wordCount,
     sourceType,
-    nativeType: [8, 32, 64, 128, 4][sourceType] ?? 8,
+    nativeType: nativeTypeForSource(sourceType),
     updateError: false,
     notShelf: false,
     durChapterTime: current.durChapterTime ?? current.updatedAt,
@@ -100,6 +117,9 @@ export function switchLibraryBookSource(
     currentChapterIndex: currentIndex,
     chapterTitle: chapter?.title ?? switched.chapterTitle,
     content: chapter?.content ?? '',
+    ...(chapter && position
+      ? { readingPosition: { ...position, chapterId: chapter.id } }
+      : {}),
     updatedAt: Date.now(),
   };
 }

@@ -1,5 +1,7 @@
 import type { Book, LocalChapter } from '../types';
-const identity = (chapter: LocalChapter) => chapter.url || chapter.id;
+import { chapterIdentity } from './chapterIdentity';
+import { mergeSourceVariables } from './sourceVariables';
+const identity = (chapter: LocalChapter) => chapterIdentity(chapter);
 const sameStructure = (before: LocalChapter[], next: LocalChapter[]) =>
   before.length === next.length &&
   before.every((chapter, index) => identity(chapter) === identity(next[index]));
@@ -42,10 +44,13 @@ export function applyBookUpdate(
       'lastCheckCount',
       'coverUrl',
       'tocUrl',
+      'variable',
     ] as const)
       delete patch[key];
     return { ...current, ...patch };
   }
+  if (patch.variable !== undefined && current.variable !== before.variable)
+    patch.variable = mergeSourceVariables(before.variable, current.variable, [patch.variable]);
   if (
     patch.chapters &&
     before.chapters &&
@@ -58,13 +63,16 @@ export function applyBookUpdate(
         for (const key of Object.keys(chapter) as Array<keyof LocalChapter>)
           if (!Object.is(chapter[key], old[key]))
             Object.assign(fields, { [key]: chapter[key] });
-        return [identity(chapter), fields];
+        return [identity(chapter), {fields, old}];
       }),
     );
-    patch.chapters = current.chapters?.map(chapter => ({
-      ...chapter,
-      ...changes.get(identity(chapter)),
-    }));
+    patch.chapters = current.chapters?.map(chapter => {
+      const change = changes.get(identity(chapter));
+      if (!change) return chapter;
+      const fields = { ...change.fields };
+      if (chapter.variable !== change.old.variable) delete fields.variable;
+      return { ...chapter, ...fields };
+    });
   }
   const result = { ...current, ...patch };
   if (patch.currentChapterIndex !== undefined) {

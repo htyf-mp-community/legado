@@ -7,6 +7,7 @@ module.exports = function (api) {
     presets: ['module:@react-native/babel-preset'],
     plugins: [
       '@babel/plugin-transform-export-namespace-from',
+      ...(remote ? [require.resolve('./tools/babel-plugin-navigation-compat.js')] : []),
       remote
         ? require.resolve('./tools/host-worklets/plugin/index.js')
         : 'react-native-worklets/plugin',

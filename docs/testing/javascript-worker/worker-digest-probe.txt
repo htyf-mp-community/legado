@@ -1,0 +1,30 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker digest / HMAC']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_digest_probe',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_digest_probe');
+  const bridge={baseUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{}};
+  const run=script=>e.run(script,bridge);
+  log('SHA-256 hex',await run('java.digestHex("西游记","SHA-256")')==='942c26cac8c24d7070c084e2a5a4c3166e612b604d46db2b19600586c53fd995');
+  log('SHA-1 Base64',await run('java.digestBase64Str("西游记","SHA-1")')==='VklNE8vHWXnr6SAkRMmL+5+xJpY=');
+  log('HMAC-SHA1 alias',await run('java.HMacHex("西游记","HMAC-SHA1","snY%169j")')==='a4781450fd18ca1e3642d2c2060bd29b4fd56eb6');
+  log('HMAC-SHA256 Base64',await run('java.HMacBase64("西游记","HmacSHA256","snY%169j")')==='ZeXuQgd1Mkl7DQSpF0N6W5s54hyNTsJ+ZRTwr5ztyVo=');
+  log('malformed UTF-16',await run('java.digestHex("\\ud800","SHA-256")')==='8a8de823d5ed3e12746a62ef169bcf372be0ca44f0a1236abc35df05d96928e1');
+  log('invalid algorithm catch',await run('try{java.digestHex("x","no-such-algorithm")}catch(e){"caught"}')==='caught');
+  log('empty HMAC key catch',await run('try{java.HMacHex("x","HmacSHA1","")}catch(e){"caught"}')==='caught');
+  log('omitted HMAC key',await run('java.HMacHex("x","SHA-1")')==='11f6ad8ec52a2984abaafd7c3b516503785c2072');
+  log('UUID v4',await run('var a=java.randomUUID(),b=java.randomUUID();a!==b&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(a)')===true);
+  let rejected=false;try{await run('java.digestHex("x".repeat(64001),"MD5")')}catch(error){rejected=/限制/.test(String(error))}log('input limit',rejected);
+  log('after failure',await run('java.digestHex("abc","MD5")')==='900150983cd24fb0d6963f7d28e17f72');
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

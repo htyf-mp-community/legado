@@ -1,0 +1,76 @@
+import React,{useEffect,useState} from 'react';
+import {Text,View,TurboModuleRegistry} from 'react-native';
+import {createSynchronizable,createWorkletRuntime,runOnRuntimeAsync,scheduleOnRN} from 'react-native-worklets';
+
+export default function App(){
+  const [lines,setLines]=useState<string[]>(['QuickJS Worklet probe']);
+  useEffect(()=>{let live=true;const log=(s:string)=>{if(live)setLines(old=>[...old,s]);};
+    (async()=>{try{
+      const native=TurboModuleRegistry.get('QuickjsSandbox');
+      log('native module '+(native?'available':'missing'));
+      const sandbox=(globalThis as any).QuickJSSandbox;
+      if(!sandbox){log('main runtime QuickJS missing');return;}
+      log('main runtime QuickJS available');
+      const createContext=sandbox.createContext, evalCode=sandbox.evalCode, disposeContext=sandbox.disposeContext, registerHostCallback=sandbox.registerHostCallback;
+      const runtime=createWorkletRuntime('legado-qjs-probe');
+      const probe=runOnRuntimeAsync(runtime,()=>{
+        'worklet';
+        const id='legado-qjs-probe-20261103';
+        try{
+          const globalType=typeof (globalThis as any).QuickJSSandbox;
+          const created=createContext(id);
+          const value=evalCode(id,'6*7','probe.js');
+          registerHostCallback(id,(_id:string,action:string,args:string)=>action+':'+args);
+          const callback=evalCode(id,'__nativeCall("lookup", "hello")','callback.js');
+          disposeContext(id);
+          return 'global='+globalType+' created='+created+' result='+value+' callback='+callback;
+        }catch(error){try{disposeContext(id);}catch(_){}return 'error '+String(error);}
+      });
+      const result=await Promise.race([probe,new Promise<string>(resolve=>setTimeout(()=>resolve('timeout'),10000))]);
+      log('worklet '+result);
+      if(result==='timeout')return;
+      let timerFired=false;
+      const notifyStart=()=>{setTimeout(()=>{timerFired=true;},50);};
+      const busy=runOnRuntimeAsync(runtime,()=>{
+        'worklet';
+        const id='legado-qjs-probe-finite';
+        try{
+          createContext(id);
+          scheduleOnRN(notifyStart);
+          return evalCode(id,'var end=Date.now()+400; while(Date.now()<end){}; "finished"','finite.js');
+        }finally{disposeContext(id);}
+      });
+      const busyResult=await Promise.race([busy,new Promise<string>(resolve=>setTimeout(()=>resolve('timeout'),10000))]);
+      log('finite script '+busyResult+' RN timer='+timerFired);
+      if(busyResult==='timeout')return;
+      const channel=createSynchronizable('');
+      let timerDuringWait=false;
+      const request=(id:number,action:string)=>{
+        setTimeout(()=>{timerDuringWait=true;},30);
+        if(action==='ajax'){
+          fetch('http://127.0.0.1:18219/rpc').then(res=>res.text()).then(value=>channel.setBlocking(id+':'+value),()=>channel.setBlocking(id+':ERROR'));
+        }else setTimeout(()=>channel.setBlocking(id+':CANCEL'),80);
+      };
+      const network=runOnRuntimeAsync(runtime,()=>{
+        'worklet';
+        const id='legado-qjs-probe-rpc';let call=0;
+        try{
+          createContext(id);
+          registerHostCallback(id,(_ctx:string,action:string,_args:string)=>{
+            const current=++call; scheduleOnRN(request,current,action);
+            const until=Date.now()+3000;
+            while(Date.now()<until){const value=channel.getBlocking();if(value.startsWith(current+':'))return value.slice(String(current).length+1);}
+            throw new Error('RPC timeout');
+          });
+          const response=evalCode(id,'__nativeCall("ajax", "{}")','ajax.js');
+          const cancelled=evalCode(id,'__nativeCall("wait", "{}")','cancel.js');
+          return JSON.stringify({response,cancelled});
+        }finally{disposeContext(id);}
+      });
+      const networkResult=await Promise.race([network,new Promise<string>(resolve=>setTimeout(()=>resolve('timeout'),10000))]);
+      log('async RPC '+networkResult+' RN timer='+timerDuringWait);
+    }catch(error){log('probe error '+String(error));}})();
+    return()=>{live=false;};
+  },[]);
+  return <View style={{flex:1,paddingTop:100,paddingHorizontal:18,backgroundColor:'#fff'}}><Text>{lines.join('\n')}</Text></View>;
+}

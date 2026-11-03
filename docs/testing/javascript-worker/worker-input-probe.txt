@@ -1,0 +1,33 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {createSourceRuleLookup,sourceRuleValues,sourceRuleText} from './src/core/sourceRule';
+import {isSourceNode} from './src/core/sourceDomIdentity';
+function App(){
+ const [lines,setLines]=useState(['iOS source input graph']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_input',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_input');
+  const html='<div><a href="/1">第一章</a><a href="/2">第二章</a></div><p>原始页面</p>',nodes=sourceRuleValues(html,'tag.div');
+  const bridge={baseUrl:'https://example.org/book',sourceUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{},lookup:createSourceRuleLookup(html)};
+  const script='result[0].select("a").attr("href")+":"+result[0].text()';
+  const selected=await e.run(script,{...bridge,ruleGlobals:{src:html}},nodes);
+  const expected=sourceRuleText(html,'tag.div@js:'+script);log('selected DOM input',selected===expected,String(selected));
+  const shared={name:'原名'};
+  const alias=await e.run('result.name="新名";src.name+":"+(src===result)',{...bridge,ruleGlobals:{src:shared}},shared);
+  log('src/result alias',alias==='新名:true'&&shared.name==='原名',String(alias));
+  const node=sourceRuleValues(html,'tag.a')[0],input={list:[node,{label:'普通'}],missing:undefined,number:NaN};
+  const output=await e.run('result',bridge,input);
+  log('nested input roundtrip',output.list[0]===node&&isSourceNode(output.list[0])&&output.list[1].label==='普通'&&output.missing===undefined&&Number.isNaN(output.number));
+  const fake=await e.run('result',bridge,{kind:'node',handle:'1'});log('ordinary object preserved',!isSourceNode(fake)&&fake.kind==='node');
+  const cycle={};cycle.self=cycle;let rejected=false;try{await e.run('result',bridge,cycle)}catch(error){rejected=String(error).includes('循环')}log('cyclic input rejected',rejected);
+  log('after input failure',(await e.run('6*7',bridge,''))===42);
+ }catch(error){log('input flow',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

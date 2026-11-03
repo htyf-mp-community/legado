@@ -1,0 +1,24 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {runSourceDebug} from './src/core/sourceDebug';
+function App(){
+ const [lines,setLines]=useState(['iOS Worker source debug flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);const e=new SourceWorkerExecutor('ios_debug_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_debug_rule');
+  let count=0;const pages=[{books:[{name:'测试书',url:'/book'}]},{intro:'介绍',toc:'/toc'},{chapters:[{name:'第一章',url:'/chapter'}]},{content:'正文'}];global.fetch=async(address,options)=>{const target=String(address);if(!target.startsWith('https://example.org/'))return originalFetch(address,options);const data=pages[count++];return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>JSON.stringify(data)};};
+  const source={bookSourceUrl:'https://example.org',bookSourceName:'测试',bookSourceType:0,customOrder:0,enabled:true,enabledExplore:true,searchUrl:'/search',ruleSearch:{bookList:'@js:result.books',name:'@js:result.name',bookUrl:'$.url'},ruleBookInfo:{intro:'@js:result.intro',tocUrl:'$.toc'},ruleToc:{chapterList:'@js:result.chapters',chapterName:'@js:result.name',chapterUrl:'$.url'},ruleContent:{content:'@js:result.content'}};
+  const worker=createSourceWorkerRuleRunner(e),events=[];let stages=0;const runRuleJavaScript=(task,signal)=>{stages++;return worker(task,signal)};
+  const result=await runSourceDebug(source,'书',event=>events.push(event.stage+':'+event.status),undefined,{runRuleJavaScript});
+  log('four stages',events.join(',')==='search:running,search:success,info:running,info:success,toc:running,toc:success,content:running,content:success');
+  log('detail and content',result.info.intro==='介绍'&&result.content.includes('正文'));log('worker and requests',stages===6&&count===4,stages+'/'+count);
+ }catch(error){log('debug flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

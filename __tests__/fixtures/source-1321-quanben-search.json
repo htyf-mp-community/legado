@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "⚡📂全本小说",
+  "bookSourceUrl": "https://www.quanben.io",
+  "searchUrl": "{{String(source.getVariable()!=\"\"?source.getVariable():source.getKey()).replace(/\\/$/, '')}}/index.php?c=book&a=search&keywords={{key}}"
+}

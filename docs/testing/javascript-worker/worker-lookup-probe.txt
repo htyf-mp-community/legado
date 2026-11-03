@@ -1,0 +1,30 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {createSourceRuleLookup,sourceRuleText} from './src/core/sourceRule';
+function App(){
+ const [lines,setLines]=useState(['iOS rule lookup bridge']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_lookup',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_lookup');
+  const html='<div id="nr1"><p>西游记正文</p></div><p>甲&amp;amp;乙</p><p>第二</p><a href="../read?a=1&amp;amp;b=2">正文</a>';
+  const context={baseUrl:'https://request.example/book',redirectUrl:'https://cdn.example/dir/page'};
+  const lookup=createSourceRuleLookup(html,context),bridge={baseUrl:context.baseUrl,sourceUrl:context.baseUrl,key:null,page:1,ajax:async()=>'',removeCookie:()=>{},lookup};
+  const rule="java.getString('#nr1@html');";
+  const extracted=await e.run(rule,bridge,html);log('real content lookup',extracted===sourceRuleText(html,'@js:'+rule),String(extracted));
+  const links=await e.run('java.getString("tag.a@href",null,true)',bridge,html);log('redirect URL',links==='https://cdn.example/read?a=1&b=2',String(links));
+  const list=await e.run('var x=java.getStringList("p@text");x.size()+":"+x.get(2)+":"+x.isEmpty()',bridge,html);log('list methods',list==='3:第二:false',String(list));
+  const unescape=await e.run('java.getString("p@text",false)+"|"+java.getString("p@text",true)',bridge,'');log('unescape overload',unescape.includes('甲&amp;乙')&&unescape.includes('甲&乙'));
+  const changed=await e.run('java.setContent("<p>新内容</p>");java.getString("p@text")',bridge,'');log('setContent',changed==='新内容',String(changed));
+  let denied=false;try{await e.run('java.getString("@js:1")',bridge,'')}catch(error){denied=String(error).includes('嵌套')}log('nested rule rejected',denied);
+  let limited=false;try{await e.run('for(var i=0;i<17;i++)java.getString("p@text");',bridge,'')}catch(error){limited=String(error).includes('次数')}log('lookup limit',limited);
+  log('after failure',(await e.run('6*7',bridge,''))===42);
+ }catch(error){log('lookup bridge',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

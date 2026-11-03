@@ -1,4 +1,10 @@
 jest.mock('react-native-nitro-http-server', () => ({ HttpServer: jest.fn() }));
+jest.mock('react-native', () => ({
+  AppState: { addEventListener: () => ({ remove: jest.fn() }) },
+}));
+jest.mock('react-native-quick-crypto', () => ({
+  randomUUID: () => '00000000-0000-4000-8000-000000000001',
+}));
 import { HttpServer } from 'react-native-nitro-http-server';
 import {
   localServerState,
@@ -13,6 +19,8 @@ const server = {
   port: 1122,
 };
 const handler = () => ({ statusCode: 200, body: 'OK' });
+let running = false;
+let dispatch: ((request: any) => any) | undefined;
 beforeEach(async () => {
   await stopLocalServer('web');
   await stopLocalServer('mcp');
@@ -20,12 +28,39 @@ beforeEach(async () => {
   jest
     .mocked(HttpServer)
     .mockImplementation(() => server as unknown as HttpServer);
-  server.start.mockImplementation(async (port: number) => {
-    server.port = port;
-    return port;
+  server.start.mockImplementation(
+    async (port: number, callback: (request: any) => any) => {
+      server.port = port;
+      dispatch = callback;
+      running = true;
+      return port;
+    },
+  );
+  server.isRunning.mockImplementation(async () => running);
+  server.stop.mockImplementation(async () => {
+    running = false;
+    dispatch = undefined;
   });
-  server.isRunning.mockResolvedValue(true);
-  server.stop.mockResolvedValue(undefined);
+  jest.spyOn(globalThis, 'fetch').mockImplementation(async input => {
+    const url = new URL(String(input));
+    if (!running || !dispatch || Number(url.port) !== server.port)
+      throw new Error('not listening');
+    const result = await dispatch({
+      requestId: 'r',
+      method: 'GET',
+      path: url.pathname,
+      headers: {},
+    });
+    return {
+      ok: result.statusCode === 200,
+      text: async () => result.body ?? '',
+    } as Response;
+  });
+});
+afterEach(async () => {
+  await stopLocalServer('web');
+  await stopLocalServer('mcp');
+  jest.restoreAllMocks();
 });
 test('starting the other service preserves the running listener and reports a conflict', async () => {
   await startLocalServer('web', 1122, handler);

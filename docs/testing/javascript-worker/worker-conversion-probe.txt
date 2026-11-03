@@ -1,0 +1,27 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+function App(){
+ const [lines,setLines]=useState(['iOS worker source conversion']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_conversion_source',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_conversion_source');
+  const bridge={baseUrl:'https://example.org',key:null,page:1,ajax:async()=>'',removeCookie:()=>{},ruleMode:true};
+  const run=(script,input='')=>e.run(script,bridge,input);
+  log('1321 traditional to simple',await run('java.t2s(result)','繁體書籍與網頁')==='繁体书籍与网页');
+  log('simple to traditional',await run('java.s2t(result)','汉语书籍')==='漢語書籍');
+  log('1321 chapter number',await run('result.replace(/第([零一二两三四五六七八九十百千]+)章/g,java.toNumChapter(result))','第十二章')==='第12章');
+  log('null chapter number',await run('java.toNumChapter(null)')===null);
+  log('1321 hex decode',await run('var tt=/^[0-9a-fA-F]+$/.test(String(result).trim())?java.hexDecodeToString(result):String(result);tt','e8a5bfe6b8b8e8aeb0')==='西游记');
+  log('hex encode',await run('java.hexEncodeToString(result)','西游记𠮷')==='e8a5bfe6b8b8e8aeb0f0a0aeb7');
+  log('bad hex caught',await run('try{java.hexDecodeToString("0x41")}catch(e){"caught"}')==='caught');
+  const large='繁體'.repeat(35000);log('large text conversion',(await run('java.t2s(result)',large))==='繁体'.repeat(35000));
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

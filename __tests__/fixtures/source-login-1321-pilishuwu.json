@@ -1,0 +1,5 @@
+{
+  "bookSourceName": "📂霹雳书屋",
+  "bookSourceUrl": "https://www.pilishuwu.com",
+  "loginCheckJs": "var resultUrl = result.url();\nvar resultCode = result.code();\nvar resultBoDy = String(result.body()||\"\");\nif (/Just a moment|Checking your browser|_cf_|cf-browser-verification|challenge-platform/i.test(resultBoDy) && resultCode >= 403) {\n  java.longToast(\"请完成人机验证后点右上角对勾\");\n  cookie.removeCookie(baseUrl);\n  result = java.startBrowserAwait(resultUrl, \"Cloudflare验证\", false);\n}\nresult;"
+}

@@ -120,7 +120,7 @@ async function applyLegacyBackup(
   restoreMedia?: () => Promise<void>,
 ): Promise<LegacyRestoreResult> {
   const payload = parseBackup(input);
-  if (payload.encryptedEntries)
+  if (payload.encryptedEntries || payload.encryptedSourceVariables)
     throw new Error('旧版恢复只接受已解密的原版条目');
   const incoming = Object.fromEntries(
     Object.entries(payload.entries).filter(
@@ -132,6 +132,7 @@ async function applyLegacyBackup(
     RECORDS,
     ...AFTER_RECORDS,
     ...AFTER_COOKIES,
+    'legacy.keep-light.v1',
     'auto.tasks.v1',
   ]);
   for (const key of Object.keys(incoming))
@@ -219,6 +220,20 @@ async function applyLegacyBackup(
     for (const key of Object.keys(incoming))
       if (key.startsWith('source-cookie.v1.')) category(key);
     for (const key of AFTER_COOKIES) category(key);
+    const keepLight = incoming['legacy.keep-light.v1'];
+    if (keepLight) {
+      if (keepLight.type !== 'string') throw new Error('旧版屏幕超时无效');
+      const seconds: unknown = JSON.parse(keepLight.value);
+      if (seconds !== -1 && seconds !== 0 && seconds !== 60 && seconds !== 300 && seconds !== 600)
+        throw new Error('旧版屏幕超时无效');
+      // BackupConfig.readPrefKeys does not include keep_light: it restores even
+      // when the separate readConfig.json restoration is ignored.
+      commitPrepared('reader.preferences.v1', prepareRestoreEntries(
+        current,
+        {'reader.preferences.v1': {type:'string',value:JSON.stringify({screenTimeoutSeconds:seconds})}},
+        {...ignore, readConfig:false}, ownDevice, bookIds,
+      ));
+    }
     await restoreMedia?.();
     const tasks = incoming['auto.tasks.v1'];
     // Source upsert is conditional on !restoredAutoTasks.isNullOrEmpty().

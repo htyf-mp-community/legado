@@ -6,6 +6,7 @@ import { loadChapters } from './webBook';
 import { isLocalBook } from './bookKinds';
 import { shelfUnreadCount } from './bookshelfDisplay';
 import { trackBookshelfRefresh } from '../services/bookshelfRefreshRuntime';
+import { chapterIdentity, createChapterMatcher, mapRemoteChapters } from './chapterIdentity';
 
 export type BookshelfRefreshResult = {
   books: Book[];
@@ -20,31 +21,19 @@ const searchBook = (book: Book, source: BookSource): SearchBook => ({
   name: book.name,
   author: book.author,
   bookUrl: book.bookUrl ?? '',
+  ...(book.variable ? {variable:book.variable} : {}),
   origin: book.origin ?? '',
   originName: book.originName ?? source.bookSourceName,
   tocUrl: book.tocUrl,
   sourceType: book.sourceType,
+  reverseToc: book.reverseToc,
 });
 
 export function mergeRefreshedChapters(
   book: Book,
   incoming: Awaited<ReturnType<typeof loadChapters>>,
 ): Book {
-  const old = new Map(
-    (book.chapters ?? []).map(chapter => [chapter.url ?? chapter.id, chapter]),
-  );
-  const chapters: LocalChapter[] = incoming.map(chapter => ({
-    id: chapter.url || `${book.id}-${chapter.index}`,
-    title: chapter.title,
-    content: old.get(chapter.url)?.content ?? '',
-    url: chapter.url,
-    baseUrl: chapter.baseUrl,
-    isVolume: chapter.isVolume,
-    isVip: chapter.isVip,
-    isPay: chapter.isPay,
-    tag: chapter.tag,
-    wordCount: chapter.wordCount,
-  }));
+  const chapters: LocalChapter[] = mapRemoteChapters(incoming, book.id, book.chapters);
   const index = Math.max(
     0,
     Math.min(chapters.length - 1, book.currentChapterIndex ?? 0),
@@ -108,12 +97,13 @@ export async function refreshBookshelf(
             const source = sourceMap.get(book.origin!)!;
             let updated: Book;
             try {
-              const chapters = await loadChapters(
-                source,
-                searchBook(book, source),
-              );
+              const remote = searchBook(book, source);
+              const chapters = await loadChapters(source, remote);
               if (!chapters.length) throw new Error('目录为空');
-              updated = mergeRefreshedChapters(book, chapters);
+              updated = mergeRefreshedChapters(
+                remote.variable !== book.variable ? { ...book, variable: remote.variable } : book,
+                chapters,
+              );
             } catch (cause) {
               await options.onBookUpdated?.(book, {
                 ...book,
@@ -178,19 +168,14 @@ export function applyBookshelfRefresh(
     if (incoming.updateError || !incoming.chapters?.length)
       return { ...book, updateError: incoming.updateError };
     const currentChapter = book.chapters?.[book.currentChapterIndex ?? 0];
-    const cached = new Map(
-      (book.chapters ?? []).map(chapter => [
-        chapter.url || chapter.id,
-        chapter.content,
-      ]),
-    );
+    const match = createChapterMatcher(book.chapters ?? []);
     const chapters = incoming.chapters.map(chapter => ({
       ...chapter,
-      content: cached.get(chapter.url || chapter.id) ?? chapter.content,
+      content: match(chapter)?.content ?? chapter.content,
     }));
-    const identity = currentChapter?.url || currentChapter?.id;
+    const identity = currentChapter && chapterIdentity(currentChapter);
     const located = identity
-      ? chapters.findIndex(chapter => (chapter.url || chapter.id) === identity)
+      ? chapters.findIndex(chapter => chapterIdentity(chapter) === identity || chapter.id === currentChapter?.id)
       : -1;
     const index =
       located >= 0

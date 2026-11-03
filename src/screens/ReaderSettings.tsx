@@ -21,6 +21,7 @@ import {
   type ReaderTheme,
 } from '../data/readerPreferences';
 import { useAppTheme } from '../theme/AppTheme';
+import type { ScreenTimeoutSeconds } from '../core/readerKeepAwake';
 
 export function ReaderSettings({ back }: { back: () => void }) {
   const { colors, t } = useAppTheme();
@@ -271,6 +272,19 @@ export function ReaderSettings({ back }: { back: () => void }) {
           selected={preferences.orientation}
           choose={orientation => change({ orientation })}
         />
+        <Text style={[s.label, { color: colors.text }]}>{t('readerScreenTimeout')}</Text>
+        <Choices
+          values={[
+            ['0', t('readerScreenTimeoutDefault')],
+            ['60', t('readerScreenTimeoutOneMinute')],
+            ['300', t('readerScreenTimeoutFiveMinutes')],
+            ['600', t('readerScreenTimeoutTenMinutes')],
+            ['-1', t('readerScreenTimeoutAlways')],
+          ]}
+          selected={String(preferences.screenTimeoutSeconds)}
+          choose={value => change({screenTimeoutSeconds: Number(value) as ScreenTimeoutSeconds})}
+        />
+        <Text style={[s.note, { color: colors.muted, borderColor: colors.border }]}>{t('readerScreenTimeoutHelp')}</Text>
         <Toggle
           label={t('hideReaderStatusBar')}
           value={preferences.hideStatusBar}
@@ -443,12 +457,6 @@ export function ReaderSettings({ back }: { back: () => void }) {
           value={preferences.mangaAutoNext}
           change={mangaAutoNext => change({ mangaAutoNext })}
         />
-        {/* TODO(htyf-native): Keep-awake remains unavailable until the configured native work in docs/htyf-migration-gaps.md is authorized. */}
-        <Text
-          style={[s.note, { color: colors.muted, borderColor: colors.border }]}
-        >
-          {t('readerNativeSettingsUnavailable')}
-        </Text>
       </ScrollView>
     </View>
   );

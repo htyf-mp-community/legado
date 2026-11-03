@@ -78,6 +78,22 @@ test('does not erase the old directory when refresh returns no chapters', () => 
   expect(refreshed.name).toBe('书（更新）');
 });
 
+test('persists variables produced while caching content', async () => {
+  const refreshed = mergeRefreshedChapters(book, info, chapters);
+  const result = await cacheBookChapters(refreshed, async () => ({content:'正文',variable:'{"token":"value"}'}));
+  expect(result.book.chapters?.[2]).toMatchObject({content:'正文',variable:'{"token":"value"}'});
+});
+
+test('merges book-variable updates from independently loaded chapters', async () => {
+  const initial = {...book, variable:'{"base":"yes"}', chapters:chapters.map(chapter => ({id:chapter.url,title:chapter.title,url:chapter.url,content:''}))};
+  const result = await cacheBookChapters(initial, async (_chapter, index) => {
+    if (index === 1) throw new Error('failed');
+    return {content:'正文',bookVariable:JSON.stringify({base:'yes',[`key${index}`]:'value'})};
+  }, {concurrency:3});
+  expect(JSON.parse(result.book.variable!)).toEqual({base:'yes',key0:'value',key2:'value'});
+  expect(result.failures).toHaveLength(1);
+});
+
 test('caches only missing chapters in range and isolates failures', async () => {
   const refreshed = mergeRefreshedChapters(book, info, chapters),
     progress: number[] = [],

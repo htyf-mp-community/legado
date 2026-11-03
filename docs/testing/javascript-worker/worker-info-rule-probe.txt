@@ -1,0 +1,23 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {createSourceWorkerRuleRunner} from './src/core/sourceWorkerRuleRunner';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {loadBookInfo,loadChapters} from './src/core/webBook';
+function App(){
+ const [lines,setLines]=useState(['iOS async detail flow']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const originalFetch=global.fetch;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);const e=new SourceWorkerExecutor('ios_info_rule',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_info_rule');
+  let requests=0;global.fetch=async(address,options)=>{const target=String(address);if(!target.startsWith('https://example.org/'))return originalFetch(address,options);requests++;const body=JSON.stringify({book:{name:'书',author:'作者',intro:'介绍',kind:'玄幻',chapters:[{name:'第一章',url:'/1'}]}});return {ok:true,status:200,url:target,headers:{get:()=>null,forEach:()=>{}},text:async()=>body};};
+  const source={bookSourceUrl:'https://example.org',bookSourceName:'测试',bookSourceType:0,customOrder:0,enabled:true,enabledExplore:false,ruleBookInfo:{init:'@js:java.put("step","初");result.book',intro:'@js:java.put("step",java.get("step")+"简");result.intro',name:'@js:result.name+java.get("step")',author:'@js:result.author',kind:'@js:result.kind',tocUrl:'@js:baseUrl'},ruleToc:{chapterList:'$.book.chapters[*]',chapterName:'$.name',chapterUrl:'$.url'}};
+  const book={bookUrl:'https://example.org/book',origin:source.bookSourceUrl,originName:source.bookSourceName,name:'',author:''};const worker=createSourceWorkerRuleRunner(e);let stages=0;const runRuleJavaScript=(task,signal)=>{stages++;return worker(task,signal)};
+  const info=await loadBookInfo(source,book,undefined,{runRuleJavaScript});log('async detail',info.name==='书初简'&&info.author==='作者'&&info.intro==='介绍'&&info.kind==='玄幻',info.name);
+  log('variable persisted',JSON.parse(info.variable).step==='初简');const chapters=await loadChapters(source,info);log('detail page reused',requests===1&&chapters[0].title==='第一章',String(requests));log('worker stages',stages===6,String(stages));
+ }catch(error){log('detail flow',false,String(error));}})();
+ return()=>{live=false;global.fetch=originalFetch;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

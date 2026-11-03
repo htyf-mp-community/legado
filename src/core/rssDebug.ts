@@ -72,7 +72,7 @@ async function fetchRawContent(
   article: RssArticle,
   fetcher: typeof fetch,
 ) {
-  const request = buildSourceRequest(asBookSource(source), article.link),
+  const request = buildSourceRequest(asBookSource(source), article.link, '', 1, true, false),
     response = await fetcher(request.url, {
       method: request.method,
       headers: request.headers,
@@ -102,6 +102,8 @@ export async function runRssSourceDebug(
       resolved.url,
       resolved.key,
       1,
+      true,
+      false,
     );
   emit({
     stage: 'input',

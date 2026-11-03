@@ -27,6 +27,7 @@ import {
   saveBulkBookExport,
 } from '../src/core/bulkBookExport';
 import { DEFAULT_BOOK_EXPORT_PREFERENCES } from '../src/data/exportPreferences';
+import { renderBookTxt } from '../src/core/bookExport';
 import type { Book } from '../src/types';
 
 const make = (id: string, name = 'Same'): Book => ({
@@ -87,6 +88,21 @@ test('writes selected books, zips them, saves one document and cleans temporary 
   expect(awaitZip).toHaveBeenCalled();
   expect(unlink).toHaveBeenCalledTimes(2);
 });
+
+test.each(['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GBK', 'GB18030', 'BIG5'] as const)(
+  'exports %s books without iconv', async charset => {
+    (getUnzip as jest.Mock).mockReturnValue({ zip: jest.fn(() => ({ await: jest.fn().mockResolvedValue(undefined) })) });
+    (saveDocuments as jest.Mock).mockResolvedValue([{ uri: 'content://saved', error: null }]);
+    const book = { ...make('encoding'), content: '中😀€Ê\u0304', chapters: [{ id: '1', title: '第1章', content: '中😀€Ê\u0304' }] };
+    const preferences = { ...DEFAULT_BOOK_EXPORT_PREFERENCES, charset };
+    const expected = new Uint8Array(iconv.encode(renderBookTxt(book, preferences), charset));
+    const encode = jest.spyOn(iconv, 'encode').mockImplementation(() => { throw new Error('unexpected iconv'); });
+    try {
+      await saveBulkBookExport([book], new Set([book.id]), 'txt', undefined, preferences);
+      expect((fromByteArray as jest.Mock).mock.calls.at(-1)?.[0]).toEqual(expected);
+    } finally { encode.mockRestore(); }
+  },
+);
 
 test('applies enabled replacement rules and selected TXT charset', async () => {
   (appStorage.getString as jest.Mock).mockImplementation((key: string) =>

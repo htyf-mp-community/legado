@@ -1,0 +1,1 @@
+{"requests":[{"method":"MKCOL","path":"/legado/","status":201},{"method":"PROPFIND","path":"/legado/","status":207},{"method":"GET","path":"/legado/backup-htyf.zip","status":200,"sha256":"a9e258ccc1f6f476b32819b2456fa347480db8b74c7d099555a7d34ca0f3f8dc"}]}

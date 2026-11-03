@@ -29,9 +29,10 @@ import { PageHeader } from '../components/PageHeader';
 import { formatAudioTime, parseAudioContent } from '../core/audioContent';
 import { AUDIO_REMOTE_CHAPTER_EVENT } from '../core/audioRemoteNavigation';
 import { ensureAudioPlayer } from '../core/audioPlayer';
+import { prepareAudioCacheRange } from '../core/audioCache';
 import { buildSourceRequest } from '../core/sourceRequest';
 import { coverImageUri, displayBookCover } from '../core/bookCover';
-import { loadChapterContent } from '../core/webBook';
+import { loadChapterPayload } from '../core/webBook';
 import {
   clearAudioSleepDeadline,
   getAudioSleepDeadline,
@@ -132,21 +133,25 @@ export function AudioPlayer({
         let content = chapter.content;
         if (!content) {
           if (!chapter.url) throw new Error(t('chapterAudioRuleMissing'));
-          content = await loadChapterContent(source, {
+          const payload = await loadChapterPayload(source, {
             url: chapter.url,
+            variable: chapter.variable, bookVariable: book.variable, bookName: book.name,
             title: chapter.title,
             index: safeIndex,
+            nextChapterUrl: chapters[safeIndex + 1]?.url,
             bookUrl: book.bookUrl ?? '',
             baseUrl: chapter.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
             isVolume: !!chapter.isVolume,
             isVip: !!chapter.isVip,
             isPay: !!chapter.isPay,
           });
+          content = payload.content;
           const nextChapters = chapters.map((item, index) =>
-            index === safeIndex ? { ...item, content } : item,
+            index === safeIndex ? { ...item, content, ...(payload.variable !== undefined ? {variable: payload.variable} : {}) } : item,
           );
           update({
             ...book,
+            ...(payload.bookVariable !== undefined ? {variable: payload.bookVariable} : {}),
             chapters: nextChapters,
             currentChapterIndex: safeIndex,
             chapterTitle: chapter.title,
@@ -259,20 +264,20 @@ export function AudioPlayer({
     setCaching(true);
     try {
       const queued: DownloadRecord[] = [];
-      for (let index = start; index <= end; index += 1) {
-        const item = chapters[index];
-        let content = item.content;
-        if (!content && item.url)
-          content = await loadChapterContent(activeSource, {
-            url: item.url,
+      const prepared = await prepareAudioCacheRange(book, start, end, (item, index, bookVariable) =>
+          loadChapterPayload(activeSource, {
+            url: item.url!,
+            variable: item.variable, bookVariable, bookName: book.name,
             title: item.title,
             index,
+            nextChapterUrl: chapters[index + 1]?.url,
             bookUrl: book.bookUrl ?? '',
             baseUrl: item.baseUrl ?? book.tocUrl ?? book.bookUrl ?? '',
             isVolume: !!item.isVolume,
             isVip: !!item.isVip,
             isPay: !!item.isPay,
-          });
+          }));
+      for (const {chapter: item, content} of prepared.entries) {
         const headers = item.url
           ? buildSourceRequest(activeSource, item.url).headers
           : {};
@@ -287,6 +292,7 @@ export function AudioPlayer({
         );
       }
       if (!queued.length) throw new Error(t('noPlayableAudio'));
+      if (prepared.book !== book) update(prepared.book);
       saveDownloads([...queued, ...loadDownloads()]);
       let completed = 0;
       for (const item of queued) {

@@ -58,7 +58,7 @@ test('force-refreshes current content without discarding other chapters', async 
   );
 });
 
-test('updates the directory while retaining cached content and current title', async () => {
+test('updates the directory while preserving the native chapter index and position', async () => {
   const incoming: BookChapter[] = [
     {
       url: 'zero',
@@ -91,12 +91,14 @@ test('updates the directory while retaining cached content and current title', a
       isPay: false,
     },
   ];
-  const refreshed = await refreshReaderToc(book, source, async () => incoming);
+  const current = { ...book, readingPosition: { chapterId: 'old-2', position: 120, titleVisible: false } };
+  const refreshed = await refreshReaderToc(current, source, async () => incoming);
   expect(refreshed).toMatchObject({
     id: 'library-id',
-    currentChapterIndex: 2,
-    chapterTitle: 'Chapter 2',
-    content: 'cached two',
+    currentChapterIndex: 1,
+    chapterTitle: 'Chapter 1',
+    content: 'cached one',
+    readingPosition: { chapterId: refreshed.chapters?.[1].id, position: 120, titleVisible: false },
     groupIds: ['favorite'],
   });
   expect(refreshed.chapters?.map(item => item.content)).toEqual([
@@ -110,6 +112,54 @@ test('rejects an empty refreshed directory without changing the book', async () 
   await expect(refreshReaderToc(book, source, async () => [])).rejects.toThrow(
     'empty chapter directory',
   );
+});
+
+test('clamps a shortened directory and maps the current character position to its last chapter', async () => {
+  const current = { ...book, readingPosition: { chapterId: 'old-2', position: 33 } };
+  const incoming: BookChapter[] = [{
+    url: 'one', title: 'Chapter 1', index: 0, bookUrl: book.bookUrl!, baseUrl: '',
+    isVolume: false, isVip: false, isPay: false,
+  }];
+  const refreshed = await refreshReaderToc(current, source, async () => incoming);
+  expect(refreshed.currentChapterIndex).toBe(0);
+  expect(refreshed.readingPosition).toEqual({ chapterId: refreshed.chapters?.[0].id, position: 33 });
+});
+
+test('rebases a delayed directory update onto the newest chapter, cursor and cached content', async () => {
+  let finish!: (chapters: BookChapter[]) => void;
+  const pending = new Promise<BookChapter[]>(resolve => { finish = resolve; });
+  let latest: Book = { ...book, currentChapterIndex: 0, chapterTitle: 'Chapter 1',
+    readingPosition: { chapterId: 'old-1', position: 8 } };
+  const task = refreshReaderToc(latest, source, async () => pending, () => latest);
+  latest = { ...latest, currentChapterIndex: 1, chapterTitle: 'Chapter 2',
+    readingPosition: { chapterId: 'old-2', position: 55, titleVisible: false },
+    chapters: latest.chapters!.map((item, i) => i === 1 ? { ...item, content: 'newly loaded' } : item) };
+  finish([
+    { url: 'one', title: 'Chapter 1', index: 0, bookUrl: book.bookUrl!, baseUrl: '', isVolume: false, isVip: false, isPay: false },
+    { url: 'two', title: 'Chapter 2', index: 1, bookUrl: book.bookUrl!, baseUrl: '', isVolume: false, isVip: false, isPay: false },
+  ]);
+  const result = await task;
+  expect(result).toMatchObject({ currentChapterIndex: 1, chapterTitle: 'Chapter 2', content: 'newly loaded',
+    readingPosition: { chapterId: 'old-2', position: 55, titleVisible: false } });
+});
+
+test.each(['origin', 'bookUrl', 'tocUrl', 'reverseToc', 'sourceType'] as const)(
+  'rejects a delayed directory update after %s changes', async key => {
+    let finish!: (chapters: BookChapter[]) => void;
+    const pending = new Promise<BookChapter[]>(resolve => { finish = resolve; });
+    const task = refreshReaderToc(book, source, async () => pending,
+      () => ({ ...book, [key]: key === 'reverseToc' ? true : key === 'sourceType' ? 2 : 'changed' }));
+    finish([{ url: 'one', title: 'Chapter 1', index: 0, bookUrl: book.bookUrl!, baseUrl: '', isVolume: false, isVip: false, isPay: false }]);
+    await expect(task).rejects.toMatchObject({ name: 'StaleReaderTocError' });
+  },
+);
+
+test('discards an old network failure after the book has switched source', async () => {
+  let fail!: (reason: Error) => void;
+  const pending = new Promise<BookChapter[]>((_resolve, reject) => { fail = reject; });
+  const task = refreshReaderToc(book, source, async () => pending, () => ({ ...book, origin: 'new-source' }));
+  fail(new Error('old source failed'));
+  await expect(task).rejects.toMatchObject({ name: 'StaleReaderTocError' });
 });
 
 test('clears only the requested chapter-cache range', () => {

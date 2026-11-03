@@ -1,0 +1,30 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/hostNavigationCompatibility.test.js
+  ● remote stack card transitions do not access the removed host InteractionManager getter
+
+    InteractionManager removed
+
+      12 |   const module = { exports: {} };
+      13 |   const reactNative = {};
+    > 14 |   Object.defineProperty(reactNative, 'InteractionManager', { get() { throw new Error('InteractionManager removed'); } });
+         |                                                                            ^
+      15 |   vm.runInNewContext(code, { module, exports: module.exports, require: name => name === 'react-native' ? reactNative : require(name) });
+      16 |   return module.exports.transition();
+      17 | }
+
+      at Object.get (__tests__/hostNavigationCompatibility.test.js:14:76)
+      at Object.transition (evalmachine.<anonymous>:1:113)
+      at transition (__tests__/hostNavigationCompatibility.test.js:16:25)
+      at Object.execute (__tests__/hostNavigationCompatibility.test.js:21:16)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        0.641 s

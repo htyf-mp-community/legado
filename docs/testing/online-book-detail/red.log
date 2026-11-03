@@ -1,0 +1,176 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> apps@0.0.1 test
+> jest --runInBand __tests__/onlineLibrary.test.ts __tests__/bookMetadataLabels.test.ts
+
+FAIL __tests__/bookMetadataLabels.test.ts
+  ● Test suite failed to run
+
+    Cannot find module '../src/core/bookMetadataLabels' from '__tests__/bookMetadataLabels.test.ts'
+
+    > 1 | import { bookMetadataLabels } from '../src/core/bookMetadataLabels';
+        | ^
+      2 | test('native detail labels put word count first and split, trim and retain repeated kinds', () => {
+      3 |   expect(bookMetadataLabels({wordCount:'1.2万字',kind:' 玄幻, ,经典\n玄幻,\u3000科幻\u3000'})).toEqual(['1.2万字','玄幻','经典','玄幻','科幻']);
+      4 | });
+
+      at Resolver._throwModNotFoundError (node_modules/jest-resolve/build/index.js:895:11)
+      at Object.require (__tests__/bookMetadataLabels.test.ts:1:1)
+
+FAIL __tests__/onlineLibrary.test.ts
+  ● copies source metadata and native source type when adding a searched book
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 4
+    + Received  + 0
+
+      Object {
+        "coverUrl": "https://example.com/cover.jpg",
+    -   "kind": "玄幻,经典",
+    -   "latestChapterTitle": "最终章",
+    -   "nativeType": 136,
+        "sourceType": 3,
+    -   "wordCount": "1.2万字",
+      }
+
+       98 | test('copies source metadata and native source type when adding a searched book', () => {
+       99 |   const result = toLibraryBook({ ...book, kind: '玄幻,经典', wordCount: '1.2万字', latestChapterTitle: '最终章', coverUrl: 'https://example.com/cover.jpg', sourceType: 3 }, chapters);
+    > 100 |   expect(result).toMatchObject({kind:'玄幻,经典',wordCount:'1.2万字',latestChapterTitle:'最终章',coverUrl:'https://example.com/cover.jpg',sourceType:3,nativeType:136});
+          |                  ^
+      101 | });
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+
+      at Object.toMatchObject (__tests__/onlineLibrary.test.ts:100:18)
+
+  ● maps source type 0 to native book flags 8
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 8
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● maps source type 1 to native book flags 32
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 32
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● maps source type 2 to native book flags 64
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 64
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● maps source type 3 to native book flags 136
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 136
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● maps source type 4 to native book flags 4
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 4
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● maps source type 999 to native book flags 8
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 8
+    Received: undefined
+
+      102 |
+      103 | test.each([[0,8],[1,32],[2,64],[3,136],[4,4],[999,8]])('maps source type %i to native book flags %i', (sourceType, nativeType) => {
+    > 104 |   expect(toLibraryBook({...book,sourceType},chapters).nativeType).toBe(nativeType);
+          |                                                                   ^
+      105 | });
+      106 |
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+
+      at toBe (__tests__/onlineLibrary.test.ts:104:67)
+
+  ● source switching retains unrelated native flags while replacing source-type flags
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 904
+    Received: 128
+
+      107 | test('source switching retains unrelated native flags while replacing source-type flags', () => {
+      108 |   const current = {...toLibraryBook(book,chapters), nativeType:8 | 256 | 512};
+    > 109 |   expect(switchLibraryBookSource(current,{...book,sourceType:3},chapters).nativeType).toBe(136 | 256 | 512);
+          |                                                                                       ^
+      110 | });
+      111 |
+
+      at Object.toBe (__tests__/onlineLibrary.test.ts:109:87)
+
+Test Suites: 2 failed, 2 total
+Tests:       8 failed, 4 passed, 12 total
+Snapshots:   0 total
+Time:        0.553 s, estimated 1 s
+Ran all test suites matching __tests__/onlineLibrary.test.ts|__tests__/bookMetadataLabels.test.ts.

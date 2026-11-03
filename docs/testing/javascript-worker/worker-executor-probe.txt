@@ -1,0 +1,35 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import defaults from './defaultBookSources.json';
+import fixture from './source-weishuxiang.json';
+function App(){
+ const [lines,setLines]=useState(['iOS queued source executor']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_executor',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_executor');
+  let cookies=0,posts=0;const origin=defaults[0].bookSourceUrl;
+  const bridge={baseUrl:origin,sourceUrl:origin,key:'西游记',page:1,ajax:async()=>'<form id="search" action="/search21.html">',removeCookie:()=>cookies++};
+  const other={...bridge,baseUrl:fixture.bookSourceUrl,sourceUrl:fixture.bookSourceUrl,post:async()=>{posts++;return {data:'',body:'',url:fixture.bookSourceUrl,code:302,headers:{Location:'/e/search/result/index.php?searchid=42'}}}};
+  const parts=Array.from(defaults[0].searchUrl.matchAll(/\{\{([\s\S]*?)\}\}/g),m=>m[1]);
+  const [first,second,third]=await Promise.all([e.run(parts[0],bridge),e.run(parts[1],bridge),e.run(fixture.searchUrl.replace(/^@js:\s*/,''),other)]);
+  log('queued 7663 / 1321',cookies===1&&posts===1&&second==='http://www.kkbiquge.net/search21.html?searchkey=%E8%A5%BF%E6%B8%B8%E8%AE%B0'&&third==='/e/search//e/search/result/index.php?page={{page-1}}&searchid=42');
+  const response={data:'challenge',body:'<script>window.challenge=true</script>',url:origin+'/search',code:403},retry={data:'ok',body:'ok',url:origin+'/search',code:200};
+  const login={...bridge,response,toast:()=>{},browser:async()=>retry,connect:async()=>retry};
+  log('login response identity',(await e.run(defaults[0].loginCheckJs,login))===retry);
+  const busyController=new AbortController(),queuedController=new AbortController();let called;
+  const started=new Promise(resolve=>{called=resolve});
+  const blocked=e.run('java.ajax(baseUrl)',{...bridge,ajax:()=>{called();return new Promise(()=>{})}},'',busyController.signal).catch(error=>error.name);
+  await started;
+  const skipped=e.run('"should not run"',bridge,'',queuedController.signal).catch(error=>error.name);queuedController.abort();
+  log('cancel queued task',(await skipped)==='AbortError');busyController.abort();log('cancel active task',(await blocked)==='AbortError');
+  log('queue recovers',(await e.run('6*7',bridge))===42);
+ }catch(error){log('executor',false,String(error));}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)} onError={()=>executor.current?.pageUnavailable('ios_executor')} onContentProcessDidTerminate={()=>executor.current?.pageUnavailable('ios_executor')}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

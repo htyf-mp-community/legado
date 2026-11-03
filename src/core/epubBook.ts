@@ -3,13 +3,11 @@ import {
   readFile,
   unlink,
 } from '@dr.pogodin/react-native-fs';
-import { keepLocalCopy } from '@react-native-documents/picker';
 import { getUnzip } from 'react-native-nitro-unzip';
 import type { Book, LocalChapter } from '../types';
 import { readerHtmlToText } from './readerImages';
+import { stageBookFile } from './stageBookFile';
 
-const clean = (uri: string) =>
-  decodeURIComponent(uri.replace(/^file:\/\//, ''));
 const decodeXml = (value: string) =>
   value
     .replace(/&lt;/g, '<')
@@ -116,13 +114,7 @@ export async function importEpubBook(
   uri: string,
   fileName = '本地书籍.epub',
 ): Promise<Book> {
-  const copies = await keepLocalCopy({
-      files: [{ uri, fileName }],
-      destination: 'cachesDirectory',
-    }),
-    copy = copies[0];
-  if (copy.status === 'error') throw new Error(copy.copyError);
-  const archive = clean(copy.localUri),
+  const archive = await stageBookFile(uri, fileName),
     directory = `${DocumentDirectoryPath}/legado-epub-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   let imported = false;
   try {

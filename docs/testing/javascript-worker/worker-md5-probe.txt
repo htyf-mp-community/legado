@@ -1,0 +1,27 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerExecutor} from './src/core/sourceWorkerExecutor';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import source from './source-quanmian-signing.json';
+function App(){
+ const [lines,setLines]=useState(['iOS worker signed source']),[url,setUrl]=useState('');const web=useRef(null),executor=useRef(null);
+ useEffect(()=>{let lease,live=true;const log=(name,ok)=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  const e=new SourceWorkerExecutor('ios_md5_source',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)));executor.current=e;setUrl(lease.url+'#ios_md5_source');
+  const bridge={baseUrl:source.bookSourceUrl,key:'西游记',page:2,ajax:async()=>'',removeCookie:()=>{}};
+  const script='Date.now=function(){return 1700000000000};\n'+source.searchUrl.replace(/^@js:\s*/,'');
+  const signed=await e.run(script,bridge);
+  log('1321 original signed search',signed.includes('keywords=西游记')&&signed.includes('page=1')&&signed.includes('sign=C1EF2FADC92DC6088B28F885338368CC'));
+  log('Chinese MD5',await e.run('java.md5Encode("西游记")',bridge)==='9db64a7a1f63a775102be1d7713f57f1');
+  log('short MD5',await e.run('java.md5Encode16("abc")',bridge)==='3cd24fb0d6963f7d');
+  log('malformed UTF-16',await e.run('java.md5Encode("\\ud800")',bridge)==='d1457b72c3fb323a2671125aef3eab5d');
+  let rejected=false;try{await e.run('java.md5Encode("x".repeat(64001))',bridge)}catch(error){rejected=/限制/.test(String(error))}log('input limit',rejected);
+  log('after rejection',await e.run('java.md5Encode("abc")',bridge)==='900150983cd24fb0d6963f7d28e17f72');
+ }catch(error){if(live)setLines(x=>[...x,'FAIL '+String(error)]);}})();
+ return()=>{live=false;executor.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>executor.current?.receive(e.nativeEvent.data)}/>:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

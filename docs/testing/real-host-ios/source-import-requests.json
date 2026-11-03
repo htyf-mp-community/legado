@@ -1,0 +1,10 @@
+[
+  {
+    "method": "GET",
+    "path": "/source.json"
+  },
+  {
+    "method": "GET",
+    "path": "/app.json"
+  }
+]

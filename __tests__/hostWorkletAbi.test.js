@@ -18,14 +18,14 @@ function execute(code, filename, overrides) {
       require: name =>
         Object.hasOwn(overrides, name) ? overrides[name] : realRequire(name),
       console,
-      global: {},
+      global: { Error },
       __DEV__: false,
     },
     { filename },
   );
   return module.exports;
 }
-function layoutWithHost(nativeStandalone = false) {
+function layoutWithHost(nativeStandalone = false, envName = 'production') {
   const react = {
     useEffect: () => {},
     useMemo: f => f(),
@@ -54,7 +54,7 @@ function layoutWithHost(nativeStandalone = false) {
     cwd: root,
     configFile: path.join(root, 'babel.config.js'),
     babelrc: false,
-    envName: 'production',
+    envName,
   }).code;
   const layout = execute(compiled, hookPath, {
     react,
@@ -83,6 +83,21 @@ function layoutWithHost(nativeStandalone = false) {
   layout.useAnimatedLayout(undefined, 20, 30, false, false);
   return { reactions, compiled };
 }
+test('remote development worklets use the version checked by the current host runtime', () => {
+  const old = process.env.APP_EXPOSES_OPTIONS;
+  process.env.APP_EXPOSES_OPTIONS = encodeURI(JSON.stringify({ name: 'plugin_legado' }));
+  try {
+    const { reactions } = layoutWithHost(false, 'development');
+    for (const pair of reactions)
+      for (const callback of pair) {
+        expect(Array.isArray(callback.__closure)).toBe(true);
+        expect(callback.__pluginVersion).toBe('0.13.1');
+      }
+  } finally {
+    if (old === undefined) delete process.env.APP_EXPOSES_OPTIONS;
+    else process.env.APP_EXPOSES_OPTIONS = old;
+  }
+});
 test('production Gorhom worklets can be consumed by the host Reanimated 4.7 native reaction hook', () => {
   const old = process.env.APP_EXPOSES_OPTIONS;
   process.env.APP_EXPOSES_OPTIONS = encodeURI(

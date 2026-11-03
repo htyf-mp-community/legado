@@ -1,0 +1,37 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {AppRegistry,Text,View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import {acquireLocalWorkerPage} from './src/services/localServerRuntime';
+import {SourceWorkerSession} from './src/core/sourceWorkerSession';
+import {SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT,sourceWorkerCommandScript} from './src/core/sourceWorkerResources';
+import {prepareSourceWorkerScript,createSourceWorkerBridge} from './src/core/sourceWorkerBridge';
+import defaults from './defaultBookSources.json';
+import fixture from './source-weishuxiang.json';
+function App(){
+ const [lines,setLines]=useState(['iOS source bridge']),[url,setUrl]=useState('');
+ const web=useRef(null),session=useRef(null);
+ useEffect(()=>{let lease;let live=true;const log=(name,ok,value='')=>{if(live)setLines(x=>[...x,(ok?'PASS ':'FAIL ')+name+' '+value]);};
+ (async()=>{try{
+  lease=await acquireLocalWorkerPage(SOURCE_WORKER_HTML,SOURCE_WORKER_SCRIPT);
+  let cookies=0,posts=0;
+  const bridge={baseUrl:defaults[0].bookSourceUrl,key:'西游记',page:1,ajax:async()=>'<form id="search" action="/search21.html">',removeCookie:()=>{cookies++},post:async()=>{posts++;return {data:'',body:'',url:fixture.bookSourceUrl,code:302,headers:{Location:'/e/search/result/index.php?searchid=42'}}}};
+  let current;
+  const s=new SourceWorkerSession('ios_bridge_1',command=>web.current.injectJavaScript(sourceWorkerCommandScript(command)),(action,args,signal)=>current.invoke(action,args,signal),{executionMs:1000,readyMs:10000,resolveResponse:handle=>current.resolveResponse(handle)});
+  session.current=s;setUrl(lease.url+'#ios_bridge_1');
+  const context={baseUrl:bridge.baseUrl,sourceUrl:bridge.baseUrl,key:bridge.key,page:1,result:''};
+  const run=(script,ctx=context)=>{current=createSourceWorkerBridge(bridge);return s.run(prepareSourceWorkerScript(script),ctx,undefined,current.initialResponse)};
+  const parts=Array.from(defaults[0].searchUrl.matchAll(/\{\{([\s\S]*?)\}\}/g),m=>m[1]);
+  await run(parts[0]);
+  const result=await run(parts[1]);
+  log('7663 search',cookies===1&&result==='http://www.kkbiquge.net/search21.html?searchkey=%E8%A5%BF%E6%B8%B8%E8%AE%B0',String(result));
+  const post=await run(fixture.searchUrl.replace(/^@js:\s*/,''),{...context,sourceUrl:fixture.bookSourceUrl,baseUrl:fixture.bookSourceUrl});
+  log('1321 POST header',posts===1&&post==='/e/search//e/search/result/index.php?page={{page-1}}&searchid=42',String(post));
+  const encoding=await run('java.encodeURI("中 文~","GBK")');
+  log('GBK form encoding',encoding==='%D6%D0+%CE%C4%7E',String(encoding));
+  let timeout=false;try{await run('while(true){}');}catch(e){timeout=String(e).includes('超时');}log('timeout',timeout);
+  log('recovery',(await run('40+2'))===42);
+ }catch(e){log('bridge',false,String(e));}})();
+ return()=>{live=false;session.current?.dispose();lease?.release().catch(()=>{});};},[]);
+ return <View style={{flex:1,paddingTop:70,paddingHorizontal:15}}><Text>{lines.join('\n')}</Text>{url?<WebView ref={web} style={{height:100,flex:0}} source={{uri:url}} originWhitelist={['*']} onMessage={e=>session.current?.receive(e.nativeEvent.data)} />:null}</View>;
+}
+AppRegistry.registerComponent('apps',()=>App);

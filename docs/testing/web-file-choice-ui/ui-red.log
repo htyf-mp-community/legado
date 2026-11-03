@@ -1,0 +1,79 @@
+npm warn Unknown user config "sass_binary_site". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "phantomjs_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sqlite3_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "profiler_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "chromedriver_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "sentrycli_cdnurl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "canvas_binary_host_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+FAIL __tests__/onlineWebFileDetail.test.tsx
+  ● file source skips chapters and imports only the selected ZIP entry
+
+    TypeError: Cannot read properties of undefined (reading 'parent')
+
+      72 |   expect(loadChapters).not.toHaveBeenCalled();
+      73 |   const read = tree.root.findAllByType(Text).find(node => node.props.children === 'startReading');
+    > 74 |   await act(async () => read!.parent!.props.onPress());
+         |                               ^
+      75 |   const download = tree.root
+      76 |     .findAllByType(Text)
+      77 |     .find(node => node.props.children === 'book.zip');
+
+      at parent (__tests__/onlineWebFileDetail.test.tsx:74:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/onlineWebFileDetail.test.tsx:74:12)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● download failure remains on detail and can be retried without adding a book
+
+    TypeError: Cannot read properties of undefined (reading 'parent')
+
+      116 |   });
+      117 |   const shelf = tree.root.findAllByType(Text).find(node => node.props.children === 'webFileAddToShelf');
+    > 118 |   await act(async () => shelf!.parent!.props.onPress());
+          |                                ^
+      119 |   const download = tree.root
+      120 |     .findAllByType(Text)
+      121 |     .find(node => node.props.children === 'book.zip');
+
+      at parent (__tests__/onlineWebFileDetail.test.tsx:118:32)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/onlineWebFileDetail.test.tsx:118:12)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● adding a file to the shelf does not request immediate reading
+
+    TypeError: Cannot read properties of undefined (reading 'parent')
+
+      144 |   await act(async () => { tree = create(<OnlineBookDetail initialBook={book} back={jest.fn()} added={added} search={jest.fn()} />); });
+      145 |   const shelf = tree.root.findAllByType(Text).find(node => node.props.children === 'webFileAddToShelf');
+    > 146 |   await act(async () => shelf!.parent!.props.onPress());
+          |                                ^
+      147 |   const choice = tree.root.findAllByType(Text).find(node => node.props.children === 'book.zip');
+      148 |   await act(async () => choice!.parent!.props.onPress());
+      149 |   expect(added).toHaveBeenCalledWith({ id: 'chosen' }, false);
+
+      at parent (__tests__/onlineWebFileDetail.test.tsx:146:32)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at Object.<anonymous> (__tests__/onlineWebFileDetail.test.tsx:146:12)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.528 s, estimated 1 s

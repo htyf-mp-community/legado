@@ -171,7 +171,7 @@ export async function inspectLegacyBackupDirectory(
       blocked.push(item.name);
       continue;
     }
-    if (item.name.toLowerCase().endsWith('.json')) {
+    if (item.name.toLowerCase().endsWith('.json') || item.name === 'config.xml') {
       const raw = await readFile(item.path, 'utf8');
       const trimmed = trimSourceWhitespace(raw);
       // Server decrypt failures are source runCatching warnings. Cookies and runtime

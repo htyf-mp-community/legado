@@ -1,4 +1,5 @@
 import { parseNativeReadRecords } from '../core/readRecordImport';
+import { parseNativeKeepLightSnapshot } from '../core/nativePreferenceSnapshot';
 import { parseLegacyJson } from '../core/legacyJson';
 import { isLocalBook, sourceTypeFromLegacyBookType } from '../core/bookKinds';
 import type {
@@ -245,6 +246,7 @@ function books(
       originName: text(value.originName) || undefined,
       bookUrl: text(value.bookUrl) || undefined,
       tocUrl: text(value.tocUrl) || undefined,
+      ...(typeof value.variable === 'string' ? { variable: value.variable } : {}),
       coverUrl: layers.coverUrl,
       customCoverUrl: remapLegacyMediaCover(layers.customCoverUrl, media),
       persistedCoverUrl: remapLegacyMediaCover(layers.persistedCoverUrl, media),
@@ -475,9 +477,10 @@ export function convertLegacyBackup(
   }
   if (files['readConfig.json']) {
     try {
-      entries['reader.preferences.v1'] = entry(
-        convertLegacyReaderPreferences(files['readConfig.json'], media),
-      );
+      const converted: Partial<ReaderPreferences> = convertLegacyReaderPreferences(files['readConfig.json'], media);
+      // keep_light is a separate shared preference, not a ReadBookConfig field.
+      delete converted.screenTimeoutSeconds;
+      entries['reader.preferences.v1'] = entry(converted);
       entries['legacy.read-config.v1'] = {
         type: 'string',
         value: files['readConfig.json'],
@@ -487,6 +490,18 @@ export function convertLegacyBackup(
       warnings.push(
         `readConfig.json: ${error instanceof Error ? error.message : String(error)}`,
       );
+    }
+  }
+  if (files['config.xml'] !== undefined) {
+    try {
+      const config = parseNativeKeepLightSnapshot(files['config.xml']);
+      if (config.value !== undefined) {
+        entries['legacy.keep-light.v1'] = entry(config.value);
+        importedFiles.push('config.xml');
+      }
+      if (config.warning) warnings.push(config.warning);
+    } catch (error) {
+      warnings.push(`config.xml: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
   if (!importedFiles.length)

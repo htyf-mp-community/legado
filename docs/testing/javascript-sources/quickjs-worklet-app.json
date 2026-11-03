@@ -1,0 +1,1 @@
+{"name":"apps","displayName":"QJS Probe","htyf":{"type":"app","entry":"./src/index.tsx","version":"0.0.2","name":"QJS 隔离探针","appid":"plugin_legado_qjsprobe","rotate":"auto","appUrlConfig":"http://127.0.0.1:18219/app.json","zipUrl":"http://127.0.0.1:18219/dist.dgz"}}
