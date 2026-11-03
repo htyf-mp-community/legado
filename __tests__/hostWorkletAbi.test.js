@@ -32,7 +32,7 @@ function layoutWithHost(nativeStandalone = false, envName = 'production') {
     useState: f => [f()],
   };
   const hostFile = nativeStandalone
-    ? require.resolve('react-native-reanimated/src/hook/useAnimatedReaction.ts')
+    ? require.resolve('react-native-reanimated/src/hook/useAnimatedReactionCommon.ts')
     : path.join(
         __dirname,
         'fixtures/host-worklets/useAnimatedReactionCommon-4.7.1.ts.txt',
@@ -65,14 +65,12 @@ function layoutWithHost(nativeStandalone = false, envName = 'production') {
       makeMutable: value => ({ value, get: () => value }),
       useAnimatedReaction: (prepare, reaction) => {
         reactions.push([prepare, reaction]);
-        if (nativeStandalone) host.useAnimatedReaction(prepare, reaction);
-        else
-          host.useAnimatedReactionBase(
-            prepare,
-            reaction,
-            undefined,
-            prepare.__closure ?? [],
-          );
+        host.useAnimatedReactionBase(
+          prepare,
+          reaction,
+          undefined,
+          prepare.__closure ?? [],
+        );
       },
     },
     '../constants': {
@@ -116,16 +114,17 @@ test('production Gorhom worklets can be consumed by the host Reanimated 4.7 nati
   }
 });
 
-test('standalone debug build keeps the pinned native Worklets object ABI', () => {
+test('standalone debug build works with the updated native Worklets array ABI', () => {
   const old = process.env.APP_EXPOSES_OPTIONS;
   delete process.env.APP_EXPOSES_OPTIONS;
   try {
-    const { reactions } = layoutWithHost(true);
+    const { reactions } = layoutWithHost(true, 'development');
     expect(reactions).toHaveLength(2);
     for (const pair of reactions)
       for (const callback of pair) {
         expect(callback.__closure).toBeDefined();
-        expect(Array.isArray(callback.__closure)).toBe(false);
+        expect(Array.isArray(callback.__closure)).toBe(true);
+        expect(callback.__pluginVersion).toBe('0.13.1');
       }
     expect(reactions[0][0]()).toBe(-999);
   } finally {

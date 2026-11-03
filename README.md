@@ -5,13 +5,13 @@ A React Native HTYF migration of Legado. Feature and visual parity acceptance is
 
 ## 预览、分享与使用 / Preview, Share and Use
 
-**当前调试 / Current preview:** 使用独立的“Legado HTYF 调试”iPhone 17 Pro 模拟器（iOS 26.5）。本轮只调试 iOS。
-Use the dedicated “Legado HTYF 调试” iPhone 17 Pro Simulator (iOS 26.5). This iteration targets iOS only.
+**当前调试 / Current preview:** 使用独立的“Legado HTYF 调试”iPhone 17 Pro 模拟器（iOS 26.5）。模板依赖已更新，独立 App 需要重新编译；本轮设备验收尚未完成。
+Use the dedicated “Legado HTYF 调试” iPhone 17 Pro Simulator (iOS 26.5). Template dependencies have been updated. The standalone app requires a native rebuild; device acceptance for this update remains pending.
 
-**[配置分享入口 / Configured share entry](https://mp.dagouzhi.com/share?data=%7B%22type%22%3A%22app%22%2C%22entry%22%3A%22.%2Fsrc%2Findex.tsx%22%2C%22version%22%3A%220.0.58%22%2C%22name%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22appid%22%3A%22plugin_legado%22%2C%22rotate%22%3A%22auto%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fdist.dgz%22%2C%22projectname%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22engines%22%3A%222.0.0%22%7D)**：该链接使用当前本地 `plugin_legado` / `0.0.58` 配置。本轮代码尚未部署，不能用它验证新增功能；App 扫码添加尚待验收。
-This link uses the current local `plugin_legado` / `0.0.58` configuration. The current changes have not been deployed; App scan/add acceptance remains pending.
-远程配置/包地址本次返回 HTTP 200/200，配置版本为 0.0.49；不能作为本轮本地 0.0.58 包的验收证据。
-The configured remote config/package URLs returned HTTP 200/200; the config version is 0.0.49. This does not verify the local 0.0.58 archive.
+**[配置分享入口 / Configured share entry](https://mp.dagouzhi.com/share?data=%7B%22type%22%3A%22app%22%2C%22entry%22%3A%22.%2Fsrc%2Findex.tsx%22%2C%22version%22%3A%220.0.65%22%2C%22name%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22appid%22%3A%22plugin_legado%22%2C%22rotate%22%3A%22auto%22%2C%22appUrlConfig%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fapp.json%22%2C%22zipUrl%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fhtyf-mp-community%2Fdemo%2Fmain%2Fv2%2Fplugin_legado%2Flatest%2Fdist.dgz%22%2C%22projectname%22%3A%22%E9%98%85%E8%AF%BB%22%2C%22engines%22%3A%222.0.0%22%7D)**：该链接使用当前本地 `plugin_legado` / `0.0.65` 配置。本轮代码尚未部署，不能用它验证新增功能；App 扫码添加尚待验收。
+This link uses the current local `plugin_legado` / `0.0.65` configuration. The current changes have not been deployed; App scan/add acceptance remains pending.
+本次读取的远程配置版本为 0.0.64；不能作为本轮本地 0.0.65 包的验收证据。
+The remote configuration currently reports version 0.0.64. This does not verify the local 0.0.65 archive.
 
 ![Legado HTYF 分享二维码 / Share QR code](docs/assets/htyf-share-qr.png)
 
@@ -24,12 +24,17 @@ The configured remote config/package URLs returned HTTP 200/200; the config vers
 4. 将分享链接或二维码图片发给其他用户，即可按相同步骤添加。
    Share the link or QR image with another user to follow the same process.
 
-在线使用前，必须先将当前构建的 `dist/app.json` 和 `dist/dist.dgz` 分别上传到配置地址和包地址。本地包已在 iOS 模拟器的红糖云服调试宿主验证，远程入口尚未更新，物理手机仍需验收。打包或生成二维码不会自动上传。
-Before remote use, upload the current `dist/app.json` and `dist/dist.dgz` to the configured metadata/package URLs. The local package has been exercised in the HTYF debug host on an iOS simulator; the remote entry and physical-device acceptance remain pending. Packaging and QR generation do not upload files.
+在线使用前，必须先将当前构建的 `dist/app.json` 和 `dist/dist.dgz` 分别上传到配置地址和包地址。历史本地包已在 iOS 模拟器的红糖云服调试宿主验证；本次模板升级后的宿主及物理手机验收尚待完成，远程入口尚未更新。打包或生成二维码不会自动上传。
+Before remote use, upload the current `dist/app.json` and `dist/dist.dgz` to the configured metadata/package URLs. Earlier packages were exercised in the HTYF debug host on an iOS simulator. Host and physical-device acceptance for this template update remain pending, and the remote entry is not updated. Packaging and QR generation do not upload files.
 
 - 配置 / Metadata: [app.json](https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/app.json)
 - 资源包 / Package: [dist.dgz](https://raw.githubusercontent.com/htyf-mp-community/demo/main/v2/plugin_legado/latest/dist.dgz)
 - 重新生成分享二维码 / Regenerate share QR: `node scripts/share-qr.mjs`
+
+## 模板版本 / Template revision
+
+已同步官方 `htyf-cli` app 模板 `8c6fc84`：React Native 0.88.1、React 19.3.1、CLI 0.7.14，要求 Node.js ≥22.13.0。更新范围及验证结果见 [模板更新记录](docs/template-update.md)。
+Synchronized the official app template at `8c6fc84`: React Native 0.88.1, React 19.3.1 and CLI 0.7.14, requiring Node.js ≥22.13.0. See the [template update record](docs/template-update.md) for scope and validation.
 
 ## 独立 iOS 调试 / Dedicated iOS Simulator
 

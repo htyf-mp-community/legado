@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Keyboard, Pressable, StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native';
 import type { Book, LocalChapter } from '../types';
 import { PageHeader } from '../components/PageHeader';
 import { InTreeSheet } from '../components/InTreeSheet';
@@ -26,7 +26,7 @@ export function ContentSearch({ book, initialSession, back, select }: {
   const [lastQuery, setLastQuery] = useState(initialSession?.query ?? ''), [lastRegex, setLastRegex] = useState(initialSession?.regex ?? false);
   const [error, setError] = useState('');
   const controller = useRef<AbortController | undefined>(undefined);
-  const input = useRef<InstanceType<typeof TextInput>>(null), list = useRef<FlatList<ContentMatch>>(null);
+  const input = useRef<TextInputInstance>(null), list = useRef<FlatList<ContentMatch>>(null);
   useEffect(() => () => controller.current?.abort(), []);
   const stop = () => { controller.current?.abort(); setRunning(false); };
   const start = async () => {
@@ -63,7 +63,7 @@ export function ContentSearch({ book, initialSession, back, select }: {
     {running ? <ActivityIndicator color={colors.primary} style={s.progress} /> : null}
     <FlatList ref={list} data={results} keyExtractor={item => `${item.chapterId}:${item.ordinal}`}
       keyboardShouldPersistTaps="handled" contentContainerStyle={s.results}
-      ListEmptyComponent={submitted && !running ? <Text style={[s.empty, { color: colors.muted }]}>{error || t('contentSearchEmpty')}</Text> : null}
+      ListEmptyComponent={submitted && !running ? <Text style={[s.empty, { color: colors.muted }]}>{error || t('contentSearchEmpty')}</Text> : undefined}
       renderItem={({ item, index }) => {
         const parts = contentSearchSnippetParts(item);
         return <Pressable accessibilityRole="button" accessibilityLabel={`${item.chapterTitle}: ${item.excerpt}`}

@@ -1,5 +1,5 @@
 module.exports = function (api) {
-  // A remote runs on the host's Worklets 0.13 ABI; the standalone iOS binary stays on its pinned 0.11 ABI.
+  // Remote builds retain the verified host compiler; standalone builds use the template's matching 0.13 ABI.
   const remote = api.cache.using(() =>
     Boolean(process.env.APP_EXPOSES_OPTIONS),
   );
